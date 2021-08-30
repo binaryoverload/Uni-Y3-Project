@@ -38,6 +38,11 @@
         </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
+            <artifactId>ktor-auth-jwt</artifactId>
+            <version>${ktor_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
             <artifactId>ktor-server-sessions</artifactId>
             <version>${ktor_version}</version>
         </dependency>
@@ -67,9 +72,14 @@
             <version>${exposed_version}</version>
         </dependency>
         <dependency>
-        <groupId>org.jetbrains.exposed</groupId>
-        <artifactId>exposed-jdbc</artifactId>
-        <version>${exposed_version}</version>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-jdbc</artifactId>
+            <version>${exposed_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-java-time</artifactId>
+            <version>${exposed_version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -88,7 +98,7 @@
         </dependency>
         <dependency>
             <groupId>io.insert-koin</groupId>
-            <artifactId>koin-core</artifactId>
+            <artifactId>koin-core-jvm</artifactId>
             <version>${koin_version}</version>
         </dependency>
         <dependency>
