@@ -16,4 +16,5 @@ WORKDIR /app
 
 COPY --from=build /app/target/spm-backend-jar-with-dependencies.jar spm-backend.jar
 
+EXPOSE 8080
 CMD ["java", "-jar", "spm-backend.jar"]
