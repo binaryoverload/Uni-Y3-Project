@@ -3,7 +3,7 @@
     <Alert />
     <form @submit.prevent="submitLogin">
       <label for="username">Username:</label>
-      <input type="text" id="username" name="username" v-model="username" />
+      <input  type="text" id="username" name="username" v-model="username" />
 
       <br />
 
@@ -20,13 +20,8 @@
 
 <script>
 
-import Alert from './components/Alert.vue'
-
 export default {
   name: "App",
-  components: {
-    Alert
-  },
   data() {
     return {
       username: "",
@@ -44,7 +39,7 @@ export default {
   methods: {
     submitLogin() {
       const { username, password } = this
-      this.$store.dispatch('auth/login', { username, password })  
+      this.$store.dispatch('auth/login', { username, password })
     },
   },
 };

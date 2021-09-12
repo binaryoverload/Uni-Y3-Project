@@ -1,8 +1,10 @@
 export default {
     namespaced: true,
-    state: {
-        type: null,
-        message: null
+    state() {
+        return {
+            type: null,
+            message: null
+        }
     },
     mutations: {
         setAlert(state, alert) {

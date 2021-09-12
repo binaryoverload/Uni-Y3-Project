@@ -6,28 +6,30 @@ const Status = {
     LOGGED_IN: "logged_in"
 }
 
-export { Status }
+export {Status}
 
 export default {
     namespaced: true,
-    state: {
-        status: Status.LOGGED_OUT,
-        user: null
+    state() {
+        return {
+            status: Status.LOGGED_OUT,
+            user: null
+        }
     },
     actions: {
-        login({ commit }, { username, password }) {
-            commit('loginStarted', { username })
-            
-            UserController.login(username, password)
+        login({commit}, {username, password}) {
+            commit('loginStarted', {username})
+
+            UserController.login(this.$config.apiUrl, username, password)
                 .then(
                     user => {
                         commit("loginSuccess", user)
-                        commit("alert/clearAlert", null, { root: true })
+                        commit("alert/clearAlert", null, {root: true})
                     },
                     error => {
                         commit("logout")
                         console.log(error)
-                        commit("alert/setAlert", { message: error, type: "error" }, { root: true })
+                        commit("alert/setAlert", {message: error, type: "error"}, {root: true})
                     }
                 )
 
@@ -40,7 +42,7 @@ export default {
     mutations: {
         loginStarted(state, username) {
             state.status = Status.LOGGING_IN
-            state.user = { username }
+            state.user = {username}
         },
         loginSuccess(state, user) {
             state.status = Status.LOGGED_IN

@@ -1,7 +1,5 @@
-import config from "../../config"
-
-function login(username, password) {
-    return fetch(config.apiUrl + "/login", {
+function login(apiUrl, username, password) {
+    return fetch(apiUrl + "/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
