@@ -22,7 +22,9 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [
+    "~plugins/vue-tailwind"
+  ],
 
   publicRuntimeConfig: {
     apiUrl: process.env.API_URL || DEFAULT_API_URL
@@ -60,9 +62,9 @@ export default {
           property: false
         },
         endpoints: {
-          login: { url: '/auth/login', method: 'post' },
+          login: {url: '/auth/login', method: 'post'},
           logout: {},
-          user: { url: '/auth/user', method: 'get' }
+          user: {url: '/auth/user', method: 'get'}
         },
       }
     }
