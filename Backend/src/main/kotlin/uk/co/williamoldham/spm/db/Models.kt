@@ -12,7 +12,12 @@ import org.jetbrains.exposed.sql.`java-time`.datetime
 import java.time.LocalDateTime
 import java.util.UUID
 
-class User(val id: UUID, val username: String, val updatedAt: LocalDateTime) : Principal
+class User(
+    val id: UUID,
+    val username: String,
+    val updatedAt: LocalDateTime,
+    val changePasswordOnLogin: Boolean
+) : Principal
 
 object Users : Table() {
 
@@ -20,6 +25,7 @@ object Users : Table() {
     val username : Column<String> = varchar("username", 255).uniqueIndex()
     val password : Column<String>  = varchar("password", 255)
     val updatedAt : Column<LocalDateTime> = datetime("updated_at").clientDefault { LocalDateTime.now() }
+    val changePasswordOnLogin : Column<Boolean> = bool("change_password_on_login").default(true)
 
     override val primaryKey: PrimaryKey
         get() = PrimaryKey(id)
@@ -28,7 +34,8 @@ object Users : Table() {
         return User(
             row[id],
             row[username],
-            row[updatedAt]
+            row[updatedAt],
+            row[changePasswordOnLogin]
         )
     }
 
