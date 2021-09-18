@@ -111,11 +111,6 @@
             <version>${dotenv_version}</version>
         </dependency>
         <dependency>
-            <groupId>io.insert-koin</groupId>
-            <artifactId>koin-core-jvm</artifactId>
-            <version>${koin_version}</version>
-        </dependency>
-        <dependency>
             <groupId>at.favre.lib</groupId>
             <artifactId>bcrypt</artifactId>
             <version>${bcrypt_version}</version>
