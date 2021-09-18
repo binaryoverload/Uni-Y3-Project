@@ -38,7 +38,7 @@ fun databaseInitialise(config: Config) {
             it[password] = hashPassword(config.defaultAdminPassword, config)
         }.insertedCount
         if (insertedCount > 0) {
-            LoggerFactory.getLogger("Postgres").info("Created default user \"admin\" with password \"${genPassword}\"")
+            LoggerFactory.getLogger("Postgres").info("Created default user \"admin\" with password \"${config.defaultAdminPassword}\"")
         }
     }
 }

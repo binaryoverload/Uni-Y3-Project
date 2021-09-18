@@ -47,8 +47,6 @@ fun Application.configureSecurity() {
                 val username = jwtCredential["username"] ?: return@validate null
                 val updatedAt = LocalDateTime.ofEpochSecond((jwtCredential.getClaim("updated_at", Long::class) ?: return@validate null), 0, ZoneOffset.UTC)
 
-                println("$username $updatedAt")
-
                 val user = transaction {
                     Users.select { Users.username eq username }.first()
                 }

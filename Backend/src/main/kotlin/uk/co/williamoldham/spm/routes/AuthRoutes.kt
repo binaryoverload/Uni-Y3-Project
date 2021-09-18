@@ -4,6 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.application.call
+import io.ktor.auth.authenticate
 import io.ktor.auth.principal
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
@@ -54,13 +55,17 @@ fun Route.authRoutes() {
 
     }
 
-    get("/auth/user") {
-        val user = call.principal<User>()
-        if (user == null) {
-            call.respond(HttpStatusCode.NotFound)
-        } else {
-            call.respond(user)
+    authenticate {
+        get("/auth/user") {
+            val user = call.principal<User>()
+            if (user == null) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                call.respond(user)
+            }
         }
     }
+
+
 
 }

@@ -3,8 +3,6 @@ package uk.co.williamoldham.spm
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import org.koin.core.context.startKoin
-import org.koin.logger.slf4jLogger
 import uk.co.williamoldham.spm.db.databaseInitialise
 import uk.co.williamoldham.spm.db.setupPostgres
 import uk.co.williamoldham.spm.plugins.configureHTTP
@@ -33,7 +31,7 @@ val dotenv = dotenv {
 val config = createConfig()
 val database = setupPostgres(dotenv)
 
-fun createConfig() : Config {
+fun createConfig(): Config {
 
     val port: Int = dotenv.get("PORT")?.toIntOrNull() ?: 8080
     val host = dotenv.get("HOST") ?: "0.0.0.0"
@@ -61,14 +59,10 @@ fun main() {
 
     databaseInitialise(config)
 
-    startKoin {
-        slf4jLogger()
-    }
-
     embeddedServer(Netty, port = config.port, host = config.host) {
         configureHTTP()
-        configureRouting()
         configureSecurity()
+        configureRouting()
         configureMonitoring()
         configureSerialization()
     }.start(wait = true)
