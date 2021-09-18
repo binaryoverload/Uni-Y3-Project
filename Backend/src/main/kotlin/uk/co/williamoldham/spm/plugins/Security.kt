@@ -9,6 +9,7 @@ import io.ktor.util.*
 import io.ktor.sessions.*
 import io.ktor.application.*
 import io.ktor.auth.jwt.jwt
+import io.ktor.http.HttpStatusCode
 import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
@@ -21,10 +22,12 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatformTools
 import org.postgresql.gss.MakeGSS.authenticate
 import uk.co.williamoldham.spm.Config
+import uk.co.williamoldham.spm.db.User
 import uk.co.williamoldham.spm.db.Users
 import uk.co.williamoldham.spm.hashPassword
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -58,13 +61,15 @@ fun Application.configureSecurity(config: Config) {
             )
             validate { jwtCredential ->
                 val username = jwtCredential["username"] ?: return@validate null
-                val updatedAt = LocalDateTime.ofEpochSecond((jwtCredential["updated_at"] ?: return@validate null).toLong(), 0, ZoneOffset.UTC)
+                val updatedAt = LocalDateTime.ofEpochSecond((jwtCredential.getClaim("updated_at", Long::class) ?: return@validate null), 0, ZoneOffset.UTC)
+
+                println("$username $updatedAt")
 
                 val user = transaction {
                     Users.select { Users.username eq username }.first()
                 }
 
-                if (user[Users.updatedAt].isAfter(updatedAt)) {
+                if (user[Users.updatedAt].truncatedTo(ChronoUnit.SECONDS) > updatedAt.truncatedTo(ChronoUnit.SECONDS)) {
                     null
                 } else {
                     Users.toUser(user)
@@ -75,7 +80,7 @@ fun Application.configureSecurity(config: Config) {
 
     routing {
 
-        post("/login") {
+        post("/auth/login") {
             val logger = call.application.environment.log
 
             val jwtUser = call.receive<JwtUser>()
@@ -106,6 +111,17 @@ fun Application.configureSecurity(config: Config) {
             }
 
 
+        }
+
+        authenticate {
+            get("/auth/user") {
+                val user = call.principal<User>()
+                if (user == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(user)
+                }
+            }
         }
 
     }

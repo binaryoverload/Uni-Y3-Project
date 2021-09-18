@@ -34,7 +34,8 @@ fun setupPostgres(dotenv: Dotenv): Database {
 
 fun databaseInitialise(config: Config) {
     transaction {
-        val genPassword = randomString(16)
+//        val genPassword = randomString(16)
+        val genPassword = "admin"
         val insertedCount = Users.insertIgnore {
             it[username] = "admin"
             it[password] = hashPassword(genPassword, config)
