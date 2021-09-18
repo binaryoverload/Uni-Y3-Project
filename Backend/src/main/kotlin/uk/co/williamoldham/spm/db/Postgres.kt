@@ -7,11 +7,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import uk.co.williamoldham.spm.Config
 import uk.co.williamoldham.spm.hashPassword
-import uk.co.williamoldham.spm.randomString
 
 fun setupPostgres(dotenv: Dotenv): Database {
     require(dotenv.get("POSTGRES_JDBC_URL") != null) { "The env variable POSTGRES_JDBC_URL is required!" }
@@ -35,11 +33,9 @@ fun setupPostgres(dotenv: Dotenv): Database {
 
 fun databaseInitialise(config: Config) {
     transaction {
-//        val genPassword = randomString(16)
-        val genPassword = "admin"
         val insertedCount = Users.insertIgnore {
             it[username] = "admin"
-            it[password] = hashPassword(genPassword, config)
+            it[password] = hashPassword(config.defaultAdminPassword, config)
         }.insertedCount
         if (insertedCount > 0) {
             LoggerFactory.getLogger("Postgres").info("Created default user \"admin\" with password \"${genPassword}\"")

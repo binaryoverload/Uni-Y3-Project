@@ -4,7 +4,6 @@ import io.github.cdimascio.dotenv.dotenv
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
 import org.koin.logger.slf4jLogger
 import uk.co.williamoldham.spm.db.databaseInitialise
 import uk.co.williamoldham.spm.db.setupPostgres
@@ -14,7 +13,13 @@ import uk.co.williamoldham.spm.plugins.configureSecurity
 import uk.co.williamoldham.spm.plugins.configureSerialization
 import uk.co.williamoldham.spm.routes.configureRouting
 
-class Config(val host: String, val port: Int, val jwtConfig: JwtConfig, val bcryptConfig: BcryptConfig)
+class Config(
+    val host: String,
+    val port: Int,
+    val defaultAdminPassword: String,
+    val jwtConfig: JwtConfig,
+    val bcryptConfig: BcryptConfig
+)
 
 class JwtConfig(val secret: String, val validDuration: Long)
 
@@ -32,6 +37,7 @@ fun createConfig() : Config {
 
     val port: Int = dotenv.get("PORT")?.toIntOrNull() ?: 8080
     val host = dotenv.get("HOST") ?: "0.0.0.0"
+    val defaultAdminPassword = dotenv.get("DEFAULT_ADMIN_PASS") ?: "admin"
 
     require(dotenv.get("JWT_SECRET") != null) { "JWT_SECRET is required!" }
     require(dotenv.get("JWT_SECRET").length > 32) { "JWT_SECRET must be at least 32 character in length" }
@@ -39,6 +45,7 @@ fun createConfig() : Config {
     return Config(
         host,
         port,
+        defaultAdminPassword,
         JwtConfig(
             dotenv.get("JWT_SECRET"),
             (dotenv.get("JWT_VALID_DURATION")?.toULongOrNull() ?: 86400U).toLong()
@@ -58,7 +65,7 @@ fun main() {
         slf4jLogger()
     }
 
-    embeddedServer(Netty, port = config.port, host = "0.0.0.0") {
+    embeddedServer(Netty, port = config.port, host = config.host) {
         configureHTTP()
         configureRouting()
         configureSecurity()
