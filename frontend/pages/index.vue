@@ -12,8 +12,8 @@
 
       <input type="submit" value="Submit" />
 
-      <p>Status: {{ status }}</p>
-      <p>Token: {{ token }}</p>
+      <p>Logged in: {{ $auth.loggedIn }}</p>
+      <p>User: {{ $auth.user }}</p>
     </form>
   </div>
 </template>
@@ -28,18 +28,15 @@ export default {
       password: ""
     };
   },
-  computed: {
-    token() {
-      return this.$store.state.auth.user
-    },
-    status() {
-      return this.$store.state.auth.status
-    }
-  },
   methods: {
     submitLogin() {
-      const { username, password } = this
-      this.$store.dispatch('auth/login', { username, password })
+      const { username, password } = this;
+      this.$auth.loginWith('local', {
+          data: {
+              username,
+              password
+          }
+      })
     },
   },
 };
