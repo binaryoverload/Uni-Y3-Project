@@ -4,7 +4,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.*
 import io.ktor.features.*
 import io.ktor.application.*
-import io.ktor.gson.gson
 import io.ktor.jackson.jackson
 import io.ktor.response.*
 import io.ktor.request.*
