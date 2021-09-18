@@ -1,10 +1,10 @@
 package uk.co.williamoldham.spm.plugins
 
-import io.ktor.features.*
-import org.slf4j.event.*
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.request.*
+import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.features.CallLogging
+import io.ktor.request.path
+import org.slf4j.event.Level
 
 fun Application.configureMonitoring() {
     install(CallLogging) {

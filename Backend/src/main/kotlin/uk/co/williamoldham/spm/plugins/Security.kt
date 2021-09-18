@@ -1,39 +1,24 @@
 package uk.co.williamoldham.spm.plugins
 
-import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.plugins.UUIDSerializer
-import io.ktor.auth.*
-import io.ktor.util.*
-import io.ktor.sessions.*
-import io.ktor.application.*
+import io.ktor.application.Application
+import io.ktor.application.install
+import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.*
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
 import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.java.KoinJavaComponent.inject
-import org.koin.mp.KoinPlatformTools
-import org.postgresql.gss.MakeGSS.authenticate
-import uk.co.williamoldham.spm.Config
 import uk.co.williamoldham.spm.config
-import uk.co.williamoldham.spm.db.User
 import uk.co.williamoldham.spm.db.Users
 import uk.co.williamoldham.spm.hashPassword
-import uk.co.williamoldham.spm.routes.AuthenticationException
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
-import java.util.Date
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 @Serializable
 class JwtUser(val username: String, val password: String) {

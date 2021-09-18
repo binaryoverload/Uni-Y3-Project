@@ -1,13 +1,14 @@
 package uk.co.williamoldham.spm.plugins
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.ktor.serialization.*
-import io.ktor.features.*
-import io.ktor.application.*
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.ContentNegotiation
 import io.ktor.jackson.jackson
-import io.ktor.response.*
-import io.ktor.request.*
-import io.ktor.routing.*
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.routing
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
