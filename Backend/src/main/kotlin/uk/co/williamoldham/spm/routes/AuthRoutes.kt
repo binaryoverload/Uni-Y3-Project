@@ -87,22 +87,22 @@ fun Route.authRoutes() {
             throw BadRequestException("JWT: Token type is invalid")
         }
 
-        if (tokenType != TokenType.ACCESS) {
-            throw ForbiddenException("JWT: Token type is not access")
+        if (tokenType != TokenType.REFRESH) {
+            throw ForbiddenException("JWT: Token type is not refresh")
         }
 
         val user = transaction {
             Users.select { Users.username eq username }.first()
         }
 
-        if (user[Users.revocationUUID] == revocationUUID) {
+        if (user[Users.revocationUUID] != revocationUUID) {
             throw UnauthorisedException("JWT Revoked")
         } else {
-            call.respond(mapOf("refresh_token" to createJWT(
+            call.respond(mapOf("access_token" to createJWT(
                 user[Users.username],
                 user[Users.revocationUUID],
-                TokenType.REFRESH,
-                config.jwtConfig.refreshValidDuration
+                TokenType.ACCESS,
+                config.jwtConfig.accessValidDuration
             )))
         }
 

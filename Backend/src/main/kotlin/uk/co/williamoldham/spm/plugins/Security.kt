@@ -69,6 +69,6 @@ fun createJWT(username: String, revocationUUID: UUID, type: TokenType, validDura
         .withClaim("username", username)
         .withClaim("revocation_uuid", revocationUUID.toString())
         .withClaim("token_type", type.name)
-        .withExpiresAt(Date(System.currentTimeMillis() + validDuration))
+        .withExpiresAt(Date(System.currentTimeMillis() + (validDuration * 1000)))
         .sign(Algorithm.HMAC256(config.jwtConfig.secret))
 }

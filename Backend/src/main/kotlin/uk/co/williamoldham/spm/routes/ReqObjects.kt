@@ -1,11 +1,9 @@
 package uk.co.williamoldham.spm.routes
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 import uk.co.williamoldham.spm.config
 import uk.co.williamoldham.spm.hashPassword
 
-@Serializable
 class LoginUser(val username: String, val password: String) {
 
     val hashedPassword
@@ -13,11 +11,9 @@ class LoginUser(val username: String, val password: String) {
 
 }
 
-@Serializable
 class ChangePasswordReq(val oldPassword: String, val newPassword: String)
 
-@Serializable
 class RefreshTokenReq(
-    @SerialName("refresh_token")
+    @JsonProperty("refresh_token")
     val refreshToken: String
 )

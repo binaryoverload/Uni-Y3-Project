@@ -59,18 +59,18 @@ export default {
         token: {
           property: "access_token",
           global: true,
-          maxAge: 60 * 30 // 30 Seconds
+          maxAge: process.env.JWT_ACCESS_VALID_DURATION || (60 * 30) // 30 Minutes
         },
-        refresh: {
+        refreshToken: {
           property: "refresh_token",
           data: "refresh_token",
-          maxAge: 60 * 60 * 24 * 30, // 30 Days
-          tokenRequired: true
+          maxAge: process.env.JWT_REFRESH_VALID_DURATION || (60 * 60 * 24 * 30), // 30 Days
+          required: true
         },
         user: {
-          property: false
+          property: false,
+          autoFetch: true
         },
-        autoFetch: true,
         endpoints: {
           login: {url: '/auth/login', method: 'post'},
           refresh: {url: '/auth/refresh', method: 'post'},
