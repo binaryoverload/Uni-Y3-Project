@@ -18,14 +18,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Date
 
-@Serializable
-class JwtUser(val username: String, val password: String) {
-
-    val hashedPassword
-        get() = hashPassword(password, config)
-
-}
-
 fun Application.configureSecurity() {
 
     install(Authentication) {
