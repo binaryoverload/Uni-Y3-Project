@@ -21,6 +21,7 @@ fun Application.configureRouting() {
 
     routing {
         authRoutes()
+        userRoutes()
     }
 }
 
@@ -38,3 +39,5 @@ sealed class HTTPStatusException(val httpStatusCode: HttpStatusCode, override va
 class UnauthorisedException(message: String? = null) : HTTPStatusException(HttpStatusCode.Unauthorized, message)
 class ForbiddenException(message: String? = null) : HTTPStatusException(HttpStatusCode.Forbidden, message)
 class BadRequestException(message: String? = null) : HTTPStatusException(HttpStatusCode.BadRequest, message)
+class InternalServerException(message: String? = null) : HTTPStatusException(HttpStatusCode.InternalServerError, message)
+class NotFoundException(message: String? = null) : HTTPStatusException(HttpStatusCode.NotFound, message)

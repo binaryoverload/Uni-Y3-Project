@@ -12,6 +12,7 @@ class User(
     val id: UUID,
     val username: String,
     val updatedAt: LocalDateTime,
+    val revocationUUID: UUID,
     val changePasswordOnLogin: Boolean
 ) : Principal
 
@@ -20,6 +21,7 @@ object Users : Table() {
     val id : Column<UUID> = uuid("id").clientDefault { UUID.randomUUID() }
     val username : Column<String> = varchar("username", 255).uniqueIndex()
     val password : Column<String>  = varchar("password", 255)
+    val revocationUUID: Column<UUID> = uuid("revocation").clientDefault { UUID.randomUUID() }
     val updatedAt : Column<LocalDateTime> = datetime("updated_at").clientDefault { LocalDateTime.now() }
     val changePasswordOnLogin : Column<Boolean> = bool("change_password_on_login").default(true)
 
@@ -31,6 +33,7 @@ object Users : Table() {
             row[id],
             row[username],
             row[updatedAt],
+            row[revocationUUID],
             row[changePasswordOnLogin]
         )
     }

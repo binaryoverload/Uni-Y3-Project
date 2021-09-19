@@ -55,17 +55,35 @@ export default {
   auth: {
     strategies: {
       local: {
+        scheme: "refresh",
         token: {
+          property: "access_token",
           global: true,
+          maxAge: 60 * 30 // 30 Seconds
+        },
+        refresh: {
+          property: "refresh_token",
+          data: "refresh_token",
+          maxAge: 60 * 60 * 24 * 30, // 30 Days
+          tokenRequired: true
         },
         user: {
           property: false
         },
+        autoFetch: true,
         endpoints: {
           login: {url: '/auth/login', method: 'post'},
+          refresh: {url: '/auth/refresh', method: 'post'},
           logout: {},
-          user: {url: '/auth/user', method: 'get'}
+          user: {url: '/user', method: 'get'}
         },
+      }
+    },
+    cookie: {
+      prefix: 'auth.',
+      options: {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30
       }
     },
     resetOnError: true

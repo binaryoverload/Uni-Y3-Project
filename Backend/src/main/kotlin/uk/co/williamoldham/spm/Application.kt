@@ -19,7 +19,7 @@ class Config(
     val bcryptConfig: BcryptConfig
 )
 
-class JwtConfig(val secret: String, val validDuration: Long)
+class JwtConfig(val secret: String, val accessValidDuration: Long, val refreshValidDuration: Long)
 
 class BcryptConfig(val cost: Int)
 
@@ -46,7 +46,8 @@ fun createConfig(): Config {
         defaultAdminPassword,
         JwtConfig(
             dotenv.get("JWT_SECRET"),
-            (dotenv.get("JWT_VALID_DURATION")?.toULongOrNull() ?: 86400U).toLong()
+            (dotenv.get("JWT_ACCESS_VALID_DURATION")?.toULongOrNull() ?: (60UL * 30U)).toLong(),
+            (dotenv.get("JWT_REFRESH_VALID_DURATION")?.toULongOrNull() ?: (60UL * 60U * 24U * 30U)).toLong()
         ),
         BcryptConfig(
             dotenv.get("BCRYPT_COST")?.toIntOrNull() ?: 12

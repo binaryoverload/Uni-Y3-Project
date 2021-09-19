@@ -6,17 +6,16 @@ import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.jwt.jwt
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import uk.co.williamoldham.spm.config
 import uk.co.williamoldham.spm.db.Users
-import uk.co.williamoldham.spm.hashPassword
+import uk.co.williamoldham.spm.routes.BadRequestException
+import uk.co.williamoldham.spm.routes.ForbiddenException
 import uk.co.williamoldham.spm.routes.UnauthorisedException
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.lang.IllegalArgumentException
 import java.util.Date
+import java.util.UUID
 
 fun Application.configureSecurity() {
 
@@ -28,8 +27,21 @@ fun Application.configureSecurity() {
                     .build()
             )
             validate { jwtCredential ->
-                val username = jwtCredential["username"] ?: return@validate null
-                val updatedAt = LocalDateTime.ofEpochSecond((jwtCredential.getClaim("updated_at", Long::class) ?: return@validate null), 0, ZoneOffset.UTC)
+                val username = jwtCredential["username"] ?: throw BadRequestException("JWT: Username not present")
+                val revocationUUID = try {
+                    UUID.fromString(jwtCredential["revocation_uuid"] ?: throw  BadRequestException("JWT: Revocation UUID is not present"))
+                } catch (e: IllegalArgumentException) {
+                    throw BadRequestException("JWT: Revocation UUID not in correct format")
+                }
+                val tokenType = try {
+                    TokenType.valueOf(jwtCredential["token_type"] ?: throw BadRequestException("JWT: Token type not present"))
+                } catch (e: IllegalArgumentException) {
+                    throw BadRequestException("JWT: Token type is invalid")
+                }
+
+                if (tokenType != TokenType.ACCESS) {
+                    throw ForbiddenException("JWT: Token type is not access")
+                }
 
                 val user = transaction {
                     Users.select { Users.username eq username }.first()
@@ -37,8 +49,8 @@ fun Application.configureSecurity() {
 
                 // Check that the user in the table has not been updated after the JWT was issued.
                 // If it has, reject the request and force the user to re-login
-                if (Duration.between(user[Users.updatedAt], updatedAt).toSeconds() >= 1) {
-                    throw UnauthorisedException("JWT Expired")
+                if (user[Users.revocationUUID] != revocationUUID) {
+                    throw UnauthorisedException("JWT Revoked")
                 } else {
                     Users.toUser(user)
                 }
@@ -47,10 +59,16 @@ fun Application.configureSecurity() {
     }
 }
 
-fun createJWT(username: String, updatedAt: Long) : String {
+enum class TokenType {
+    ACCESS,
+    REFRESH
+}
+
+fun createJWT(username: String, revocationUUID: UUID, type: TokenType, validDuration: Long) : String {
     return JWT.create()
         .withClaim("username", username)
-        .withClaim("updated_at", updatedAt)
-        .withExpiresAt(Date(System.currentTimeMillis() + config.jwtConfig.validDuration))
+        .withClaim("revocation_uuid", revocationUUID.toString())
+        .withClaim("token_type", type.name)
+        .withExpiresAt(Date(System.currentTimeMillis() + validDuration))
         .sign(Algorithm.HMAC256(config.jwtConfig.secret))
 }
