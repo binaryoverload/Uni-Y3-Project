@@ -12,10 +12,12 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import uk.co.williamoldham.spm.config
 import uk.co.williamoldham.spm.db.User
 import uk.co.williamoldham.spm.db.Users
-import uk.co.williamoldham.spm.plugins.JwtUser
 import uk.co.williamoldham.spm.plugins.createJWT
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 fun Route.authRoutes() {
@@ -60,8 +62,43 @@ fun Route.authRoutes() {
                 call.respond(user)
             }
         }
-    }
 
+        post("/auth/user/password") {
+            val logger = call.application.environment.log
+            val reqData = call.receive<ChangePasswordReq>()
+            val user = call.principal<User>() ?: throw UnauthorisedException()
+
+            val dbUser = try {
+                transaction {
+                    Users.select { Users.id eq user.id }.first()
+                }
+            } catch (e: NoSuchElementException) {
+                throw UnauthorisedException();
+            }
+
+            if (reqData.oldPassword == reqData.newPassword) {
+                throw BadRequestException("New and old password cannot be the same!")
+            }
+
+            if (BCrypt.verifyer().verify(reqData.oldPassword.toByteArray(), dbUser[Users.password].toByteArray()).verified) {
+                val newPassHash = BCrypt.withDefaults().hashToString(config.bcryptConfig.cost, reqData.newPassword.toCharArray())
+
+                transaction {
+                    Users.update({ Users.id eq user.id }) {
+                        it[password] = newPassHash
+                        it[updatedAt] = LocalDateTime.now(ZoneOffset.UTC)
+                    }
+                }
+
+                call.respond(HttpStatusCode.OK)
+            } else {
+                logger.debug("Password Change Request: Password for user '${user.username}' failed to verify bcrypt")
+                throw UnauthorisedException()
+            }
+
+        }
+
+    }
 
 
 }
