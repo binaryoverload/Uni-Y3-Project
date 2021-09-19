@@ -14,11 +14,8 @@ fun Application.configureRouting() {
     install(Locations)
 
     install(StatusPages) {
-        exception<UnauthorisedException> { cause ->
-            responseToException(call, HttpStatusCode.Unauthorized, cause.message)
-        }
-        exception<ForbiddenException> { cause ->
-            responseToException(call, HttpStatusCode.Forbidden, cause.message)
+        exception<HTTPStatusException> { cause ->
+            respondToException(call, cause)
         }
     }
 
@@ -27,13 +24,17 @@ fun Application.configureRouting() {
     }
 }
 
-suspend fun responseToException(call: ApplicationCall, statusCode: HttpStatusCode, message: String?) {
+suspend fun respondToException(call: ApplicationCall, exception: HTTPStatusException) {
+    val message = exception.message
     if (message == null) {
-        call.respond(statusCode)
+        call.respond(exception.httpStatusCode)
     } else {
-        call.respond(statusCode, message)
+        call.respond(exception.httpStatusCode, message)
     }
 }
 
-class UnauthorisedException(override val message: String? = null) : RuntimeException()
-class ForbiddenException(override val message: String? = null) : RuntimeException()
+sealed class HTTPStatusException(val httpStatusCode: HttpStatusCode, override val message: String? = null) : RuntimeException()
+
+class UnauthorisedException(message: String? = null) : HTTPStatusException(HttpStatusCode.Unauthorized, message)
+class ForbiddenException(message: String? = null) : HTTPStatusException(HttpStatusCode.Forbidden, message)
+class BadRequestException(message: String? = null) : HTTPStatusException(HttpStatusCode.BadRequest, message)
