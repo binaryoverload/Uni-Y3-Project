@@ -67,7 +67,8 @@ export default {
           user: {url: '/auth/user', method: 'get'}
         },
       }
-    }
+    },
+    resetOnError: true
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
