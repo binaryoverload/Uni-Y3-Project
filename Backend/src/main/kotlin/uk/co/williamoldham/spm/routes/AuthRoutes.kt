@@ -1,8 +1,6 @@
 package uk.co.williamoldham.spm.routes
 
 import at.favre.lib.crypto.bcrypt.BCrypt
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.application.call
 import io.ktor.auth.authenticate
 import io.ktor.auth.principal
@@ -14,12 +12,11 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import uk.co.williamoldham.spm.config
 import uk.co.williamoldham.spm.db.User
 import uk.co.williamoldham.spm.db.Users
 import uk.co.williamoldham.spm.plugins.JwtUser
+import uk.co.williamoldham.spm.plugins.createJWT
 import java.time.ZoneOffset
-import java.util.Date
 
 fun Route.authRoutes() {
 
@@ -35,22 +32,21 @@ fun Route.authRoutes() {
 
         if (dbUser == null) {
             logger.debug("Login Request: Username '${jwtUser.username}' not found in DB")
-            throw AuthenticationException()
+            throw UnauthorisedException()
         }
 
         val result = BCrypt.verifyer().verify(jwtUser.password.toByteArray(), dbUser[Users.password].toByteArray())
 
         if (result.verified) {
-            val token = JWT.create()
-                .withClaim("username", dbUser[Users.username])
-                .withClaim("updated_at", dbUser[Users.updatedAt].toEpochSecond(ZoneOffset.UTC))
-                .withExpiresAt(Date(System.currentTimeMillis() + config.jwtConfig.validDuration))
-                .sign(Algorithm.HMAC256(config.jwtConfig.secret))
+            val token = createJWT(
+                dbUser[Users.username],
+                dbUser[Users.updatedAt].toEpochSecond(ZoneOffset.UTC)
+            )
 
             call.respond(hashMapOf("token" to token))
         } else {
             logger.debug("Login Request: Password for user '${jwtUser.username}' failed to verify bcrypt")
-            throw AuthenticationException()
+            throw UnauthorisedException()
         }
 
     }

@@ -1,6 +1,7 @@
 package uk.co.williamoldham.spm.routes
 
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.StatusPages
@@ -13,11 +14,11 @@ fun Application.configureRouting() {
     install(Locations)
 
     install(StatusPages) {
-        exception<AuthenticationException> {
-            call.respond(HttpStatusCode.Unauthorized)
+        exception<UnauthorisedException> { cause ->
+            responseToException(call, HttpStatusCode.Unauthorized, cause.message)
         }
-        exception<AuthorizationException> {
-            call.respond(HttpStatusCode.Forbidden)
+        exception<ForbiddenException> { cause ->
+            responseToException(call, HttpStatusCode.Forbidden, cause.message)
         }
     }
 
@@ -26,5 +27,13 @@ fun Application.configureRouting() {
     }
 }
 
-class AuthenticationException : RuntimeException()
-class AuthorizationException : RuntimeException()
+suspend fun responseToException(call: ApplicationCall, statusCode: HttpStatusCode, message: String?) {
+    if (message == null) {
+        call.respond(statusCode)
+    } else {
+        call.respond(statusCode, message)
+    }
+}
+
+class UnauthorisedException(override val message: String? = null) : RuntimeException()
+class ForbiddenException(override val message: String? = null) : RuntimeException()
