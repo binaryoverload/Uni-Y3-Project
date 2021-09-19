@@ -17,10 +17,6 @@ fun Application.configureHTTP() {
         gzip {
             priority = 1.0
         }
-        deflate {
-            priority = 10.0
-            minimumSize(1024) // condition
-        }
     }
     install(CORS) {
         method(HttpMethod.Put)
