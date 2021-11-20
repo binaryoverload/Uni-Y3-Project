@@ -1,6 +1,6 @@
 *.env
 .env
 env/
-/target
-.idea
+node_modules/
+.idea/
 *.iml

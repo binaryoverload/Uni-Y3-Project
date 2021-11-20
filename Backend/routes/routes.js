@@ -1,0 +1,5 @@
+module.exports = {
+    setupRoutes(app) {
+        
+    }
+}
