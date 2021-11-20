@@ -3,7 +3,9 @@ const config = require("./config")
 
 const { setupRoutes } = require("./routes/routes")
 
-const app = express()
+const app = express();
+
+app.use(express.json());
 
 setupRoutes(app)
 
