@@ -1,7 +1,7 @@
 const auth = require("./auth")
 
 module.exports = {
-    setupRoutes(app) {
+    setupRoutes (app) {
         app.use("/auth", auth)
     }
 }

@@ -1,4 +1,4 @@
-const {body} = require("express-validator")
+const { body } = require("express-validator")
 
 module.exports = {
     login: [
@@ -6,9 +6,7 @@ module.exports = {
         body("password", "The password is required").exists().isString().trim()
     ],
     refresh: [
-        body("username").exists().isLength({min: 1}),
-        body("revocation_uuid").exists().isUUID("4"),
-        body("token_type").equals("refresh")
+        body("refresh_token", "Refresh token as a JWT is required").exists().isJWT()
     ]
 }
 
