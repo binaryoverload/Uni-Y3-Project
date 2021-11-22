@@ -1,27 +1,24 @@
 const { Router } = require("express")
-const { validationResult } = require("express-validator")
 const jwt = require("jsonwebtoken")
 
 const { refresh: refreshValidator, login: loginValidator } = require("../validation/auth")
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../config")
+const { checkValidationErrors, respondFail, respondError } = require("../utils/http")
 
 const router = Router()
 
 router.post("/login", loginValidator, (req, res) => {
 
-    const errors = validationResult(req).array({ onlyFirstError: true })
-
-    if (errors.length > 0) {
-        // TODO: Return error
-    }
+    checkValidationErrors(req, res)
 
     const { username, password } = req.body
 
     // TODO: Check against db, check password hash not plaintext
     if (username !== "admin" && password !== "admin") {
-        // TODO: Return 401
+        respondFail(res, 401, { message: "Invalid username or password" })
+        return
     }
 
     const accessToken = signAccessJwt(username, "hi")
@@ -32,11 +29,7 @@ router.post("/login", loginValidator, (req, res) => {
 
 router.post("/refresh", refreshValidator, (req, res) => {
 
-    const errors = validationResult(req).array({ onlyFirstError: true })
-
-    if (errors.length > 0) {
-        // TODO: Return error
-    }
+    checkValidationErrors(req, res)
 
     const { refresh_token: refreshToken } = req.body
 
@@ -44,11 +37,15 @@ router.post("/refresh", refreshValidator, (req, res) => {
     try {
         decoded = jwt.verify(refreshToken, config.jwt.secret)
     } catch (e) {
-        // TODO: Throw error
+        respondFail(res, 401, {
+            "message": `JWT: ${e.message}`
+        })
+        return
     }
 
     if (decoded?.token_type !== "refresh") {
-        // TODO: Throw error
+        respondFail(res, 401, { token_type: `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'` })
+        return
     }
 
     // TODO: Get user from DB

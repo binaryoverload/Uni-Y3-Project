@@ -1,16 +1,17 @@
 const validator = require("validator")
 const jwt = require("jsonwebtoken")
 const config = require("../config")
+const { respondFail } = require("../utils/http")
 
 const validateJwt = (req, res, next) => {
     if (!req.headers.authorization) {
-        // TODO: Return 401
+        respondFail(res, 401, { message: "Missing authorization header" })
     }
 
     const authHeader = req.headers.authorization
 
     if (!authHeader.startsWith("Bearer ") || validator.isJwt(authHeader.split(" ")[1])) {
-        // TODO: Return 400
+        respondFail(res, 401, { message: "Authorization header malformed" })
     }
 
     const accessToken = authHeader.split(" ")[1]
@@ -19,11 +20,14 @@ const validateJwt = (req, res, next) => {
     try {
         decoded = jwt.verify(accessToken, config.jwt.secret)
     } catch (e) {
-        // TODO: Return 401
+        respondFail(res, 401, {
+            "message": `JWT: ${e.message}`
+        })
     }
 
     if (decoded?.token_type !== "access") {
-        // TODO: Return 401
+        respondFail(res, 401, { token_type: `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'` })
+        return
     }
 
     const { username, revocation_uuid: revocationUUID } = decoded
@@ -32,7 +36,7 @@ const validateJwt = (req, res, next) => {
     const user = { username }
 
     if (!user) {
-        // TODO: Return 401
+        respondFail(res, 401, { message: "User not found" })
     }
 
     req.user = user
