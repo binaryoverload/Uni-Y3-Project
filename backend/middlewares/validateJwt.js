@@ -6,15 +6,17 @@ const { respondFail, respondToJwtError } = require("../utils/http")
 const validateJwt = (req, res, next) => {
     if (!req.headers.authorization) {
         respondFail(res, 401, { message: "Missing authorization header" })
+        return
     }
 
     const authHeader = req.headers.authorization
 
-    if (!authHeader.startsWith("Bearer ") || validator.isJwt(authHeader.split(" ")[1])) {
-        respondFail(res, 401, { message: "Authorization header malformed" })
-    }
-
     const accessToken = authHeader.split(" ")[1]
+
+    if (!(authHeader.startsWith("Bearer ") && validator.isJWT(accessToken))) {
+        respondFail(res, 401, { message: "Authorization header malformed" })
+        return
+    }
 
     let decoded = undefined
     try {
@@ -36,6 +38,7 @@ const validateJwt = (req, res, next) => {
 
     if (!user) {
         respondFail(res, 401, { message: "User not found" })
+        return
     }
 
     req.user = user
