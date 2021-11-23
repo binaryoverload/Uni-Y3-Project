@@ -1,10 +1,11 @@
 const dotenv = require("dotenv")
+const validator = require("validator")
 const { merge } = require("lodash")
 
 // Loads .env file into process.env
 dotenv.config()
 
-const requiredEnv = ["JWT_SECRET"]
+const requiredEnv = ["JWT_SECRET", "POSTGRES_HOST", "POSTGRES_PASSWORD"]
 
 const missingEnv = requiredEnv.filter(env => typeof process.env[env] === "undefined")
 
@@ -22,6 +23,11 @@ const defaultConfig = {
     },
     bcrypt: {
         cost: 12
+    },
+    postgres: {
+        db: "postgres",
+        user: "postgres",
+        port: 5432
     }
 }
 
@@ -35,13 +41,31 @@ const envConfig = {
     },
     bcrypt: {
         cost: process.env.BCRYPT_COST
+    },
+    postgres: {
+        db: process.env.POSTGRES_DB,
+        user: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        host: process.env.POSTGRES_HOST,
+        port: process.env.POSTGRES_PORT
     }
 }
 
 const mergedConfig = merge(defaultConfig, envConfig)
 
-if (!(mergedConfig.jwt.secret && mergedConfig.jwt.secret.length >= 32)) {
-    console.error("JWT Secret must be at least 32 characters long!")
+if (!validator.isLength(mergedConfig.jwt.secret, { min: 32, max: 64 })) {
+    console.error("JWT Secret must be between 32 and 64 characters long!")
+    process.exit(1)
+}
+
+if (!validator.isPort(mergedConfig.postgres.port)) {
+    console.error("Postgres port must be a valid TCP/IP port!")
+    process.exit(1)
+}
+
+const host = mergedConfig.postgres.host
+if (!validator.isFQDN(host, { require_tld: false }) || !validator.isIP(host)) {
+    console.error("Postgres host must be a valid hostname or IP!")
     process.exit(1)
 }
 
