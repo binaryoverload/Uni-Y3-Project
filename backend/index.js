@@ -10,14 +10,14 @@ const app = express()
 app.use(express.json())
 app.use(morgan("dev"))
 
+setupRoutes(app)
+
 app.use((err, req, res, next) => {
 
     console.error(`Error 500: ${err.message}`)
     respondError(res, err.message, { stack: err.stack })
 
 });
-
-setupRoutes(app)
 
 app.get("/", (req, res) => res.send("Hello world"))
 
