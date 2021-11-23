@@ -14,6 +14,7 @@ if (missingEnv.length > 0) {
 }
 
 const defaultConfig = {
+    environment: "production",
     port: 8080,
     jwt: {
         accessValidDuration: "30m",
@@ -25,6 +26,7 @@ const defaultConfig = {
 }
 
 const envConfig = {
+    environment: process.env.NODE_ENV,
     port: process.env.PORT,
     jwt: {
         secret: process.env.JWT_SECRET,

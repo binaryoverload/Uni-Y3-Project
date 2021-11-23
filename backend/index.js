@@ -18,4 +18,4 @@ app.use(internalError);
 
 app.get("/", (req, res) => res.send("Hello world"))
 
-app.listen(config.port, () => console.log(`Server running on http://localhost:${config.port}/`))
+app.listen(config.port, () => console.log(`Server running on http://localhost:${config.port}/ in ${config.environment} mode`))
