@@ -4,6 +4,7 @@ const morgan = require("morgan")
 
 const { respondError } = require("./utils/http")
 const { setupRoutes } = require("./routes/routes")
+const { internalError, notFound } = require("./middlewares/errors")
 
 const app = express()
 
@@ -12,12 +13,8 @@ app.use(morgan("dev"))
 
 setupRoutes(app)
 
-app.use((err, req, res, next) => {
-
-    console.error(`Error 500: ${err.message}`)
-    respondError(res, err.message, { stack: err.stack })
-
-});
+app.use(notFound)
+app.use(internalError);
 
 app.get("/", (req, res) => res.send("Hello world"))
 
