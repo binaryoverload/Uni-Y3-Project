@@ -5,7 +5,7 @@ const { refresh: refreshValidator, login: loginValidator } = require("../validat
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../config")
-const { checkValidationErrors, respondFail, respondError } = require("../utils/http")
+const { checkValidationErrors, respondFail, respondError, respondToJwtError } = require("../utils/http")
 
 const router = Router()
 
@@ -41,9 +41,7 @@ router.post("/refresh", refreshValidator, (req, res) => {
     try {
         decoded = jwt.verify(refreshToken, config.jwt.secret)
     } catch (e) {
-        respondFail(res, 401, {
-            "message": `JWT: ${e.message}`
-        })
+        respondToJwtError(res, e)
         return
     }
 

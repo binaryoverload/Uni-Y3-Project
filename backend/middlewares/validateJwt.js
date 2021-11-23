@@ -1,7 +1,7 @@
 const validator = require("validator")
 const jwt = require("jsonwebtoken")
 const config = require("../config")
-const { respondFail } = require("../utils/http")
+const { respondFail, respondToJwtError } = require("../utils/http")
 
 const validateJwt = (req, res, next) => {
     if (!req.headers.authorization) {
@@ -20,9 +20,8 @@ const validateJwt = (req, res, next) => {
     try {
         decoded = jwt.verify(accessToken, config.jwt.secret)
     } catch (e) {
-        respondFail(res, 401, {
-            "message": `JWT: ${e.message}`
-        })
+        respondToJwtError(res, e)
+        return
     }
 
     if (decoded?.token_type !== "access") {

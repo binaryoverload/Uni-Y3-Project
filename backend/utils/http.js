@@ -38,7 +38,7 @@ const validationErrorsToJsend = (errors) => {
 }
 
 const checkValidationErrors = (req, res) => {
-    const errors = validationResult(req).array({ onlyFirstError: true });
+    const errors = validationResult(req).array({ onlyFirstError: true })
 
     if (errors.length === 0) {
         return true // Passed validation
@@ -46,8 +46,21 @@ const checkValidationErrors = (req, res) => {
 
     const dataErrors = validationErrorsToJsend(errors)
 
-    respondFail(res, 400, dataErrors)
+    respondFail(res, 400, { code: "validation", ...dataErrors })
     return false // Failed validation
 }
 
-module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors }
+const respondToJwtError = (res, err) => {
+
+    let code = "jwt_general"
+    if (err.constructor.name === "TokenExpiredError") {
+        code = "jwt_expired"
+    }
+
+    respondFail(res, 401, {
+        code,
+        "message": `JWT: ${err.message}`
+    })
+}
+
+module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, respondToJwtError }
