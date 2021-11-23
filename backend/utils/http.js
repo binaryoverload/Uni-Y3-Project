@@ -20,6 +20,7 @@ const respondFail = (res, status, data) => {
 
 const respondError = (res, message, data) => {
     res.status(500).send({
+        status: "error",
         message,
         data
     })
