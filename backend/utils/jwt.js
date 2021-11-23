@@ -7,7 +7,7 @@ const signAccessJwt = (username, revocationUUID) => {
 }
 
 const signRefreshJwt = (username, revocationUUID) => {
-    return signJwt({ username, revocation_uuid: revocationUUID, token_type: "refresh" }, config.jwt.accessValidDuration)
+    return signJwt({ username, revocation_uuid: revocationUUID, token_type: "refresh" }, config.jwt.refreshValidDuration)
 }
 
 const signJwt = (payload, validDuration) => {
@@ -16,5 +16,7 @@ const signJwt = (payload, validDuration) => {
         expiresIn: validDuration
     })
 }
+
+
 
 module.exports = { signAccessJwt, signRefreshJwt }
