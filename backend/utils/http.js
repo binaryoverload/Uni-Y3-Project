@@ -40,12 +40,13 @@ const checkValidationErrors = (req, res) => {
     const errors = validationResult(req).array({ onlyFirstError: true });
 
     if (errors.length === 0) {
-        return
+        return true
     }
 
     const dataErrors = validationErrorsToJsend(errors)
 
     respondFail(res, 400, dataErrors)
+    return false
 }
 
 module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors }

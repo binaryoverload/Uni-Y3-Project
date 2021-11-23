@@ -11,12 +11,14 @@ const router = Router()
 
 router.post("/login", loginValidator, (req, res) => {
 
-    checkValidationErrors(req, res)
+    if (!checkValidationErrors(req, res)) {
+        return
+    }
 
     const { username, password } = req.body
 
     // TODO: Check against db, check password hash not plaintext
-    if (username !== "admin" && password !== "admin") {
+    if (username !== "admin" || password !== "admin") {
         respondFail(res, 401, { message: "Invalid username or password" })
         return
     }
@@ -29,7 +31,9 @@ router.post("/login", loginValidator, (req, res) => {
 
 router.post("/refresh", refreshValidator, (req, res) => {
 
-    checkValidationErrors(req, res)
+    if (!checkValidationErrors(req, res)) {
+        return
+    }
 
     const { refresh_token: refreshToken } = req.body
 
