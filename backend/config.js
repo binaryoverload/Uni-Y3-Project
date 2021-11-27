@@ -58,13 +58,13 @@ if (!validator.isLength(mergedConfig.jwt.secret, { min: 32, max: 64 })) {
     process.exit(1)
 }
 
-if (!validator.isPort(mergedConfig.postgres.port)) {
+if (!validator.isPort(String(mergedConfig.postgres.port))) {
     console.error("Postgres port must be a valid TCP/IP port!")
     process.exit(1)
 }
 
 const host = mergedConfig.postgres.host
-if (!validator.isFQDN(host, { require_tld: false }) || !validator.isIP(host)) {
+if (!(validator.isFQDN(host, { require_tld: false }) || validator.isIP(host))) {
     console.error("Postgres host must be a valid hostname or IP!")
     process.exit(1)
 }
