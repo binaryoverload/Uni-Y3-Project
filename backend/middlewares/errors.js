@@ -1,5 +1,6 @@
 const { respondFail, respondError } = require("../utils/http")
 const config = require("../config")
+const logger = require("../logger")
 
 const notFound = (req, res, next) => {
     return respondFail(res, 404, { message: "Not found!" })
@@ -10,7 +11,7 @@ const internalError = (err, req, res, next) => {
         delete err.stack
     }
 
-    console.error(`Error 500: ${err.message}`)
+    logger.error(`Error 500: ${err.message}`)
     respondError(res, err.message, { ...err })
 }
 

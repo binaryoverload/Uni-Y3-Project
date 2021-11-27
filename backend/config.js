@@ -1,6 +1,7 @@
 const dotenv = require("dotenv")
 const validator = require("validator")
 const { merge } = require("lodash")
+const tripleBeam = require("triple-beam")
 
 // Loads .env file into process.env
 dotenv.config()
@@ -21,6 +22,7 @@ const defaultConfig = {
         accessValidDuration: "30m",
         refreshValidDuration: "30d"
     },
+    loggingLevel: "info",
     bcrypt: {
         cost: 12
     },
@@ -32,13 +34,14 @@ const defaultConfig = {
 }
 
 const envConfig = {
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV.toLowerCase(),
     port: process.env.PORT,
     jwt: {
         secret: process.env.JWT_SECRET,
         accessValidDuration: process.env.JWT_ACCESS_VALID_DURATION,
         refreshValidDuration: process.env.JWT_REFRESH_VALID_DURATION
     },
+    loggingLevel: process.env.LOGGING_LEVEL?.toLowerCase(),
     bcrypt: {
         cost: process.env.BCRYPT_COST
     },
@@ -67,6 +70,11 @@ const host = mergedConfig.postgres.host
 if (!(validator.isFQDN(host, { require_tld: false }) || validator.isIP(host))) {
     console.error("Postgres host must be a valid hostname or IP!")
     process.exit(1)
+}
+
+if (Object.keys(tripleBeam.configs.npm.levels).indexOf(mergedConfig.loggingLevel) === -1) {
+    console.warn("Logging level is not valid! Using INFO")
+    mergedConfig.loggingLevel = "info"
 }
 
 module.exports = mergedConfig
