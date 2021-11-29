@@ -14,7 +14,7 @@ Columns:
 - first_name - `varchar(50)`
 - last_name - `varchar(50)`
 
-## Computer
+## Client
 
 This is an entry for a "client" device enrolled onto the system.
 
@@ -41,6 +41,8 @@ Columns:
 - expires_at - `timestamp`
 - usage_limit - `integer`
 - usage_current - `integer`
+
+
 
 
 ## Audit Log
