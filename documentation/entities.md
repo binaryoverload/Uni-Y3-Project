@@ -30,6 +30,17 @@ Columns:
 - key - `varchar(50)` - PK
 - value - `text`
 
+## Joining Keys
+
+Storage for all keys that can be used to join a client to the system. Different keys can be used to join a client to different "tags". Time limited / limited to number of uses. 8 random bytes digested as hex as the token (Use [randomBytes](https://nodejs.org/api/crypto.html#cryptorandombytessize-callback))
+
+Columns:
+- id - `serial` - PK
+- token - `varchar(16)`
+- created_at - `timestamp`
+- expires_at - `timestamp`
+- usage_limit - `integer`
+- usage_current - `integer`
 
 
 ## Audit Log
