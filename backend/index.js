@@ -1,8 +1,8 @@
 const express = require("express")
-const morgan = require("morgan")
+const cors = require("cors")
 
 const config = require("./config")
-const logger = require("./logger")
+const { logger, expressLogger } = require("./logger")
 
 const { respondError } = require("./utils/http")
 const { setupRoutes } = require("./routes/routes")
@@ -10,8 +10,11 @@ const { internalError, notFound } = require("./middlewares/errors")
 
 const app = express()
 
+app.use(expressLogger)
+
+app.use(cors())
+
 app.use(express.json())
-app.use(morgan("dev"))
 
 setupRoutes(app)
 
