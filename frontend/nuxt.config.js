@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = "http://localhost:8081"
+const DEFAULT_API_URL = "http://localhost:8080"
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
