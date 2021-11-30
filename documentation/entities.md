@@ -18,6 +18,8 @@ Columns:
 
 This is an entry for a "client" device enrolled onto the system.
 
+Containing some sort of public/private key relationship with the client?
+
 Columns:
 - id - `serial` - PK
 
@@ -41,7 +43,6 @@ Columns:
 - expires_at - `timestamp`
 - usage_limit - `integer`
 - usage_current - `integer`
-
 
 
 
