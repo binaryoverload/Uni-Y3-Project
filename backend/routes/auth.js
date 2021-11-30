@@ -9,11 +9,7 @@ const { checkValidationErrors, respondFail, respondError, respondToJwtError } = 
 
 const router = Router()
 
-router.post("/login", loginValidator, (req, res) => {
-
-    if (!checkValidationErrors(req, res)) {
-        return
-    }
+router.post("/login", checkValidationErrors(loginValidator), (req, res) => {
 
     const { username, password } = req.body
 
@@ -29,11 +25,7 @@ router.post("/login", loginValidator, (req, res) => {
     res.send({ access_token: accessToken, refresh_token: refreshToken })
 })
 
-router.post("/refresh", refreshValidator, (req, res) => {
-
-    if (!checkValidationErrors(req, res)) {
-        return
-    }
+router.post("/refresh", checkValidationErrors(refreshValidator), (req, res) => {
 
     const { refresh_token: refreshToken } = req.body
 

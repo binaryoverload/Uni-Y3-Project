@@ -37,17 +37,24 @@ const validationErrorsToJsend = (errors) => {
     return finalObject
 }
 
-const checkValidationErrors = (req, res) => {
-    const errors = validationResult(req).array({ onlyFirstError: true })
+const checkValidationErrors = (validator) => {
+    const validationCheck = (req, res, next) => {
+        const errors = validationResult(req).array({ onlyFirstError: true })
 
-    if (errors.length === 0) {
-        return true // Passed validation
+        if (errors.length === 0) {
+            next()
+            return
+        }
+
+        const dataErrors = validationErrorsToJsend(errors)
+
+        respondFail(res, 400, { code: "validation", ...dataErrors })
     }
 
-    const dataErrors = validationErrorsToJsend(errors)
-
-    respondFail(res, 400, { code: "validation", ...dataErrors })
-    return false // Failed validation
+    return [
+        ...validator,
+        validationCheck
+    ]
 }
 
 const respondToJwtError = (res, err) => {
