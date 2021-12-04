@@ -3,6 +3,8 @@ const validator = require("validator")
 const { merge } = require("lodash")
 const tripleBeam = require("triple-beam")
 
+const exitCodes = require("./exitCodes")
+
 // Loads .env file into process.env
 dotenv.config()
 
@@ -12,7 +14,7 @@ const missingEnv = requiredEnv.filter(env => typeof process.env[env] === "undefi
 
 if (missingEnv.length > 0) {
     console.error(`Missing environment variables: ${missingEnv.map(s => `"${s}"`).join(", ")}`)
-    process.exit(1)
+    process.exit(exitCodes.configMissingEnv)
 }
 
 const defaultConfig = {
@@ -58,18 +60,18 @@ const mergedConfig = merge(defaultConfig, envConfig)
 
 if (!validator.isLength(mergedConfig.jwt.secret, { min: 32, max: 64 })) {
     console.error("JWT Secret must be between 32 and 64 characters long!")
-    process.exit(1)
+    process.exit(exitCodes.configInvalidJwtSecret)
 }
 
 if (!validator.isPort(String(mergedConfig.postgres.port))) {
     console.error("Postgres port must be a valid TCP/IP port!")
-    process.exit(1)
+    process.exit(exitCodes.configInvalidPostgres)
 }
 
 const host = mergedConfig.postgres.host
 if (!(validator.isFQDN(host, { require_tld: false }) || validator.isIP(host))) {
     console.error("Postgres host must be a valid hostname or IP!")
-    process.exit(1)
+    process.exit(exitCodes.configInvalidPostgres)
 }
 
 if (Object.keys(tripleBeam.configs.npm.levels).indexOf(mergedConfig.loggingLevel) === -1) {

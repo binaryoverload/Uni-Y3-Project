@@ -1,6 +1,6 @@
 const validator = require("validator")
 const jwt = require("jsonwebtoken")
-const config = require("../config")
+const config = require("../utils/config")
 const { respondFail, respondToJwtError } = require("../utils/http")
 
 const validateJwt = (req, res, next) => {

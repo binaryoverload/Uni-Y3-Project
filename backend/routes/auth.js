@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 const { refresh: refreshValidator, login: loginValidator } = require("../validation/auth")
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
-const config = require("../config")
+const config = require("../utils/config")
 const { checkValidationErrors, respondFail, respondError, respondToJwtError } = require("../utils/http")
 
 const router = Router()

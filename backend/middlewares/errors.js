@@ -1,6 +1,6 @@
 const { respondFail, respondError } = require("../utils/http")
-const config = require("../config")
-const { logger } = require("../logger")
+const config = require("../utils/config")
+const { logger } = require("../utils/logger")
 
 const notFound = (req, res, next) => {
     return respondFail(res, 404, { message: "Not found!" })
