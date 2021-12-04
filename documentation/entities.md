@@ -10,9 +10,9 @@ Columns:
 - password - `varchar(255)`
 - updated_at - `timestamp`
 - security_stamp - `integer` - Incremented whenever JWT should be invalidated
-- checksum - `varchar(70) GENERATED ALWAYS AS sha256((password::text || security_stamp::text)::bytea) STORED` 
-- first_name - `varchar(50)`
-- last_name - `varchar(50)`
+- checksum - `varchar(70) GENERATED ALWAYS AS (sha256((password::text || security_stamp::text)::bytea)) STORED` 
+- first_name - `varchar(255)`
+- last_name - `varchar(255)`
 
 ## Client
 
@@ -32,7 +32,7 @@ Columns:
 - key - `varchar(50)` - PK
 - value - `text`
 
-## Joining Keys
+## Enrolment tokens
 
 Storage for all keys that can be used to join a client to the system. Different keys can be used to join a client to different "tags". Time limited / limited to number of uses. 8 random bytes digested as hex as the token (Use [randomBytes](https://nodejs.org/api/crypto.html#cryptorandombytessize-callback))
 
