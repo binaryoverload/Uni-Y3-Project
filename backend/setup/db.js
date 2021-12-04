@@ -12,12 +12,14 @@ const pool = new Pool({
     connectionString,
 })
 
+const logLabel = { label: "postgres" }
+
 pool.on("connect", client => {
-    logger.info(`Client connected to ${host}:${port}`, { label: "postgres" })
+    logger.info(`Client connected to ${host}:${port}`, logLabel)
 })
 
 pool.on("error", (err, _) => {
-    logger.error(`Error in pool: ${err.message}`, { label: "postgres" })
+    logger.error(`Error in pool: ${err.message}`, logLabel)
 })
 
 async function queryPool(query, values) {
@@ -29,15 +31,15 @@ async function queryPool(query, values) {
 
         return result
     } catch (err) {
-        logger.error(`Error querying DB: ${err.message}`, { label: "postgres" })
+        logger.error(`Error querying DB: ${err.message}`, logLabel)
     }
 }
 
 function verifyConnection() {
     pool.query("SELECT 1")
-        .then(() => logger.info("Successfully verified connection", { label: "postgres" }))
+        .then(() => logger.info("Successfully verified connection", logLabel))
         .catch((err) => {
-            logger.error(`Error verifying connection: ${err.message}`, { label: "postgres" })
+            logger.error(`Error verifying connection: ${err.message}`, logLabel)
             process.exit(exitCodes.postgresError)
         })
 }
