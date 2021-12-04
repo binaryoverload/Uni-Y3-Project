@@ -27,12 +27,9 @@ const logger = createLogger({
 })
 
 const expressLogger = expressWinston.logger({
-    transports: [
-        new transports.Console()
-    ],
-    format: loggingFormat,
-    meta: false,
-    msg: "HTTP {{req.method}} (Status {{res.statusCode}}, {{res.responseTime}}ms) {{req.url}}",
+    winstonInstance: logger,
+    baseMeta: { label: "http" },
+    msg: "{{req.method}} (Status {{res.statusCode}}, {{res.responseTime}}ms) {{req.url}}",
     expressFormat: false,
     colorize: true
 })
