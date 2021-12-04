@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id serial,
+    id uuid default gen_random_uuid(),
     username varchar(50) not null,
     password varchar(255) not null,
     updated_at timestamp default timezone('UTC', now()),
@@ -20,7 +20,7 @@ CREATE TABLE system_properties (
 );
 
 CREATE TABLE enrolment_tokens (
-    id serial,
+    id uuid default gen_random_uuid(),
     token varchar(16) not null,
     created_at timestamp default timezone('UTC', now()),
     expires_at timestamp,

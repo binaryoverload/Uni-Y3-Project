@@ -5,7 +5,7 @@
 To make sure a user is logged out if security information changes, a checksum will be calculated from the password and security stamp.
 
 Columns:
-- id - `serial` - PK
+- id - `uuid` - PK
 - username - `varchar(50)`
 - password - `varchar(255)`
 - updated_at - `timestamp`
@@ -37,7 +37,7 @@ Columns:
 Storage for all keys that can be used to join a client to the system. Different keys can be used to join a client to different "tags". Time limited / limited to number of uses. 8 random bytes digested as hex as the token (Use [randomBytes](https://nodejs.org/api/crypto.html#cryptorandombytessize-callback))
 
 Columns:
-- id - `serial` - PK
+- id - `uuid` - PK
 - token - `varchar(16)`
 - created_at - `timestamp`
 - expires_at - `timestamp`
