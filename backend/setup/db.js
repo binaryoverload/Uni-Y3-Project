@@ -12,12 +12,17 @@ const connectionString = `postgresql://${user}:${password}@${host}:${port}/${db}
 
 const pool = new Pool({
     connectionString,
+    idleTimeoutMillis: 1000 * 60
 })
 
 const logLabel = { label: "postgres" }
 
 pool.on("connect", client => {
-    logger.info(`Client connected to ${host}:${port}`, logLabel)
+    logger.info(`Client ${pool.totalCount} connected to ${host}:${port} `, logLabel)
+})
+
+pool.on("remove", () => {
+    logger.debug(`Client removed from pool. Idle: ${pool.idleCount} Total: ${pool.totalCount}`)
 })
 
 pool.on("error", (err, _) => {
@@ -25,15 +30,14 @@ pool.on("error", (err, _) => {
 })
 
 async function queryPool(query, values) {
+    let client = null
     try {
-        const client = await pool.connect()
-        const result = await client.query(query, values)
-
-        client.release()
-
-        return result
+        client = await pool.connect()
+        return await client.query(query, values)
     } catch (err) {
         handlePostgresError(err)
+    } finally {
+        client?.release()
     }
 }
 
