@@ -4,10 +4,13 @@ const config = require("../utils/config")
 const { checkValidationErrors, respondFail, respondSuccess } = require("../utils/http")
 const { createUser } = require("../models/user")
 const { DuplicateEntityError } = require("../utils/exceptions")
+const { userPost } = require("../validation/user")
+const { validateJwt } = require("../middlewares/validateJwt")
 
 const router = Router()
 
-router.post("/", (async (req, res) => {
+router.post("/", /*validateJwt,*/ checkValidationErrors(userPost), (async (req, res) => {
+
 
     const { username, password: hashedPassword, first_name: firstName, last_name: lastName } = req.body
 
@@ -25,6 +28,5 @@ router.post("/", (async (req, res) => {
     }
 
 }))
-
 
 module.exports = router
