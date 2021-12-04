@@ -1,10 +1,9 @@
 const auth = require("./auth")
+const user = require("./user")
 
 module.exports = {
     setupRoutes (app) {
         app.use("/auth", auth)
-        app.get("/user", (req, res) => {
-            res.send("Hi!")
-        })
+        app.use("/user", user)
     }
 }
