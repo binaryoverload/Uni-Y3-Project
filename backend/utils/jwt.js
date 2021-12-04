@@ -2,12 +2,12 @@ const jwt = require("jsonwebtoken")
 
 const config = require("./config")
 
-const signAccessJwt = (username, revocationUUID) => {
-    return signJwt({ username, revocation_uuid: revocationUUID, token_type: "access" }, config.jwt.accessValidDuration)
+const signAccessJwt = (username, checksum) => {
+    return signJwt({ username, checksum, token_type: "access" }, config.jwt.accessValidDuration)
 }
 
-const signRefreshJwt = (username, revocationUUID) => {
-    return signJwt({ username, revocation_uuid: revocationUUID, token_type: "refresh" }, config.jwt.refreshValidDuration)
+const signRefreshJwt = (username, checksum) => {
+    return signJwt({ username, checksum, token_type: "refresh" }, config.jwt.refreshValidDuration)
 }
 
 const signJwt = (payload, validDuration) => {

@@ -5,27 +5,36 @@ const { refresh: refreshValidator, login: loginValidator } = require("../validat
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../utils/config")
-const { checkValidationErrors, respondFail, respondError, respondToJwtError } = require("../utils/http")
+const { checkValidationErrors, respondFail, respondToJwtError } = require("../utils/http")
+const { getUser } = require("../models/user")
+const { verifyPassword } = require("../utils/password")
+const { authorizeUser } = require("../services/user")
 
 const router = Router()
 
-router.post("/login", checkValidationErrors(loginValidator), (req, res) => {
+router.post("/login", checkValidationErrors(loginValidator), async (req, res) => {
 
     const { username, password } = req.body
 
-    // TODO: Check against db, check password hash not plaintext
-    if (username !== "admin" || password !== "admin") {
+    const user = await getUser(username)
+
+    if (user == null) {
         respondFail(res, 401, { message: "Invalid username or password" })
         return
     }
 
-    const accessToken = signAccessJwt(username, "hi")
-    const refreshToken = signRefreshJwt(username, "hi")
+    if (!(await verifyPassword(user.password, password))) {
+        respondFail(res, 401, { message: "Invalid username or password" })
+        return
+    }
+
+    const accessToken = signAccessJwt(username, user.checksum)
+    const refreshToken = signRefreshJwt(username, user.checksum)
 
     res.send({ access_token: accessToken, refresh_token: refreshToken })
 })
 
-router.post("/refresh", checkValidationErrors(refreshValidator), (req, res) => {
+router.post("/refresh", checkValidationErrors(refreshValidator), async (req, res) => {
 
     const { refresh_token: refreshToken } = req.body
 
@@ -42,9 +51,14 @@ router.post("/refresh", checkValidationErrors(refreshValidator), (req, res) => {
         return
     }
 
-    // TODO: Get user from DB
+    const { username, checksum } = decoded
 
-    res.send({ access_token: signAccessJwt("admin", "hi") })
+    const { success, user } = await authorizeUser(res, username, checksum)
+
+    if (!success)
+        return
+
+    res.send({ access_token: signAccessJwt(user.username, user.checksum) })
 })
 
 module.exports = router

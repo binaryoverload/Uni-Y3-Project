@@ -2,8 +2,11 @@ const validator = require("validator")
 const jwt = require("jsonwebtoken")
 const config = require("../utils/config")
 const { respondFail, respondToJwtError } = require("../utils/http")
+const { getUser } = require("../models/user")
+const { check } = require("express-validator")
+const { authorizeUser } = require("../services/user")
 
-const validateJwt = (req, res, next) => {
+const validateJwt = async (req, res, next) => {
     if (!req.headers.authorization) {
         respondFail(res, 401, { message: "Missing authorization header" })
         return
@@ -31,17 +34,18 @@ const validateJwt = (req, res, next) => {
         return
     }
 
-    const { username, revocation_uuid: revocationUUID } = decoded
+    const { username, checksum } = decoded
 
-    // TODO: Get user from DB
-    const user = { username }
+    const { success, user } = await authorizeUser(res, username, checksum)
 
-    if (!user) {
-        respondFail(res, 401, { message: "User not found" })
+    if (!success)
         return
-    }
 
-    req.user = user
+    req.user = {
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name
+    }
 
     next()
 }
