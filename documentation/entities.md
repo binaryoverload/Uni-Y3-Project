@@ -10,7 +10,7 @@ Columns:
 - password - `varchar(255)`
 - updated_at - `timestamp`
 - security_stamp - `integer` - Incremented whenever JWT should be invalidated
-- checksum - `varchar(70) GENERATED ALWAYS AS (sha256((password::text || security_stamp::text)::bytea)) STORED` 
+- checksum - `varchar(70) GENERATED ALWAYS AS (encode(sha256((password::text || security_stamp::text)::bytea), 'hex')) STORED` 
 - first_name - `varchar(255)`
 - last_name - `varchar(255)`
 

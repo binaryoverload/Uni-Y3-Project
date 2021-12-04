@@ -4,7 +4,7 @@ CREATE TABLE users (
     password varchar(255) not null,
     updated_at timestamp default timezone('UTC', now()),
     security_stamp integer default 0,
-    checksum  varchar(70) GENERATED ALWAYS AS (sha256((password::text || security_stamp::text)::bytea)) STORED,
+    checksum  varchar(70) GENERATED ALWAYS AS (encode(sha256((password::text || security_stamp::text)::bytea), 'hex')) STORED,
     first_name varchar(255),
     last_name varchar(255),
 
