@@ -9,7 +9,7 @@
     },
     "author": "William Oldham",
     "dependencies": {
-        "bcrypt": "^5.0.1",
+        "argon2": "^0.28.3",
         "chalk": "^4.1.2",
         "cors": "^2.8.5",
         "dotenv": "^10.0.0",

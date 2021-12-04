@@ -6,13 +6,15 @@ const { createUser } = require("../models/user")
 const { DuplicateEntityError } = require("../utils/exceptions")
 const { userPost } = require("../validation/user")
 const { validateJwt } = require("../middlewares/validateJwt")
+const { hashPassword } = require("../utils/password")
 
 const router = Router()
 
 router.post("/", /*validateJwt,*/ checkValidationErrors(userPost), (async (req, res) => {
 
+    const { username, password, first_name: firstName, last_name: lastName } = req.body
 
-    const { username, password: hashedPassword, first_name: firstName, last_name: lastName } = req.body
+    const hashedPassword = await hashPassword(password)
 
     try {
         const data = await createUser({ username, hashedPassword, firstName, lastName })

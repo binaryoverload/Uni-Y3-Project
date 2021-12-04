@@ -25,8 +25,10 @@ const defaultConfig = {
         refreshValidDuration: "30d"
     },
     loggingLevel: "info",
-    bcrypt: {
-        cost: 12
+    passwordHashing: {
+        timeCost: 3,
+        memoryCost: 4096,
+        parallelism: 1
     },
     postgres: {
         db: "postgres",
@@ -44,8 +46,10 @@ const envConfig = {
         refreshValidDuration: process.env.JWT_REFRESH_VALID_DURATION
     },
     loggingLevel: process.env.LOGGING_LEVEL?.toLowerCase(),
-    bcrypt: {
-        cost: process.env.BCRYPT_COST
+    passwordHashing: {
+        timeCost: process.env.PASSWORD_TIME_COST,
+        memoryCost: process.env.PASSWORD_MEMORY_COST,
+        parallelism: process.env.PASSWORD_PARALLELISM
     },
     postgres: {
         db: process.env.POSTGRES_DB,
@@ -72,6 +76,12 @@ const host = mergedConfig.postgres.host
 if (!(validator.isFQDN(host, { require_tld: false }) || validator.isIP(host))) {
     console.error("Postgres host must be a valid hostname or IP!")
     process.exit(exitCodes.configInvalidPostgres)
+}
+
+const passwordHashing = mergedConfig.passwordHashing
+if (Object.values(passwordHashing).some(param => !validator.isInt(String(param)))) {
+    console.error("All password hashing parameters must be integers!")
+    process.exit(exitCodes.configPasswordHashing)
 }
 
 if (Object.keys(tripleBeam.configs.npm.levels).indexOf(mergedConfig.loggingLevel) === -1) {
