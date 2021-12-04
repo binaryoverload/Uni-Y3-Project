@@ -8,7 +8,8 @@ CREATE TABLE users (
     first_name varchar(255),
     last_name varchar(255),
 
-    primary key (id)
+    primary key (id),
+    unique (username)
 );
 
 CREATE TABLE system_properties (
@@ -26,5 +27,6 @@ CREATE TABLE enrolment_tokens (
     usage_current integer default 0,
     usage_limit integer,
 
-    primary key (id)
+    primary key (id),
+    unique (token)
 );
