@@ -5,8 +5,9 @@ const expressWinston = require('express-winston');
 
 const config = require("./config")
 
-const loggingFormatString = printf(({ level, message, timestamp, stack }) => {
-    return `${timestamp} [${level}] ${stack || message}`;
+const loggingFormatString = printf(({ level, message, timestamp, label, stack }) => {
+    const labelString = label ? ` [${label}]` : "\t"
+    return `${timestamp} [${level}]${labelString} ${stack || message}`;
 });
 
 const loggingFormat = combine(
