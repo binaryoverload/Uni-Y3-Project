@@ -1,8 +1,8 @@
-const { getUser } = require("../models/user")
+const { getUserByUsername } = require("../models/user")
 const { respondFail } = require("../utils/http")
 
 async function authorizeUser (res, username, checksum) {
-    const user = await getUser(username)
+    const user = await getUserByUsername(username)
 
     if (!user) {
         respondFail(res, 401, { message: "User does not exist" })

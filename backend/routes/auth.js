@@ -6,7 +6,7 @@ const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../utils/config")
 const { checkValidationErrors, respondFail, respondToJwtError } = require("../utils/http")
-const { getUser } = require("../models/user")
+const { getUserByUsername } = require("../models/user")
 const { verifyPassword } = require("../utils/password")
 const { authorizeUser } = require("../services/user")
 
@@ -16,7 +16,7 @@ router.post("/login", checkValidationErrors(loginValidator), async (req, res) =>
 
     const { username, password } = req.body
 
-    const user = await getUser(username)
+    const user = await getUserByUsername(username)
 
     if (user == null) {
         respondFail(res, 401, { message: "Invalid username or password" })
