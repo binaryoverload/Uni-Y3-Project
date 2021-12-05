@@ -13,3 +13,7 @@
 - Modify logging to make request logging consistent with other messages.
 - Change validation to a middleware to make writing routes more consistent.
 - Create Flyway DB migrations toolkit.
+- Setup PG backend
+- Create initial DB migration for users, properties and enrolment tokens
+- Add user routes and modify auth routes to use DB
+- Add password hashing using argon2
