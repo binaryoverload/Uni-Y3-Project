@@ -1,26 +1,21 @@
-const { queryPool } = require("../setup/db")
-const queries = require("./queries")
+const { knex } = require("../setup/db")
+const { handlePostgresError } = require("../utils/errorHandling")
+
+const systemPropertiesTableName = "system_properties"
 
 async function getSystemProperty (key) {
-
-    const result = await queryPool(queries.systemProperties.get, [key])
-
-    // It is okay to check against 1, since there will only ever be 1 instance of a username due to unique constraints
-    if (result.rowCount !== 1) {
-        return null
-    }
-
-    return result.rows[0].value
+    return await knex(systemPropertiesTableName)
+        .where("key", key)
+        .returning("value")
+        .catch(handlePostgresError)
 }
 
 async function setSystemProperty (key, value) {
-
-    const result = await queryPool(queries.systemProperties.set, [key, value])
-
-    if (result.rowCount !== 1) {
-        throw Error("Could not set property!")
-    }
-
+    return await knex(systemPropertiesTableName)
+        .insert({ key, value })
+        .onConflict()
+        .merge()
+        .catch(handlePostgresError)
 }
 
 module.exports = { getSystemProperty, setSystemProperty }

@@ -1,55 +1,42 @@
-const { queryPool } = require("../setup/db")
-const queries = require("./queries")
+const { knex } = require("../setup/db")
+const { handlePostgresError } = require("../utils/errorHandling")
+
+const enrolmentTableName = "enrolment_tokens"
 
 async function getEnrolmentToken (id) {
-    const result = await queryPool(queries.enrolmentTokens.get, [id])
-
-    if (result.rowCount !== 1) {
-        return null
-    }
-
-    return result.rows[0]
+    return await knex(enrolmentTableName)
+        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .where("id", id)
+        .catch(handlePostgresError)
 }
 
 async function getAllEnrolmentTokens() {
-    const result = await queryPool(queries.enrolmentTokens.getAll)
-
-    return result.rows
+    return await knex(enrolmentTableName)
+        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .catch(handlePostgresError)
 }
 
 async function deleteEnrolmentToken(id) {
-    const result = await queryPool(queries.enrolmentTokens.delete, [id])
-
-    if (result.rowCount !== 1) {
-        // TODO something
-        return
-    }
-
-    return true
+    return await knex(enrolmentTableName)
+        .where("id", id)
+        .delete()
+        .catch(handlePostgresError)
 }
 
 async function createEnrolmentToken(token) {
-    const result = await queryPool(queries.enrolmentTokens.create, [token])
-
-    if (result.rowCount === 1) {
-        return result.rows[0]
-    } else {
-        throw Error("User not created!")
-    }
+    return await knex(enrolmentTableName)
+        .insert({ token })
+        .returning(["id", "token", "created_at", "usage_current"])
+        .catch(handlePostgresError)
 }
 
-async function updateEnrolmentToken(data) {
-
+async function updateEnrolmentToken(id, data) {
     const { expires_at, usage_current, usage_limit } = data
 
-    const result = await queryPool(queries.enrolmentTokens.update, [expires_at, usage_current, usage_limit])
-
-    if (result.rowCount !== 1) {
-        // TODO something
-        return
-    }
-
-    return true
+    return await knex(enrolmentTableName)
+        .update({ expires_at, usage_current, usage_limit })
+        .where("id", id)
+        .catch(handlePostgresError)
 }
 
 module.exports = { getAllEnrolmentTokens, getEnrolmentToken, deleteEnrolmentToken, createEnrolmentToken, updateEnrolmentToken }

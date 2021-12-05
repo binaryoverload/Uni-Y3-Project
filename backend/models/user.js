@@ -1,65 +1,66 @@
-const { queryPool } = require("../setup/db")
-const queries = require("./queries")
+const { knex } = require("../setup/db")
+const { handlePostgresError } = require("../utils/errorHandling")
+
+const usersTableName = "users"
 
 async function createUser (data) {
-    const { username, hashedPassword, firstName, lastName } = data
+    const { username, hashedPassword, first_name, last_name } = data
 
-    const values = [username, hashedPassword, firstName, lastName]
-
-    if (values.some((v) => v == null)) {
-        throw Error("One or more input values are undefined/null")
-    }
-
-    const result = await queryPool(queries.user.create, values)
-
-    if (result.rowCount === 1) {
-        return result.rows[0]
-    } else {
-        throw Error("User not created!")
-    }
+    return await knex(usersTableName)
+        .insert({
+            username,
+            password: hashedPassword,
+            first_name,
+            last_name
+        })
+        .returning("id")
+        .catch(handlePostgresError)
 }
 
 async function getUserByUsername (username) {
-    const result = await queryPool(queries.user.getUsername, [username])
-
-    // It is okay to check against 1, since there will only ever be 1 instance of a username due to unique constraints
-    if (result.rowCount !== 1) {
-        return null
-    }
-
-    return result.rows[0]
+    return await knex(usersTableName)
+        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .where("username", username)
+        .catch(handlePostgresError)
 }
 
 async function getUserById (id) {
-    const result = await queryPool(queries.user.getId, [id])
-
-    // It is okay to check against 1, since there will only ever be 1 instance of a username due to unique constraints
-    if (result.rowCount !== 1) {
-        return null
-    }
-
-    return result.rows[0]
+    return await knex(usersTableName)
+        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .where("id", id)
+        .catch(handlePostgresError)
 }
 
 async function getAllUsers () {
-    const result = await queryPool(queries.user.getAll)
-
-    return result.rows
+    return await knex(usersTableName)
+        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .catch(handlePostgresError)
 }
 
 async function deleteUser (id) {
-    const result = await queryPool(queries.enrolmentTokens.delete, [id])
-
-    if (result.rowCount !== 1) {
-        // TODO something
-        return
-    }
-
-    return true
+    return await knex(usersTableName)
+        .where("id", id)
+        .delete()
+        .catch(handlePostgresError)
 }
 
-async function updateUser (data) {
+async function updateUser (id, data) {
     const { username, first_name, last_name, password } = data
+
+    let query = knex(usersTableName)
+        .where("id", id)
+        .update({
+            username,
+            password,
+            first_name,
+            last_name
+        })
+
+    if (password) {
+        query = query.increment("security_stamp")
+    }
+
+    return await query.catch(handlePostgresError)
 }
 
 module.exports = { createUser, getUserByUsername, getUserById, getAllUsers, deleteUser }

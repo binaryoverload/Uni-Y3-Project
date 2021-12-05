@@ -8,41 +8,35 @@ const { handlePostgresError } = require("../utils/errorHandling")
 
 const { user, password, host, port, db } = config.postgres
 
-const connectionString = `postgresql://${user}:${password}@${host}:${port}/${db}`
-
-const pool = new Pool({
-    connectionString,
-    idleTimeoutMillis: 1000 * 60
-})
-
 const logLabel = { label: "postgres" }
 
-pool.on("connect", client => {
-    logger.info(`Client ${pool.totalCount} connected to ${host}:${port} `, logLabel)
-})
-
-pool.on("remove", () => {
-    logger.debug(`Client removed from pool. Idle: ${pool.idleCount} Total: ${pool.totalCount}`)
-})
-
-pool.on("error", (err, _) => {
-    logger.error(`Error in pool: ${err.message}`, logLabel)
-})
-
-async function queryPool (query, values) {
-    let client = null
-    try {
-        client = await pool.connect()
-        return await client.query(query, values)
-    } catch (err) {
-        handlePostgresError(err)
-    } finally {
-        client?.release()
+const knex = require("knex")({
+    client: "pg",
+    connection: {
+        host,
+        port,
+        user,
+        password,
+        database: db
+    },
+    pool: {
+        min: 0,
+        max: 10,
+        afterCreate (client, done) {
+            logger.info(`Client connected to ${host}:${port} `, logLabel)
+            done()
+        }
+    },
+    log: {
+        warn (message) { logger.warn(JSON.stringify(message), logLabel) },
+        debug (message) { logger.debug(JSON.stringify(message), logLabel) },
+        error (message) { logger.error(JSON.stringify(message), logLabel) },
+        deprecate (method, alternative) { logger.warn(`Knex Deprecated: ${method} -> ${alternative}`) }
     }
-}
+})
 
 function verifyConnection () {
-    pool.query("SELECT 1")
+    knex.raw("SELECT 1")
         .then(() => logger.info("Successfully verified connection", logLabel))
         .catch((err) => {
             logger.error(`Error verifying connection: ${err.message}`, logLabel)
@@ -50,4 +44,4 @@ function verifyConnection () {
         })
 }
 
-module.exports = { pool, queryPool, verifyConnection, PgError: PostgresError }
+module.exports = { knex, verifyConnection, PgError: PostgresError }
