@@ -11,7 +11,7 @@ class DatabaseError extends Error {
         this.name = "DatabaseError"
 
         this.code = code
-        this.errName  = errName
+        this.errName = errName
     }
 }
 

@@ -1,6 +1,5 @@
 const { Router } = require("express")
 
-const config = require("../utils/config")
 const { checkValidationErrors, respondFail, respondSuccess } = require("../utils/http")
 const { createUser } = require("../models/user")
 const { DuplicateEntityError } = require("../utils/exceptions")

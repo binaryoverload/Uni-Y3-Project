@@ -1,5 +1,5 @@
-const { Pool, Client } = require('pg')
-const PostgresError = require('pg-error-enum').PostgresError;
+const { Pool } = require("pg")
+const PostgresError = require("pg-error-enum").PostgresError
 
 const config = require("../utils/config")
 const { logger } = require("../utils/logger")
@@ -29,7 +29,7 @@ pool.on("error", (err, _) => {
     logger.error(`Error in pool: ${err.message}`, logLabel)
 })
 
-async function queryPool(query, values) {
+async function queryPool (query, values) {
     let client = null
     try {
         client = await pool.connect()
@@ -41,7 +41,7 @@ async function queryPool(query, values) {
     }
 }
 
-function verifyConnection() {
+function verifyConnection () {
     pool.query("SELECT 1")
         .then(() => logger.info("Successfully verified connection", logLabel))
         .catch((err) => {

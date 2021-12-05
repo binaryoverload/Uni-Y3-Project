@@ -1,14 +1,14 @@
 const { createLogger, transports, format } = require("winston")
 const { combine, timestamp, printf, colorize, align, errors } = format
 
-const expressWinston = require('express-winston');
+const expressWinston = require("express-winston")
 
 const config = require("./config")
 
 const loggingFormatString = printf(({ level, message, timestamp, label, stack }) => {
     const labelString = label ? ` [${label}]` : "\t"
-    return `${timestamp} [${level}]${labelString} ${stack || message}`;
-});
+    return `${timestamp} [${level}]${labelString} ${stack || message}`
+})
 
 const loggingFormat = combine(
     colorize(),

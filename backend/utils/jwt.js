@@ -17,6 +17,4 @@ const signJwt = (payload, validDuration) => {
     })
 }
 
-
-
 module.exports = { signAccessJwt, signRefreshJwt }

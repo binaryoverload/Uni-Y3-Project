@@ -1,12 +1,11 @@
 const { PostgresError } = require("pg-error-enum")
-const { DuplicateEntityError, InternalServerError, DatabaseError } = require("./exceptions")
-const { logger } = require("./logger")
+const { DuplicateEntityError, DatabaseError } = require("./exceptions")
 
-function postgresErrorNameFromCode(code) {
+function postgresErrorNameFromCode (code) {
     return Object.keys(PostgresError).find(key => PostgresError[key] === code)?.toLowerCase()
 }
 
-function handlePostgresError(err) {
+function handlePostgresError (err) {
     const errName = postgresErrorNameFromCode(err.code)
     switch (errName) {
         case "unique_violation":
