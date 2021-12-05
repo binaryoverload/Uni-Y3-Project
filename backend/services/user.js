@@ -17,4 +17,15 @@ async function authorizeUser (res, username, checksum) {
     return { success: true, user }
 }
 
-module.exports = { authorizeUser }
+// Create a "safe" user object without any security information to be passed around
+function getSafeUser(user) {
+    const { username, first_name, last_name } = user
+
+    return {
+        username,
+        first_name,
+        last_name
+    }
+}
+
+module.exports = { authorizeUser, getSafeUser }

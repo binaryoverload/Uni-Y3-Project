@@ -2,9 +2,7 @@ const validator = require("validator")
 const jwt = require("jsonwebtoken")
 const config = require("../utils/config")
 const { respondFail, respondToJwtError } = require("../utils/http")
-const { getUser } = require("../models/user")
-const { check } = require("express-validator")
-const { authorizeUser } = require("../services/user")
+const { authorizeUser, getSafeUser } = require("../services/user")
 
 const validateJwt = async (req, res, next) => {
     if (!req.headers.authorization) {
@@ -41,11 +39,7 @@ const validateJwt = async (req, res, next) => {
     if (!success)
         return
 
-    req.user = {
-        username: user.username,
-        first_name: user.first_name,
-        last_name: user.last_name
-    }
+    req.user = getSafeUser(user)
 
     next()
 }
