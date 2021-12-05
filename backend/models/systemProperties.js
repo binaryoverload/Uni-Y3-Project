@@ -10,6 +10,12 @@ async function getSystemProperty (key) {
         .catch(handlePostgresError)
 }
 
+async function getAllSystemProperties () {
+    return await knex(systemPropertiesTableName)
+        .select(["key", "value"])
+        .catch(handlePostgresError)
+}
+
 async function setSystemProperty (key, value) {
     return await knex(systemPropertiesTableName)
         .insert({ key, value })
@@ -18,4 +24,11 @@ async function setSystemProperty (key, value) {
         .catch(handlePostgresError)
 }
 
-module.exports = { getSystemProperty, setSystemProperty }
+async function deleteSystemProperty (key) {
+    return await knex(systemPropertiesTableName)
+        .where("key", key)
+        .delete()
+        .catch(handlePostgresError)
+}
+
+module.exports = { getSystemProperty, getAllSystemProperties, setSystemProperty, deleteSystemProperty }
