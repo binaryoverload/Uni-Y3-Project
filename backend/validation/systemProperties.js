@@ -12,7 +12,9 @@ module.exports = {
     ],
     propertySet: [
         keyValidator,
-        body().isString().withMessage("Body must be a string")
+        body("value", "Value must be a string")
+            .exists()
+            .isString()
     ],
     propertyDelete: [
         keyValidator
