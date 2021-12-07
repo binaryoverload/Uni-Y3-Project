@@ -38,7 +38,7 @@ module.exports = {
     userDelete: [
         userIdValidator
     ],
-    userPut: [
+    userPatch: [
         userIdValidator,
         body("username", "The username must be a string")
             .optional()

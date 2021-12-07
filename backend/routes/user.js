@@ -1,34 +1,44 @@
 const { Router } = require("express")
 
-const { checkValidationErrors, respondFail, respondSuccess } = require("../utils/http")
-const { createUser } = require("../models/user")
-const { DuplicateEntityError, DatabaseError } = require("../utils/exceptions")
-const { userPost } = require("../validation/user")
+const { checkValidationErrors, respondFail, respondSuccess, executeQuery } = require("../utils/http")
+const { createUser, getUserById, getAllUsers, deleteUser, updateUser } = require("../models/user")
+const { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError } = require(
+    "../utils/exceptions")
+const { userPost, userGetId, userDelete, userPatch } = require("../validation/user")
 const { validateJwt } = require("../middlewares/validateJwt")
 const { hashPassword } = require("../utils/password")
+const { getSafeUser } = require("../services/user")
 
 const router = Router()
 
-router.post("/", /*validateJwt,*/ checkValidationErrors(userPost), (async (req, res) => {
+router.get("/@me", validateJwt, executeQuery(({ user }) => {
+    return getSafeUser(user)
+}))
 
-    const { username, password, first_name, last_name } = req.body
+router.get("/:id", validateJwt, checkValidationErrors(userGetId), executeQuery(async ({ params }) => {
+    return getSafeUser(await getUserById(params.id))
+}))
 
-    const hashedPassword = await hashPassword(password)
+router.delete("/:id", validateJwt, checkValidationErrors(userDelete), executeQuery(async ({ params }) => {
+    const deletedId = await deleteUser(params.id);
 
-    try {
-        const data = await createUser({ username, hashedPassword, first_name, last_name })
-        respondSuccess(res, 200, data)
-    } catch (err) {
-        if (err instanceof DuplicateEntityError) {
-            respondFail(res, 400, {
-                code: "duplicate",
-                username: "A user with this username already exists"
-            })
-            return
-        }
-        throw err
-    }
+    if (!deletedId || deletedId.length === 0)
+        throw new NotFoundError()
 
+    return deletedId;
+}))
+
+router.patch("/:id", validateJwt, checkValidationErrors(userPatch), executeQuery(async ({ params, body }) => {
+    return getSafeUser(await updateUser(params.id, body))
+}))
+
+router.get("/", validateJwt, executeQuery(async () => {
+    return (await getAllUsers()).map(user => getSafeUser(user))
+}))
+
+router.post("/", /*validateJwt,*/ checkValidationErrors(userPost), executeQuery(async ({ body }) => {
+    const { username, password, first_name, last_name } = body
+    return await createUser({ username, password, first_name, last_name })
 }))
 
 module.exports = router

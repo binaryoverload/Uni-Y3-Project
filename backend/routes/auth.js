@@ -5,7 +5,7 @@ const { refresh: refreshValidator, login: loginValidator } = require("../validat
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../utils/config")
-const { checkValidationErrors, respondFail, respondToJwtError } = require("../utils/http")
+const { checkValidationErrors, respondFail, respondToJwtError, respondSuccess } = require("../utils/http")
 const { getUserByUsername } = require("../models/user")
 const { verifyPassword } = require("../utils/password")
 const { authorizeUser } = require("../services/user")
@@ -31,7 +31,7 @@ router.post("/login", checkValidationErrors(loginValidator), async (req, res) =>
     const accessToken = signAccessJwt(username, user.checksum)
     const refreshToken = signRefreshJwt(username, user.checksum)
 
-    res.send({ access_token: accessToken, refresh_token: refreshToken })
+    respondSuccess(res, 200, { access_token: accessToken, refresh_token: refreshToken });
 })
 
 router.post("/refresh", checkValidationErrors(refreshValidator), async (req, res) => {

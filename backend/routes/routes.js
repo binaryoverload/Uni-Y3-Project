@@ -4,6 +4,6 @@ const user = require("./user")
 module.exports = {
     setupRoutes (app) {
         app.use("/auth", auth)
-        app.use("/user", user)
+        app.use("/users", user)
     }
 }

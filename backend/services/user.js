@@ -10,7 +10,7 @@ async function authorizeUser (res, username, checksum) {
     }
 
     if (user.checksum !== checksum) {
-        respondFail(res, 401, { message: "Checksum does not match" })
+        respondFail(res, 401)
         return { success: false }
     }
 
@@ -19,6 +19,8 @@ async function authorizeUser (res, username, checksum) {
 
 // Create a "safe" user object without any security information to be passed around
 function getSafeUser(user) {
+    if (!user) return null
+
     const { username, first_name, last_name } = user
 
     return {
