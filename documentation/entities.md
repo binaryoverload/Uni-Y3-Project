@@ -44,6 +44,23 @@ Columns:
 - usage_limit - `integer`
 - usage_current - `integer`
 
+## Policies
+
+Policies consist of two tables: `policies` and `policy_items`.
+
+Each policy item is linked to a policy. A policy contains the overarching information for the whole policy while policy items specify actions to be run.
+
+### Policy
+- `id` - `uuid` - PK
+- `created_at` - `timestamp`
+- `updated_at` - `timestamp`
+- `created_by` - `uuid` - "Fake" FK - User UUID that could exist or not
+
+### Policy Item
+- `id` - `uuid` - PK
+- `policy_id` - `uuid` - FK - on delete cascade
+- `type` - `varchar(255)` - Type of policy item. Maybe use an enum? `file`, `command`, `package`, etc
+- `data` - `jsonb`
 
 
 ## Audit Log
