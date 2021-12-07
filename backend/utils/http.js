@@ -1,4 +1,6 @@
 const { validationResult } = require("express-validator")
+const { DuplicateEntityError, HttpError } = require("../utils/exceptions")
+const { NotFoundError } = require("./exceptions")
 
 /*
  *  Using https://github.com/omniti-labs/jsend for all responses
@@ -11,10 +13,10 @@ const respondSuccess = (res, status, data) => {
     })
 }
 
-const respondFail = (res, status, data) => {
+const respondFail = (res, status, data = null) => {
     res.status(status).send({
         status: "fail",
-        data: data || null
+        data: data
     })
 }
 
@@ -57,6 +59,44 @@ const checkValidationErrors = (validator) => {
     ]
 }
 
+function executeQuery (callback) {
+    return async (req, res) => {
+        let returnValue
+        try {
+            returnValue = callback({
+                body: req.body,
+                params: req.params,
+                user: req.user,
+                req: req,
+                res: res
+            })
+
+            if (returnValue instanceof Promise) {
+                returnValue = await returnValue
+            }
+            if (returnValue instanceof Error) {
+                throw returnValue
+            }
+            if (!returnValue) {
+                throw new NotFoundError()
+            }
+        } catch (err) {
+            if (err instanceof DuplicateEntityError) {
+                return respondFail(res, 400, {
+                    code: "duplicate"
+                })
+            }
+            if (err instanceof HttpError) {
+                return respondFail(res, err.status, {
+                    code: err.code
+                })
+            }
+            throw err
+        }
+        respondSuccess(res, 200, returnValue)
+    }
+}
+
 const respondToJwtError = (res, err) => {
 
     let code = "jwt_general"
@@ -70,4 +110,4 @@ const respondToJwtError = (res, err) => {
     })
 }
 
-module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, respondToJwtError }
+module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, respondToJwtError, executeQuery }
