@@ -50,6 +50,8 @@ Policies consist of two tables: `policies` and `policy_items`.
 
 Each policy item is linked to a policy. A policy contains the overarching information for the whole policy while policy items specify actions to be run.
 
+A policy can be run on the client by aquring 
+
 ### Policy
 - `id` - `uuid` - PK
 - `created_at` - `timestamp`
@@ -59,9 +61,15 @@ Each policy item is linked to a policy. A policy contains the overarching inform
 ### Policy Item
 - `id` - `uuid` - PK
 - `policy_id` - `uuid` - FK - on delete cascade
+- `policy_order` - `int` - The position of this item in the policy
 - `type` - `varchar(255)` - Type of policy item. Maybe use an enum? `file`, `command`, `package`, etc
+- `stop_on_error` - `bool`
 - `data` - `jsonb`
 
+### Policy Condition
+NOT FOR MVP - Implement only if time
+
+Specifies condition(s) that apply to a policy item that are required in order for it to run. Each condition can either halt the policy execution if not met, or skip the current policy item.
 
 ## Audit Log
 
