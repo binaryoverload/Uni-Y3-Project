@@ -1,3 +1,13 @@
+const exceptionCodes = {
+    notfound: "not_found",
+    unauthorized: "unauthorized",
+    invalidTokenType: "invalid_token_type",
+    duplicate: "duplicate",
+    jwtGeneral: "jwt_general",
+    jwtExpired: "jwt_expired",
+    validation: "validation"
+}
+
 class DuplicateEntityError extends Error {
     constructor (message) {
         super(message)
@@ -16,14 +26,14 @@ class HttpError extends Error {
 }
 
 class UnauthorizedError extends HttpError {
-    constructor (message = "Not logged in") {
-        super(401, "unauthorized", message)
+    constructor (message = "Not logged in", code=exceptionCodes.unauthorized) {
+        super(401, code, message)
     }
 }
 
 class NotFoundError extends HttpError {
     constructor (message = "Not found") {
-        super(404, "notfound", message)
+        super(404, exceptionCodes.unauthorized, message)
     }
 }
 
@@ -37,4 +47,4 @@ class DatabaseError extends Error {
     }
 }
 
-module.exports = { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError }
+module.exports = { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError, exceptionCodes }
