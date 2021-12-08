@@ -3,11 +3,11 @@ const jwt = require("jsonwebtoken")
 const config = require("../utils/config")
 const { respondFail, respondToJwtError } = require("../utils/http")
 const { authorizeUser, getSafeUser } = require("../services/user")
+const { UnauthorizedError, exceptionCodes } = require("../utils/exceptions")
 
 const validateJwt = async (req, res, next) => {
     if (!req.headers.authorization) {
-        respondFail(res, 401, { message: "Missing authorization header" })
-        return
+        throw UnauthorizedError("Missing authorization header")
     }
 
     const authHeader = req.headers.authorization
@@ -15,31 +15,18 @@ const validateJwt = async (req, res, next) => {
     const accessToken = authHeader.split(" ")[1]
 
     if (!(authHeader.startsWith("Bearer ") && validator.isJWT(accessToken))) {
-        respondFail(res, 401, { message: "Authorization header malformed" })
-        return
+        throw UnauthorizedError("Authorization header malformed")
     }
 
-    let decoded = undefined
-    try {
-        decoded = jwt.verify(accessToken, config.jwt.secret)
-    } catch (e) {
-        respondToJwtError(res, e)
-        return
-    }
+    const decoded = jwt.verify(accessToken, config.jwt.secret)
 
     if (decoded?.token_type !== "access") {
-        respondFail(res, 401, { token_type: `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'` })
-        return
+        throw UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`, exceptionCodes.invalidTokenType)
     }
 
     const { username, checksum } = decoded
 
-    const { success, user } = await authorizeUser(res, username, checksum)
-
-    if (!success)
-        return
-
-    req.user = getSafeUser(user)
+    req.user = getSafeUser(await authorizeUser(username, checksum))
 
     next()
 }

@@ -33,7 +33,7 @@ class UnauthorizedError extends HttpError {
 
 class NotFoundError extends HttpError {
     constructor (message = "Not found") {
-        super(404, exceptionCodes.unauthorized, message)
+        super(404, exceptionCodes.notfound, message)
     }
 }
 

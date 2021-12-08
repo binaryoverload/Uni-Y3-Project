@@ -60,6 +60,27 @@ const checkValidationErrors = (validator) => {
     ]
 }
 
+function handleRequestError (err, res) {
+    if (err instanceof DuplicateEntityError) {
+        return respondFail(res, 400, {
+            code: exceptionCodes.duplicate
+        })
+    }
+    if (err instanceof HttpError) {
+        return respondFail(res, err.status, {
+            code: err.code
+        })
+    }
+    if (err instanceof JsonWebTokenError) {
+        const code = err instanceof TokenExpiredError ? exceptionCodes.jwtExpired : exceptionCodes.jwtGeneral
+        return respondFail(res, 401, {
+            code,
+            "message": `JWT: ${err.message}`
+        })
+    }
+    throw err
+}
+
 function executeQuery (callback) {
     return async (req, res) => {
         let returnValue
@@ -82,27 +103,10 @@ function executeQuery (callback) {
                 throw new NotFoundError()
             }
         } catch (err) {
-            if (err instanceof DuplicateEntityError) {
-                return respondFail(res, 400, {
-                    code: exceptionCodes.duplicate
-                })
-            }
-            if (err instanceof HttpError) {
-                return respondFail(res, err.status, {
-                    code: err.code
-                })
-            }
-            if (err instanceof JsonWebTokenError) {
-                const code = err instanceof TokenExpiredError ? exceptionCodes.jwtExpired : exceptionCodes.jwtGeneral
-                return respondFail(res, 401, {
-                    code,
-                    "message": `JWT: ${err.message}`
-                })
-            }
-            throw err
+            return handleRequestError(err, res)
         }
         respondSuccess(res, 200, returnValue)
     }
 }
 
-module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, executeQuery }
+module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, executeQuery, handleRequestError }

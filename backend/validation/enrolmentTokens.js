@@ -19,5 +19,8 @@ module.exports = {
         body("usage_limit", "Usage limit must be null or a epoch value")
             .optional({ nullable: true })
             .isInt(),
+    ],
+    tokenCreate: [
+
     ]
 }

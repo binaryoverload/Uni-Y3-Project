@@ -1,4 +1,4 @@
-
+const crypto = require("crypto")
 
 /*
  Produces a 16 character code that will be used to enrol client devices.

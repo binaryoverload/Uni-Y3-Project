@@ -20,12 +20,12 @@ router.get("/:id", validateJwt, checkValidationErrors(userGetId), executeQuery(a
 }))
 
 router.delete("/:id", validateJwt, checkValidationErrors(userDelete), executeQuery(async ({ params }) => {
-    const deletedId = await deleteUser(params.id);
+    const deletedId = await deleteUser(params.id)
 
     if (!deletedId || deletedId.length === 0)
         throw new NotFoundError()
 
-    return deletedId;
+    return deletedId
 }))
 
 router.patch("/:id", validateJwt, checkValidationErrors(userPatch), executeQuery(async ({ params, body }) => {

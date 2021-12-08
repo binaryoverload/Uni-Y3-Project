@@ -1,7 +1,8 @@
-const { respondFail, respondError } = require("../utils/http")
+const { respondFail, respondError, handleRequestError } = require("../utils/http")
 const config = require("../utils/config")
 const { logger } = require("../utils/logger")
 const { DatabaseError } = require("../utils/exceptions")
+const { handleError } = require("pg/lib/native/query")
 
 const notFound = (req, res, next) => {
     return respondFail(res, 404, { message: "Not found!" })
@@ -17,7 +18,12 @@ const internalError = (err, req, res, next) => {
         label = "postgres"
 
     logger.error(`Error 500: ${err.message}`, { label })
-    respondError(res, err.message, { ...err })
+
+    try {
+        return handleRequestError(err, res)
+    } catch (unknownError) {
+        respondError(res, unknownError.message, { ...unknownError })
+    }
 }
 
 module.exports = { notFound, internalError }

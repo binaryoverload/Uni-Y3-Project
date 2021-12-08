@@ -5,7 +5,7 @@ const { refresh: refreshValidator, login: loginValidator } = require("../validat
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../utils/config")
-const { checkValidationErrors, respondFail, respondToJwtError, respondSuccess, executeQuery } = require("../utils/http")
+const { checkValidationErrors, executeQuery } = require("../utils/http")
 const { getUserByUsername } = require("../models/user")
 const { verifyPassword } = require("../utils/password")
 const { authorizeUser } = require("../services/user")
