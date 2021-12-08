@@ -5,60 +5,48 @@ const { refresh: refreshValidator, login: loginValidator } = require("../validat
 const { signAccessJwt, signRefreshJwt } = require("../utils/jwt")
 
 const config = require("../utils/config")
-const { checkValidationErrors, respondFail, respondToJwtError, respondSuccess } = require("../utils/http")
+const { checkValidationErrors, respondFail, respondToJwtError, respondSuccess, executeQuery } = require("../utils/http")
 const { getUserByUsername } = require("../models/user")
 const { verifyPassword } = require("../utils/password")
 const { authorizeUser } = require("../services/user")
+const { UnauthorizedError, exceptionCodes } = require("../utils/exceptions")
 
 const router = Router()
 
-router.post("/login", checkValidationErrors(loginValidator), async (req, res) => {
-
-    const { username, password } = req.body
+router.post("/login", checkValidationErrors(loginValidator), executeQuery(async ({ body }) => {
+    const { username, password } = body
 
     const user = await getUserByUsername(username)
 
     if (user == null) {
-        respondFail(res, 401, { message: "Invalid username or password" })
-        return
+        throw UnauthorizedError("Invalid username or password")
     }
 
     if (!(await verifyPassword(user.password, password))) {
-        respondFail(res, 401, { message: "Invalid username or password" })
-        return
+        throw UnauthorizedError("Invalid username or password")
     }
 
     const accessToken = signAccessJwt(username, user.checksum)
     const refreshToken = signRefreshJwt(username, user.checksum)
 
-    respondSuccess(res, 200, { access_token: accessToken, refresh_token: refreshToken });
-})
+    return { access_token: accessToken, refresh_token: refreshToken }
+}))
 
-router.post("/refresh", checkValidationErrors(refreshValidator), async (req, res) => {
+router.post("/refresh", checkValidationErrors(refreshValidator), executeQuery(async ({ body }) => {
+    const { refresh_token: refreshToken } = body
 
-    const { refresh_token: refreshToken } = req.body
-
-    let decoded = undefined
-    try {
-        decoded = jwt.verify(refreshToken, config.jwt.secret)
-    } catch (e) {
-        respondToJwtError(res, e)
-        return
-    }
+    let decoded = jwt.verify(refreshToken, config.jwt.secret)
 
     if (decoded?.token_type !== "refresh") {
-        respondFail(res, 401, { token_type: `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'` })
-        return
+        throw UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
+            exceptionCodes.invalidTokenType)
     }
 
     const { username, checksum } = decoded
 
-    const { success, user } = await authorizeUser(res, username, checksum)
+    const user = await authorizeUser(username, checksum)
 
-    if (!success)
-        return
-
-    res.send({ access_token: signAccessJwt(user.username, user.checksum) })
-})
+    return { access_token: signAccessJwt(user.username, user.checksum) }
+}))
 
 module.exports = router

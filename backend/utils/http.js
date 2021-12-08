@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator")
 const { DuplicateEntityError, HttpError } = require("../utils/exceptions")
-const { NotFoundError } = require("./exceptions")
+const { NotFoundError, exceptionCodes } = require("./exceptions")
+const { JsonWebTokenError, TokenExpiredError } = require("jsonwebtoken")
 
 /*
  *  Using https://github.com/omniti-labs/jsend for all responses
@@ -50,7 +51,7 @@ const checkValidationErrors = (validator) => {
 
         const dataErrors = validationErrorsToJsend(errors)
 
-        respondFail(res, 400, { code: "validation", ...dataErrors })
+        respondFail(res, 400, { code: exceptionCodes.validation, ...dataErrors })
     }
 
     return [
@@ -83,12 +84,19 @@ function executeQuery (callback) {
         } catch (err) {
             if (err instanceof DuplicateEntityError) {
                 return respondFail(res, 400, {
-                    code: "duplicate"
+                    code: exceptionCodes.duplicate
                 })
             }
             if (err instanceof HttpError) {
                 return respondFail(res, err.status, {
                     code: err.code
+                })
+            }
+            if (err instanceof JsonWebTokenError) {
+                const code = err instanceof TokenExpiredError ? exceptionCodes.jwtExpired : exceptionCodes.jwtGeneral
+                return respondFail(res, 401, {
+                    code,
+                    "message": `JWT: ${err.message}`
                 })
             }
             throw err
@@ -97,17 +105,4 @@ function executeQuery (callback) {
     }
 }
 
-const respondToJwtError = (res, err) => {
-
-    let code = "jwt_general"
-    if (err.constructor.name === "TokenExpiredError") {
-        code = "jwt_expired"
-    }
-
-    respondFail(res, 401, {
-        code,
-        "message": `JWT: ${err.message}`
-    })
-}
-
-module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, respondToJwtError, executeQuery }
+module.exports = { respondSuccess, respondFail, respondError, checkValidationErrors, executeQuery }

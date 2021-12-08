@@ -1,24 +1,23 @@
 const { getUserByUsername } = require("../models/user")
 const { respondFail } = require("../utils/http")
+const { UnauthorizedError } = require("../utils/exceptions")
 
-async function authorizeUser (res, username, checksum) {
+async function authorizeUser (username, checksum) {
     const user = await getUserByUsername(username)
 
     if (!user) {
-        respondFail(res, 401, { message: "User does not exist" })
-        return { success: false }
+        throw UnauthorizedError("User does not exist")
     }
 
     if (user.checksum !== checksum) {
-        respondFail(res, 401)
-        return { success: false }
+        throw UnauthorizedError()
     }
 
-    return { success: true, user }
+    return user
 }
 
 // Create a "safe" user object without any security information to be passed around
-function getSafeUser(user) {
+function getSafeUser (user) {
     if (!user) return null
 
     const { username, first_name, last_name } = user
