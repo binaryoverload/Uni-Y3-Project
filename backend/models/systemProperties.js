@@ -6,20 +6,24 @@ const systemPropertiesTableName = "system_properties"
 async function getSystemProperty (key) {
     return await knex(systemPropertiesTableName)
         .where("key", key)
-        .returning("value")
+        .returning(["key", "value"])
+        .first()
         .catch(handlePostgresError)
 }
 
 async function getAllSystemProperties () {
     return await knex(systemPropertiesTableName)
         .select(["key", "value"])
+        .then(results => {
+            return results.reduce((obj, item) => ({ ...obj, [item.key]: item.value }), {})
+        })
         .catch(handlePostgresError)
 }
 
 async function setSystemProperty (key, value) {
     return await knex(systemPropertiesTableName)
         .insert({ key, value })
-        .onConflict()
+        .onConflict(["key"])
         .merge()
         .catch(handlePostgresError)
 }
