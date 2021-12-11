@@ -30,3 +30,26 @@ CREATE TABLE enrolment_tokens (
     primary key (id),
     unique (token)
 );
+
+CREATE TABLE policies (
+    id uuid default gen_random_uuid(),
+    created_at timestamp default timezone('UTC', now()),
+    created_by uuid not null,
+
+    primary key (id)
+);
+
+CREATE TYPE policy_item_type AS ENUM ('file', 'command', 'package');
+
+CREATE TABLE policy_items (
+    id uuid default gen_random_uuid(),
+    policy_id uuid not null,
+    policy_order int not null,
+    type policy_item_type not null,
+    stop_on_error boolean not null,
+    data jsonb not null,
+
+    primary key (id),
+    foreign key (policy_id) references policies(id) on delete cascade,
+    unique (policy_id, policy_order)
+);
