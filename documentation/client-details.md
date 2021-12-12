@@ -11,9 +11,9 @@ Elliptical curve diffie hellman combined with AES-GCM will be used to encrypt da
 
 The client ID signing shall be done using ECDSA. The signed data shall simply contain the client's ID. This will ensure the client and server are authenticated and data integrity is maintained.
 
-HELLO and HELLOACK Packet structure as follows (98 byte header):
+HELLO and HELLOACK Packet structure as follows (66 byte header):
 1. OP Code (1 byte)
-2. Sender Public Key (65 bytes)
+2. Sender Public Key (33 bytes)
 3. AES IV (16 bytes)
 4. AES Tag (16 bytes)
 5. AEM-GCM Encrypted data (Max 438 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
@@ -25,9 +25,24 @@ All other packets follow the structure (33 byte header):
 5. AEM-GCM Encrypted data (Max 503 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
 
 ## Servers
-Maintain two HTTP servers:
+Maintain two servers:
  - One server for the web dashboard - exposed over plain HTTP (Designed to be proxied!)
- - One server for client communication - HTTPS only! Uses a self-signed certificate to communicate with clients
+ - One server for client communication - TCP server using E2E
+
+## OP Codes
+There are two sets of OP codes defined in this protocol:
+ - "Outer" OP Codes which are defined in the first byte of all packets and are unencrypted. These do not indicate the function of the call, just details about data transfer
+ - "Inner" OP Codes which are contained in the encrypted portion of the message. These indicate details about the function of the message.
+
+### Outer OP Codes
+- `1` - `HELLO` - Initiate a communication with E2E keys
+- `2` - `HELLOACK` - Response to `HELLO`, used so the other party can verify the connection
+- `4` - `DATA` - General transfer of data (Non-chunked)
+- `8` - `DATACHUNKED` - Data transfer that forms part of a chunked communications
+
+### Inner OP Codes
+- Registration of client
+- 
 
 
 ## Client Enrolment
