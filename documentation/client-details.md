@@ -7,16 +7,22 @@ Clients communicate over a TCP socket!
 
 Installation script is embedded with server's public key so that client and server can perform key-exchange securely. 
 
-[ecies](https://ecies.org/) will be used to encrypt data between client and server. This library has a version for both go and javascript, so will be standardised between client and server.
+Elliptical curve diffie hellman combined with AES-GCM will be used to encrypt data between server and client. On connection to the server, the client will issue a HELlO packet containing the client's public key and signed client ID and the server will respond with HELLOACK with its public key and the server-signed client-ID. The client will have a list of permitted server public keys so, if the sent key is not in the list and the signed client-ID cannot be verified, the connection will be closed.
 
-Each communication will be signed with the client or servers public token using ECDSA. The signed data shall simply contain the client's ID. This will ensure the client and server are authenticated and data integrity is maintained.
+The client ID signing shall be done using ECDSA. The signed data shall simply contain the client's ID. This will ensure the client and server are authenticated and data integrity is maintained.
 
-Packet structure as follows:
+HELLO and HELLOACK Packet structure as follows (98 byte header):
 1. OP Code (1 byte)
 2. Sender Public Key (65 bytes)
-3. AES Nonce (16 bytes)
+3. AES IV (16 bytes)
 4. AES Tag (16 bytes)
-5. Encrypted data (Max 438 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
+5. AEM-GCM Encrypted data (Max 438 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
+
+All other packets follow the structure (33 byte header):
+1. OP Code (1 byte)
+3. AES IV (16 bytes)
+4. AES Tag (16 bytes)
+5. AEM-GCM Encrypted data (Max 503 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
 
 ## Servers
 Maintain two HTTP servers:
