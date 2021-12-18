@@ -42,6 +42,7 @@ async function updateEnrolmentToken (id, data) {
 }
 
 module.exports = {
+    enrolmentTableName,
     getAllEnrolmentTokens,
     getEnrolmentToken,
     deleteEnrolmentToken,

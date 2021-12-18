@@ -73,4 +73,4 @@ async function updateUser (id, data) {
     return await query.catch(handlePostgresError)
 }
 
-module.exports = { createUser, getUserByUsername, getUserById, getAllUsers, deleteUser, updateUser }
+module.exports = { usersTableName, createUser, getUserByUsername, getUserById, getAllUsers, deleteUser, updateUser }

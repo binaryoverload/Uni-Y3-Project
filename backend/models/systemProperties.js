@@ -35,4 +35,10 @@ async function deleteSystemProperty (key) {
         .catch(handlePostgresError)
 }
 
-module.exports = { getSystemProperty, getAllSystemProperties, setSystemProperty, deleteSystemProperty }
+module.exports = {
+    systemPropertiesTableName,
+    getSystemProperty,
+    getAllSystemProperties,
+    setSystemProperty,
+    deleteSystemProperty
+}
