@@ -5,7 +5,8 @@ const exceptionCodes = {
     duplicate: "duplicate",
     jwtGeneral: "jwt_general",
     jwtExpired: "jwt_expired",
-    validation: "validation"
+    validation: "validation",
+    badRequest: "bad_request"
 }
 
 class DuplicateEntityError extends Error {
@@ -26,7 +27,7 @@ class HttpError extends Error {
 }
 
 class UnauthorizedError extends HttpError {
-    constructor (message = "Not logged in", code=exceptionCodes.unauthorized) {
+    constructor (message = "Not logged in", code = exceptionCodes.unauthorized) {
         super(401, code, message)
     }
 }
@@ -34,6 +35,12 @@ class UnauthorizedError extends HttpError {
 class NotFoundError extends HttpError {
     constructor (message = "Not found") {
         super(404, exceptionCodes.notfound, message)
+    }
+}
+
+class BadRequest extends HttpError {
+    constructor (message = "Bad request") {
+        super(400, exceptionCodes.badRequest, message)
     }
 }
 
@@ -47,4 +54,12 @@ class DatabaseError extends Error {
     }
 }
 
-module.exports = { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError, exceptionCodes }
+module.exports = {
+    DuplicateEntityError,
+    DatabaseError,
+    HttpError,
+    UnauthorizedError,
+    NotFoundError,
+    BadRequest,
+    exceptionCodes
+}
