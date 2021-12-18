@@ -6,6 +6,8 @@ const { logger } = require("../utils/logger")
 const exitCodes = require("../utils/exitCodes")
 const { handlePostgresError } = require("../utils/errorHandling")
 
+require("knex-with-relations")
+
 const { user, password, host, port, db } = config.postgres
 
 const logLabel = { label: "postgres" }
