@@ -51,6 +51,7 @@ There are two sets of OP codes defined in this protocol:
 ### Outer OP Codes
 - `1` - `HELLO` - Initiate a communication with E2E keys
 - `2` - `HELLOACK` - Response to `HELLO`, used so the other party can verify the connection
+- `3` - `HELLONACK` - Response to `HELLO`, indicates a failed connection
 - `4` - `DATA` - General transfer of data (Non-chunked)
 - `8` - `DATACHUNKED` - Data transfer that forms part of a chunked communications
 
