@@ -53,3 +53,15 @@ CREATE TABLE policy_items (
     foreign key (policy_id) references policies(id) on delete cascade,
     unique (policy_id, policy_order)
 );
+
+CREATE TABLE clients (
+    id uuid default gen_random_uuid(),
+    name varchar(255) not null,
+    public_key varchar(66) not null,
+    last_activity timestamp not null default timezone('UTC', now()),
+    mac_address macaddr,
+    last_known_ip inet,
+    last_known_hostname varchar(255),
+    os_information jsonb default '{}',
+    labels varchar(255)[] default '[]'
+);
