@@ -20,6 +20,14 @@ async function createPolicy (created_by) {
         .catch(handlePostgresError)
 }
 
+async function deletePolicy (id) {
+    return await knex(policiesTableName)
+        .where("id", id)
+        .delete()
+        .returning("id")
+        .catch(handlePostgresError)
+}
+
 async function getById (id) {
     return await knex(policiesTableName)
         .withRelations(knex(policyItemsTableName), "id", "policy_id")
@@ -34,3 +42,5 @@ async function getAll () {
         .first()
         .catch(handlePostgresError)
 }
+
+module.exports = { createPolicy, deletePolicy, getById, getAll }
