@@ -6,13 +6,29 @@ const exceptionCodes = {
     jwtGeneral: "jwt_general",
     jwtExpired: "jwt_expired",
     validation: "validation",
-    badRequest: "bad_request"
+    badRequest: "bad_request",
+    foreignKeyViolation: "foreign_key_violation"
 }
 
-class DuplicateEntityError extends Error {
-    constructor (message) {
+class DatabaseDataError extends Error {
+    constructor (message, code) {
         super(message)
+        this.name = "DatabaseDataError"
+        this.code = code
+    }
+}
+
+class DuplicateEntityError extends DatabaseDataError {
+    constructor (message) {
+        super(message, exceptionCodes.duplicate)
         this.name = "DuplicateEntityError"
+    }
+}
+
+class ForeignKeyError extends DatabaseDataError {
+    constructor (message) {
+        super(message, exceptionCodes.foreignKeyViolation)
+        this.name = "ForeignKeyError"
     }
 }
 
@@ -55,7 +71,9 @@ class DatabaseError extends Error {
 }
 
 module.exports = {
+    DatabaseDataError,
     DuplicateEntityError,
+    ForeignKeyError,
     DatabaseError,
     HttpError,
     UnauthorizedError,

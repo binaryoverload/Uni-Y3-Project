@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator")
 const { DuplicateEntityError, HttpError } = require("../utils/exceptions")
-const { NotFoundError, exceptionCodes } = require("./exceptions")
+const { NotFoundError, exceptionCodes, DatabaseDataError } = require("./exceptions")
 const { JsonWebTokenError, TokenExpiredError } = require("jsonwebtoken")
 
 /*
@@ -61,9 +61,10 @@ const checkValidationErrors = (validator) => {
 }
 
 function handleRequestError (err, res) {
-    if (err instanceof DuplicateEntityError) {
+    if (err instanceof DatabaseDataError) {
         return respondFail(res, 400, {
-            code: exceptionCodes.duplicate
+            code: err.code,
+            message: err.message
         })
     }
     if (err instanceof HttpError) {

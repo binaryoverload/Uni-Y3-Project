@@ -1,14 +1,16 @@
 const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 const { getUserById } = require("./user")
-const { BadRequest } = require("../utils/exceptions")
+const { ForeignKeyError } = require("../utils/exceptions")
 
 const POLICIES_TABLE_NAME = "policies"
 
 async function createPolicy (created_by) {
 
+    // This is manually checked since there is no foreign key constraint in the DB
+    // This is so a policy does not require the user to exist and may point to a deleted user in the future
     if (!await getUserById(created_by)) {
-        throw new BadRequest(`User with ID ${created_by} not found`)
+        throw new ForeignKeyError(`User with ID ${created_by} not found`)
     }
 
     return await knex(POLICIES_TABLE_NAME)
