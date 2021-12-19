@@ -17,7 +17,9 @@ async function createUser (data) {
             last_name
         })
         .returning("id")
-        .first()
+        .then(r => {
+            return { id: r[0] }
+        })
         .catch(handlePostgresError)
 }
 

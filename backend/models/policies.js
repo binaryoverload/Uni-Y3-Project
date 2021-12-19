@@ -2,6 +2,7 @@ const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 const { getUserById } = require("./user")
 const { ForeignKeyError } = require("../utils/exceptions")
+const { POLICY_ITEMS_TABLE_NAME } = require("./policyItems")
 
 const POLICIES_TABLE_NAME = "policies"
 
@@ -18,7 +19,9 @@ async function createPolicy (created_by) {
             created_by
         })
         .returning("id")
-        .first()
+        .then(r => {
+            return { id: r[0] }
+        })
         .catch(handlePostgresError)
 }
 
@@ -32,7 +35,7 @@ async function deletePolicy (id) {
 
 async function getById (id) {
     return await knex(POLICIES_TABLE_NAME)
-        .withRelations(knex(policyItemsTableName), "id", "policy_id")
+        .withRelations(knex(POLICY_ITEMS_TABLE_NAME), "id", "policy_id")
         .where("id", id)
         .first()
         .catch(handlePostgresError)
@@ -40,7 +43,7 @@ async function getById (id) {
 
 async function getAll () {
     return await knex(POLICIES_TABLE_NAME)
-        .withRelations(knex(policyItemsTableName), "id", "policy_id")
+        .withRelations(knex(POLICY_ITEMS_TABLE_NAME), "id", "policy_id")
         .first()
         .catch(handlePostgresError)
 }

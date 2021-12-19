@@ -28,6 +28,7 @@ async function createEnrolmentToken (token) {
     const [insertedRecord] = await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .insert({ token })
         .returning(["id", "token", "created_at", "usage_current"])
+        .then(r => r[0])
         .catch(handlePostgresError)
     return insertedRecord
 }
