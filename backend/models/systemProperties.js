@@ -1,10 +1,10 @@
 const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 
-const systemPropertiesTableName = "system_properties"
+const SYSTEM_PROPERTIES_TABLE_NAME = "system_properties"
 
 async function getSystemProperty (key) {
-    return await knex(systemPropertiesTableName)
+    return await knex(SYSTEM_PROPERTIES_TABLE_NAME)
         .where("key", key)
         .returning(["key", "value"])
         .first()
@@ -12,7 +12,7 @@ async function getSystemProperty (key) {
 }
 
 async function getAllSystemProperties () {
-    return await knex(systemPropertiesTableName)
+    return await knex(SYSTEM_PROPERTIES_TABLE_NAME)
         .select(["key", "value"])
         .then(results => {
             return results.reduce((obj, item) => ({ ...obj, [item.key]: item.value }), {})
@@ -21,7 +21,7 @@ async function getAllSystemProperties () {
 }
 
 async function setSystemProperty (key, value) {
-    return await knex(systemPropertiesTableName)
+    return await knex(SYSTEM_PROPERTIES_TABLE_NAME)
         .insert({ key, value })
         .onConflict(["key"])
         .merge()
@@ -29,14 +29,14 @@ async function setSystemProperty (key, value) {
 }
 
 async function deleteSystemProperty (key) {
-    return await knex(systemPropertiesTableName)
+    return await knex(SYSTEM_PROPERTIES_TABLE_NAME)
         .where("key", key)
         .delete()
         .catch(handlePostgresError)
 }
 
 module.exports = {
-    systemPropertiesTableName,
+    SYSTEM_PROPERTIES_TABLE_NAME,
     getSystemProperty,
     getAllSystemProperties,
     setSystemProperty,

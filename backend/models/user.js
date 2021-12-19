@@ -2,14 +2,14 @@ const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 const { hashPassword } = require("../utils/password")
 
-const usersTableName = "users"
+const USERS_TABLE_NAME = "users"
 
 async function createUser (data) {
     const { username, password, first_name, last_name } = data
 
     const hashedPassword = await hashPassword(password)
 
-    return await knex(usersTableName)
+    return await knex(USERS_TABLE_NAME)
         .insert({
             username,
             password: hashedPassword,
@@ -22,7 +22,7 @@ async function createUser (data) {
 }
 
 async function getUserByUsername (username) {
-    return await knex(usersTableName)
+    return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name"])
         .where("username", username)
         .first()
@@ -30,7 +30,7 @@ async function getUserByUsername (username) {
 }
 
 async function getUserById (id) {
-    return await knex(usersTableName)
+    return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name"])
         .where("id", id)
         .first()
@@ -38,13 +38,13 @@ async function getUserById (id) {
 }
 
 async function getAllUsers () {
-    return await knex(usersTableName)
+    return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name"])
         .catch(handlePostgresError)
 }
 
 async function deleteUser (id) {
-    return await knex(usersTableName)
+    return await knex(USERS_TABLE_NAME)
         .where("id", id)
         .delete()
         .returning("id")
@@ -56,7 +56,7 @@ async function updateUser (id, data) {
 
     const hashedPassword = await hashPassword(password)
 
-    let query = knex(usersTableName)
+    let query = knex(USERS_TABLE_NAME)
         .where("id", id)
         .update({
             username,
@@ -73,4 +73,4 @@ async function updateUser (id, data) {
     return await query.catch(handlePostgresError)
 }
 
-module.exports = { usersTableName, createUser, getUserByUsername, getUserById, getAllUsers, deleteUser, updateUser }
+module.exports = { USERS_TABLE_NAME, createUser, getUserByUsername, getUserById, getAllUsers, deleteUser, updateUser }

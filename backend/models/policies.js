@@ -3,7 +3,7 @@ const { handlePostgresError } = require("../utils/errorHandling")
 const { getUserById } = require("./user")
 const { BadRequest } = require("../utils/exceptions")
 
-const policiesTableName = "policies"
+const POLICIES_TABLE_NAME = "policies"
 
 async function createPolicy (created_by) {
 
@@ -11,7 +11,7 @@ async function createPolicy (created_by) {
         throw new BadRequest(`User with ID ${created_by} not found`)
     }
 
-    return await knex(policiesTableName)
+    return await knex(POLICIES_TABLE_NAME)
         .insert({
             created_by
         })
@@ -21,7 +21,7 @@ async function createPolicy (created_by) {
 }
 
 async function deletePolicy (id) {
-    return await knex(policiesTableName)
+    return await knex(POLICIES_TABLE_NAME)
         .where("id", id)
         .delete()
         .returning("id")
@@ -29,7 +29,7 @@ async function deletePolicy (id) {
 }
 
 async function getById (id) {
-    return await knex(policiesTableName)
+    return await knex(POLICIES_TABLE_NAME)
         .withRelations(knex(policyItemsTableName), "id", "policy_id")
         .where("id", id)
         .first()
@@ -37,10 +37,16 @@ async function getById (id) {
 }
 
 async function getAll () {
-    return await knex(policiesTableName)
+    return await knex(POLICIES_TABLE_NAME)
         .withRelations(knex(policyItemsTableName), "id", "policy_id")
         .first()
         .catch(handlePostgresError)
 }
 
-module.exports = { createPolicy, deletePolicy, getById, getAll }
+module.exports = {
+    POLICIES_TABLE_NAME,
+    createPolicy,
+    deletePolicy,
+    getById,
+    getAll
+}
