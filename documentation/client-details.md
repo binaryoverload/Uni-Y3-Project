@@ -11,6 +11,20 @@ Elliptical curve diffie hellman combined with AES-GCM will be used to encrypt da
 
 The client ID signing shall be done using ECDSA. The signed data shall simply contain the client's ID. This will ensure the client and server are authenticated and data integrity is maintained.
 
+### Libraries to be used
+#### Client (Golang)
+- [ecdh package](https://pkg.go.dev/github.com/aead/ecdh)
+- [crypto/ecdsa](https://pkg.go.dev/crypto/ecdsa)
+- [crypto/cipher](https://pkg.go.dev/crypto/cipher@go1.17.5#NewGCM)
+- [crypto/aes](https://pkg.go.dev/crypto/aes@go1.17.5)
+
+#### Server (Node.JS / JavaScript)
+- [Sign (ECDSA)](https://nodejs.org/api/crypto.html#class-sign)
+- [ECDH](https://nodejs.org/api/crypto.html#class-ecdh)
+- [Cipher (AES)](https://nodejs.org/api/crypto.html#class-cipher)
+
+### Packet Structures
+
 HELLO and HELLOACK Packet structure as follows (66 byte header):
 1. OP Code (1 byte)
 2. Sender Public Key (33 bytes)
