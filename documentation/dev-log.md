@@ -17,3 +17,20 @@
 - Create initial DB migration for users, properties and enrolment tokens
 - Add user routes and modify auth routes to use DB
 - Add password hashing using argon2
+- Add models and validation for system properties, enrolment tokens and users
+
+## Week 3 - w/c 6th December
+- Add endpoints for system properties, enrolment tokens and users
+- Add more enhanced express middleware and error handling
+- Start encryption spec for client/server communication
+- Add SQL for policies
+
+## Week 4 - w/c 13th December
+- Add SQL for clients
+- Add models for policies and clients
+- Add handling for foreign key constraints
+- Document security libs
+- Create Golang project for client
+
+## Week 5 - w/c 20th December - Christmas Week 🎄
+- 
