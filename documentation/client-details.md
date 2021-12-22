@@ -25,18 +25,27 @@ The client ID signing shall be done using ECDSA. The signed data shall simply co
 
 ### Packet Structures
 
+AES Headers and Data:
+1. AES IV (16 bytes)
+2. AES Tag (16 bytes)
+3. AEM-GCM Encrypted data (Max (536 - header) bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
+
 HELLO and HELLOACK Packet structure as follows (66 byte header):
 1. OP Code (1 byte)
 2. Sender Public Key (33 bytes)
-3. AES IV (16 bytes)
-4. AES Tag (16 bytes)
-5. AEM-GCM Encrypted data (Max 438 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
+3. AES Headers and Data (32 bytes + variable Length)
 
-All other packets follow the structure (33 byte header):
-1. OP Code (1 byte)
-3. AES IV (16 bytes)
-4. AES Tag (16 bytes)
-5. AEM-GCM Encrypted data (Max 503 bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
+HELLONAK:
+1. OP Code (0x03)
+
+DATA:
+1. OP Code (0x04)
+2. AES Headers and Data (32 bytes + variable length)
+
+DATACHUNKED:
+1. OP Code (0x08)
+2. Chunk Size (2 bytes)
+3. AES Headers and Data (32 bytes + variable Length)
 
 ## Servers
 Maintain two servers:
