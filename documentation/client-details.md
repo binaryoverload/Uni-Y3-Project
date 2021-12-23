@@ -31,21 +31,19 @@ AES Headers and Data:
 3. AEM-GCM Encrypted data (Max (536 - header) bytes - calculated from max TCP datagram size specified in [RFC 879](https://www.rfc-editor.org/rfc/rfc879#section-1))
 
 HELLO and HELLOACK Packet structure as follows (66 byte header):
-1. OP Code (1 byte)
-2. Sender Public Key (33 bytes)
-3. AES Headers and Data (32 bytes + variable Length)
+1. Packet Length - Excluding itself (4 bytes - UINT32BE)
+2. OP Code (1 byte)
+3. Sender Public Key (33 bytes)
+4. AES Headers and Data (32 bytes + variable Length)
 
 HELLONAK:
+1. Packet Length - Excluding itself (4 bytes - UINT32BE)
 1. OP Code (0x03)
 
 DATA:
+1. Packet Length - Excluding itself (4 bytes - UINT32BE)
 1. OP Code (0x04)
 2. AES Headers and Data (32 bytes + variable length)
-
-DATACHUNKED:
-1. OP Code (0x08)
-2. Chunk Size (2 bytes)
-3. AES Headers and Data (32 bytes + variable Length)
 
 ## Servers
 Maintain two servers:
@@ -61,8 +59,7 @@ There are two sets of OP codes defined in this protocol:
 - `1` - `HELLO` - Initiate a communication with E2E keys
 - `2` - `HELLOACK` - Response to `HELLO`, used so the other party can verify the connection
 - `3` - `HELLONACK` - Response to `HELLO`, indicates a failed connection
-- `4` - `DATA` - General transfer of data (Non-chunked)
-- `8` - `DATACHUNKED` - Data transfer that forms part of a chunked communications
+- `4` - `DATA` - General transfer of data
 
 ### Inner OP Codes
 - Registration of client
