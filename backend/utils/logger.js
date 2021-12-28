@@ -10,9 +10,15 @@ const loggingFormatString = printf(({ level, message, timestamp, label, stack })
     return `${timestamp} [${level}]${labelString} ${stack || message}`
 })
 
+const addHostToMessage = format(log => {
+    log.message = log.host ? `[${log.host}]\t${log.message}` : log.message
+    return log
+})
+
 const loggingFormat = combine(
     colorize(),
     timestamp({ format: "DD-MM-YYYY hh:mm:ss" }),
+    addHostToMessage(),
     align(),
     errors({ stack: true }),
     loggingFormatString

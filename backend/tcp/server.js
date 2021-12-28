@@ -1,7 +1,7 @@
 const net = require("net")
 
 const { logger } = require("../utils/logger")
-const { Data } = require("./outerMessages")
+const { opCodeMapping } = require("./outerMessages")
 
 const server = net.createServer()
 
@@ -19,13 +19,29 @@ function handleError (fun) {
     }
 }
 
+function processFinalData (finalData, address) {
+    const outerOpCode = finalData.readUInt8(0)
+    const dataModel = opCodeMapping[outerOpCode]
+    logger.debug(`Received message with op-code ${outerOpCode} (${dataModel?.name || "Unknown"})`, { label: "tcp,fin", host: address })
+
+    if (!dataModel) {
+        logger.debug(`Unknown op-code, dropping packet`, { label: "tcp,err", host: address })
+        return
+    }
+
+    const data = dataModel.decode(finalData)
+
+    return data
+}
+
 function handleConnection (conn) {
     let remoteAddress = conn.remoteAddress + ":" + conn.remotePort
-    logger.info(`new client connection from ${remoteAddress}`, tcpLabel)
+    logger.info(`new client connection`, { ...tcpLabel, host: remoteAddress })
 
     conn.on("data", handleError(onConnData))
     conn.once("close", onConnClose)
     conn.on("error", onConnError)
+    conn.on("processedData", (data) => { console.log(data) })
 
     let remainingLength = 0
     const buffers = []
@@ -35,19 +51,18 @@ function handleConnection (conn) {
             const buffer = d.slice(0, 4)
             remainingLength = buffer.readUInt32BE()
             if (remainingLength === 0) {
-                logger.debug(`Received a 0-length packet from ${remoteAddress}`, { label: "tcp,err" })
+                logger.debug(`Received a 0-length packet`, { label: "tcp,err", host: remoteAddress })
                 return
             }
             d = d.slice(4)
-            logger.debug(`Expecting ${remainingLength} bytes from ${remoteAddress}`, { label: "tcp,exp" })
+            logger.debug(`Expecting ${remainingLength} bytes`, { label: "tcp,exp", host: remoteAddress  })
         }
 
         if (d.length === 0)
             return
 
-
-        logger.debug(`Received ${d.length} bytes (${remainingLength - d.length} remaining) from ${remoteAddress}`,
-            { label: "tcp,rec" })
+        logger.debug(`Received ${d.length} bytes (${remainingLength - d.length} remaining)`,
+            { label: "tcp,rec", host: remoteAddress  })
 
         if (d.length < remainingLength) {
             buffers.push(d)
@@ -56,31 +71,32 @@ function handleConnection (conn) {
         }
 
         if (d.length > remainingLength) {
-            conn.emit("data", d.slice(remainingLength))
-            d = d.slice(0, remainingLength)
+            logger.debug(`Received ${d.length - remainingLength} too many bytes. Dropping packet`, { label: "tcp,err", host: remoteAddress  })
+            return
         }
 
         buffers.push(d)
         let finalData = Buffer.concat(buffers)
 
-        // TODO: Handle Final Data
-
-        Data.decode(finalData).encode()
-
-        logger.debug(`Received final ${finalData.length} bytes (${buffers.length} packets) from ${remoteAddress}`,
-            { label: "tcp,fin" })
-
-        remainingLength = 0
-        buffers.length = 0
-
+        try {
+            logger.debug(`Received final ${finalData.length} bytes (${buffers.length} packets)`,
+                { label: "tcp,fin", host: remoteAddress  })
+            const data = processFinalData(finalData, remoteAddress)
+            conn.emit("processedData", data)
+        } catch (e) {
+            logger.error(`Error processing final data: ${e.message}`, { label: "tcp,err", host: remoteAddress   })
+        } finally {
+            remainingLength = 0
+            buffers.length = 0
+        }
     }
 
     function onConnClose () {
-        logger.info(`Connection from ${remoteAddress} closed`, tcpLabel)
+        logger.info(`Connection closed`, { ...tcpLabel, host: remoteAddress  })
     }
 
     function onConnError (err) {
-        logger.error(`Connection ${remoteAddress} error: ${err.message}`, tcpLabel)
+        logger.error(`Connection error: ${err.message}`, { ...tcpLabel, host: remoteAddress  })
     }
 }
 
