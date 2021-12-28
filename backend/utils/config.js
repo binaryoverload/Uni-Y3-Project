@@ -2,13 +2,14 @@ const dotenv = require("dotenv")
 const validator = require("validator")
 const { merge } = require("lodash")
 const tripleBeam = require("triple-beam")
+const { getCurves } = require("crypto")
 
 const exitCodes = require("./exitCodes")
 
 // Loads .env file into process.env
 dotenv.config()
 
-const requiredEnv = ["JWT_SECRET", "POSTGRES_HOST", "POSTGRES_PASSWORD"]
+const requiredEnv = ["JWT_SECRET", "POSTGRES_HOST", "POSTGRES_PASSWORD", "EC_PRIVATE_KEY"]
 
 const missingEnv = requiredEnv.filter(env => typeof process.env[env] === "undefined")
 
@@ -30,6 +31,10 @@ const defaultConfig = {
         memoryCost: 4096,
         parallelism: 1
     },
+    encryption: {
+        ecCurve: "prime256v1",
+        aesAlgorithm: "aes-256-gcm"
+    },
     postgres: {
         db: "postgres",
         user: "postgres",
@@ -50,6 +55,10 @@ const envConfig = {
         timeCost: process.env.PASSWORD_TIME_COST,
         memoryCost: process.env.PASSWORD_MEMORY_COST,
         parallelism: process.env.PASSWORD_PARALLELISM
+    },
+    encryption: {
+        ecCurve: process.env.EC_CURVE,
+        ecPrivateKey: process.env.EC_PRIVATE_KEY
     },
     postgres: {
         db: process.env.POSTGRES_DB,
@@ -87,6 +96,16 @@ if (Object.values(passwordHashing).some(param => !validator.isInt(String(param))
 if (Object.keys(tripleBeam.configs.npm.levels).indexOf(mergedConfig.loggingLevel) === -1) {
     console.warn("Logging level is not valid! Using INFO")
     mergedConfig.loggingLevel = "info"
+}
+
+if (!(mergedConfig.encryption.ecPrivateKey.length === 64)) {
+    console.error("Elliptical curve private key must be 32 bytes in hex format (64 chars)")
+    process.exit(exitCodes.configEncryptionPrivateKey)
+}
+
+if (!getCurves().includes(mergedConfig.encryption.ecCurve)) {
+    console.error(`The elliptical curve "${mergedConfig.encryption.ecCurve}" is not supported! Please use crypto.getCurves() to find a supported curve. Default is "${defaultConfig.encryption.ecCurve}"`)
+    process.exit(exitCodes.configEncryptionCurve)
 }
 
 module.exports = mergedConfig
