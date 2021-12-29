@@ -60,10 +60,10 @@ class Hello extends OuterMessage {
         if (!(buffer instanceof Buffer)) throw new Error("Decode param must be buffer")
         if (buffer.length <= (1 + 33 + 32)) throw new Error("Hello must contain opcode (1 byte) + public key (33 bytes) + AES data (32+ bytes)")
         if (buffer.readUInt8() !== opCodes.HELLO) throw new Error(`OP Code does not match. Expected ${opCodes.HELLO}, got ${buffer.readUInt8()}`)
-        if (buffer.readUInt8(1) === 0x03) throw new Error("Public key must be in compressed format. First byte is not 0x03")
+        if (buffer.readUInt8(1) !== 0x03 && buffer.readUInt8(1) !== 0x02) throw new Error("Public key must be in compressed format. First byte is not 0x03 or 0x02")
         return new Hello(
-            buffer.slice(0, 33),
-            AesData.decode(buffer.slice(33))
+            buffer.slice(1, 34),
+            AesData.decode(buffer.slice(34))
         )
     }
 
@@ -89,10 +89,10 @@ class HelloAck extends OuterMessage {
         if (!(buffer instanceof Buffer)) throw new Error("Decode param must be buffer")
         if (buffer.length <= (1 + 33 + 32)) throw new Error("HelloAck must contain opcode (1 byte) + public key (33 bytes) + AES data (32+ bytes)")
         if (buffer.readUInt8() !== opCodes.HELLOACK) throw new Error(`OP Code does not match. Expected ${opCodes.HELLOACK}, got ${buffer.readUInt8()}`)
-        if (buffer.readUInt8(1) === 0x03) throw new Error("Public key must be in compressed format. First byte is not 0x03")
+        if (buffer.readUInt8(1) !== 0x03 && buffer.readUInt8(1) !== 0x02) throw new Error("Public key must be in compressed format. First byte is not 0x03 or 0x02")
         return new HelloAck(
-            buffer.slice(0, 33),
-            AesData.decode(buffer.slice(33))
+            buffer.slice(1, 34),
+            AesData.decode(buffer.slice(34))
         )
     }
 
