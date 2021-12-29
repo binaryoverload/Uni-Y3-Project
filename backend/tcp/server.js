@@ -42,7 +42,6 @@ function handleConnection (conn) {
     conn.on("data", handleError(onConnData))
     conn.once("close", onConnClose)
     conn.on("error", onConnError)
-    conn.on("processedData", (data) => { sessionHandler.processPacket(data) })
 
     let remainingLength = 0
     const buffers = []
@@ -83,7 +82,7 @@ function handleConnection (conn) {
             logger.debug(`Received final ${finalData.length} bytes (${buffers.length} packets)`,
                 { label: "tcp,fin", host: remoteAddress  })
             const data = processFinalData(finalData, remoteAddress)
-            conn.emit("processedData", data)
+            sessionHandler.processPacket(data)
         } catch (e) {
             logger.error(`Error processing final data: ${e.message}`, { label: "tcp,err", host: remoteAddress   })
         } finally {

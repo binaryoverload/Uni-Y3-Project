@@ -29,6 +29,7 @@ class SessionHandler {
             if (this.#receivedHello) throw new Error("Session has already been established with Hello!")
             this.#clientPublicKey = packet.senderPublicKey
             this.#sharedSecret = computeSharedECHDSecret(packet.senderPublicKey)
+            this.#receivedHello = true
         }
     }
 
