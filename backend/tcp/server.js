@@ -2,6 +2,7 @@ const net = require("net")
 
 const { logger } = require("../utils/logger")
 const { opCodeMapping } = require("./outerMessages")
+const SessionHandler = require("./sessionHandler")
 
 const server = net.createServer()
 
@@ -29,19 +30,19 @@ function processFinalData (finalData, address) {
         return
     }
 
-    const data = dataModel.decode(finalData)
-
-    return data
+    return dataModel.decode(finalData)
 }
 
 function handleConnection (conn) {
     let remoteAddress = conn.remoteAddress + ":" + conn.remotePort
     logger.info(`new client connection`, { ...tcpLabel, host: remoteAddress })
 
+    const sessionHandler = new SessionHandler(remoteAddress)
+
     conn.on("data", handleError(onConnData))
     conn.once("close", onConnClose)
     conn.on("error", onConnError)
-    conn.on("processedData", (data) => { console.log(data) })
+    conn.on("processedData", (data) => { sessionHandler.processPacket(data) })
 
     let remainingLength = 0
     const buffers = []

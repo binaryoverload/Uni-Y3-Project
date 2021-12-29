@@ -6,7 +6,7 @@ const { AesData } = require("../tcp/outerMessages")
 const ecdh = crypto.createECDH(config.encryption.ecCurve)
 ecdh.setPrivateKey(config.encryption.ecPrivateKey, "hex")
 
-function computerSharedECHDSecret(senderPublicKey) {
+function computeSharedECHDSecret(senderPublicKey) {
     if (Buffer.isBuffer(senderPublicKey)) {
         return ecdh.computeSecret(senderPublicKey)
     }
@@ -38,7 +38,7 @@ function decryptAes(secret, aesData) {
 
 
 module.exports = {
-    computerSharedECHDSecret,
+    computeSharedECHDSecret,
     encryptAes,
     decryptAes,
     ecPublicKey: ecdh.getPublicKey(null, "compressed")
