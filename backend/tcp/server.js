@@ -1,7 +1,7 @@
 const net = require("net")
 
 const { logger } = require("../utils/logger")
-const { opCodeMapping } = require("./outerMessages")
+const { opCodeMapping, OuterMessage, HelloNAck, ErrorPacket } = require("./outerMessages")
 const SessionHandler = require("./sessionHandler")
 
 const server = net.createServer()
@@ -82,7 +82,14 @@ function handleConnection (conn) {
             logger.debug(`Received final ${finalData.length} bytes (${buffers.length} packets)`,
                 { label: "tcp,fin", host: remoteAddress  })
             const data = processFinalData(finalData, remoteAddress)
-            sessionHandler.processPacket(data)
+            const result = sessionHandler.processOuterPacket(data)
+            if (result && result instanceof OuterMessage) {
+                logger.debug(`Sending ${result.constructor.name} (${result.opCode}) to client. ${result.encode().length} bytes`, {label: "tcp,sen", host: remoteAddress})
+                conn.write(result.encode())
+                if (result instanceof HelloNAck || result instanceof ErrorPacket) {
+                    conn.end()
+                }
+            }
         } catch (e) {
             logger.error(`Error processing final data: ${e.message}`, { label: "tcp,err", host: remoteAddress   })
         } finally {

@@ -2,7 +2,8 @@ const opCodes = {
     HELLO: 1,
     HELLOACK: 2,
     HELLONACK: 3,
-    DATA: 4
+    DATA: 4,
+    ERROR: 5
 }
 
 
@@ -148,11 +149,29 @@ class Data extends OuterMessage {
     }
 }
 
+class ErrorPacket extends OuterMessage {
+    constructor () {
+        super(opCodes.ERROR)
+    }
+
+    static decode(buffer) {
+        if (!(buffer instanceof Buffer)) throw new Error("Decode param must be buffer")
+        if (buffer.length < 1) throw new Error("Error must contain the OpCode (1 byte)")
+        if (buffer.readUInt8() !== opCodes.HELLONACK) throw new Error(`OP Code does not match. Expected ${opCodes.ERROR}, got ${buffer.readUInt8()}`)
+        return new ErrorPacket()
+    }
+
+    encode () {
+        return Buffer.from([opCodes.ERROR])
+    }
+}
+
 const opCodeMapping = {
     [opCodes.HELLO]: Hello,
     [opCodes.HELLOACK]: HelloAck,
     [opCodes.HELLONACK]: HelloNAck,
-    [opCodes.DATA]: Data
+    [opCodes.DATA]: Data,
+    [opCodes.ERROR]: ErrorPacket
 }
 
-module.exports = {opCodes, opCodeMapping, AesData, OuterMessage, Hello, HelloAck, HelloNAck, Data}
+module.exports = {opCodes, opCodeMapping, AesData, OuterMessage, Hello, HelloAck, HelloNAck, Data, ErrorPacket}
