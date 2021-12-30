@@ -2,9 +2,12 @@ const crypto = require("crypto")
 
 const config = require("./config")
 const { AesData } = require("../tcp/outerMessages")
+const { logger } = require("./logger")
 
 const ecdh = crypto.createECDH(config.encryption.ecCurve)
 ecdh.setPrivateKey(config.encryption.ecPrivateKey, "hex")
+
+logger.info(`ECDH Public Key: ${ecdh.getPublicKey("hex", "compressed")}`)
 
 function computeSharedECHDSecret(senderPublicKey) {
     if (Buffer.isBuffer(senderPublicKey)) {
