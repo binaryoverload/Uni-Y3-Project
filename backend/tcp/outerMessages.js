@@ -118,6 +118,10 @@ class HelloNAck extends OuterMessage {
         return new HelloNAck()
     }
 
+    encode () {
+        return Buffer.from([opCodes.HELLONACK])
+    }
+
 }
 
 class Data extends OuterMessage {
@@ -131,7 +135,7 @@ class Data extends OuterMessage {
         if (buffer.length <= (1 + 32)) throw new Error("HelloAck must contain opcode (1 byte) + AES data (32+ bytes)")
         if (buffer.readUInt8() !== opCodes.DATA) throw new Error(`OP Code does not match. Expected ${opCodes.DATA}, got ${buffer.readUInt8()}`)
         return new Data(
-            AesData.decode(buffer)
+            AesData.decode(buffer.slice(1))
         )
     }
 
