@@ -1,7 +1,7 @@
 const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 const { getUserById } = require("./user")
-const { ForeignKeyError } = require("../utils/exceptions")
+const { ForeignKeyError } = require("../utils/httpExceptions")
 const { POLICY_ITEMS_TABLE_NAME } = require("./policyItems")
 
 const POLICIES_TABLE_NAME = "policies"

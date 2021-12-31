@@ -9,7 +9,7 @@ const { checkValidationErrors, executeQuery } = require("../utils/http")
 const { getUserByUsername } = require("../models/user")
 const { verifyPassword } = require("../utils/password")
 const { authorizeUser } = require("../services/user")
-const { UnauthorizedError, exceptionCodes } = require("../utils/exceptions")
+const { UnauthorizedError, exceptionCodes } = require("../utils/httpExceptions")
 
 const router = Router()
 

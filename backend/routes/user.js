@@ -3,7 +3,7 @@ const { Router } = require("express")
 const { checkValidationErrors, respondFail, respondSuccess, executeQuery } = require("../utils/http")
 const { createUser, getUserById, getAllUsers, deleteUser, updateUser } = require("../models/user")
 const { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError } = require(
-    "../utils/exceptions")
+    "../utils/httpExceptions")
 const { userPost, userGetId, userDelete, userPatch } = require("../validation/user")
 const { validateJwt } = require("../middlewares/validateJwt")
 const { hashPassword } = require("../utils/password")

@@ -3,7 +3,7 @@ const { executeQuery, checkValidationErrors } = require("../utils/http")
 const { getAllSystemProperties, getSystemProperty, setSystemProperty, deleteSystemProperty } = require("../models/systemProperties")
 const { validateJwt } = require("../middlewares/validateJwt")
 const { propertyGet, propertySet, propertyDelete } = require("../validation/systemProperties")
-const { NotFoundError } = require("../utils/exceptions")
+const { NotFoundError } = require("../utils/httpExceptions")
 
 const router = Router()
 

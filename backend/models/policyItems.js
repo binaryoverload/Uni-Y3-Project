@@ -1,6 +1,6 @@
 const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
-const { BadRequest } = require("../utils/exceptions")
+const { BadRequest } = require("../utils/httpExceptions")
 
 const POLICY_ITEMS_TABLE_NAME = "policy_items"
 

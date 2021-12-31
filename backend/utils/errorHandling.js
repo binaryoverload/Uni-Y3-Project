@@ -1,6 +1,6 @@
 const { DatabaseError } = require("pg")
 const { PostgresError } = require("pg-error-enum")
-const { DuplicateEntityError, DatabaseError: DBError, ForeignKeyError } = require("./exceptions")
+const { DuplicateEntityError, DatabaseError: DBError, ForeignKeyError } = require("./httpExceptions")
 
 function postgresErrorNameFromCode (code) {
     return Object.keys(PostgresError).find(key => PostgresError[key] === code)?.toLowerCase()
