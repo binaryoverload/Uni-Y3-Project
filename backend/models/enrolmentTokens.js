@@ -11,6 +11,14 @@ async function getEnrolmentToken (id) {
         .catch(handlePostgresError)
 }
 
+async function getEnrolmentTokenByToken (token) {
+    return await knex(ENROLMENT_TOKENS_TABLE_NAME)
+        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .where("token", token)
+        .first()
+        .catch(handlePostgresError)
+}
+
 async function getAllEnrolmentTokens () {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
@@ -46,6 +54,7 @@ module.exports = {
     ENROLMENT_TOKENS_TABLE_NAME,
     getAllEnrolmentTokens,
     getEnrolmentToken,
+    getEnrolmentTokenByToken,
     deleteEnrolmentToken,
     createEnrolmentToken,
     updateEnrolmentToken

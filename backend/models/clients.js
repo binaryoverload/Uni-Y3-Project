@@ -89,3 +89,10 @@ async function getAllClients (id) {
         .catch(handlePostgresError)
 }
 
+module.exports = {
+    createClient,
+    deleteClient,
+    updateClient,
+    getClientById,
+    getAllClients
+}
