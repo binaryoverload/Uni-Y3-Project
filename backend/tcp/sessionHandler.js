@@ -1,7 +1,9 @@
 const { logger } = require("../utils/logger")
 const config = require("../utils/config")
 const { Hello, Data, HelloNAck, HelloAck, ErrorPacket } = require("./outerMessages")
-const { computeSharedECHDSecret, decryptAes, ecPublicKey } = require("../utils/encryption")
+const { computeSharedECHDSecret, decryptAes, ecPublicKey, encryptAes } = require("../utils/encryption")
+const { opCodeDecodeFunctions, encodeError, encodeTCPError, opCodes: innerOpCodes } = require("./innerMessages")
+const { CloseConnectionError } = require("../utils/tcpExceptions")
 
 class SessionHandler {
 
@@ -36,19 +38,34 @@ class SessionHandler {
             this.#clientPublicKey = packet.senderPublicKey
             this.#sharedSecret = computeSharedECHDSecret(packet.senderPublicKey)
             const jsonData = this.#decryptJsonData(packet.aesData)
-            console.log(jsonData)
+            if (Object.keys(jsonData).length > 0) {
+                logger.error("Received non-empty data from client on Hello", { label: "sess", host: this.#hostAddress })
+                return new HelloNAck()
+            }
 
             this.#receivedHello = true
-            return new HelloAck(ecPublicKey, null)
+            return new HelloAck(ecPublicKey, encryptAes(this.#sharedSecret, {}))
         }
         if (packet instanceof Data) {
             if (!this.#receivedHello) {
-                logger.error("Data packet received with no Hello", { label: "sess", host: this.#hostAddress })
-                return new HelloNAck()
+                throw new CloseConnectionError("Data packet received with no Hello")
             }
             this.#invalidPacketCount = 0
             const jsonData = this.#decryptJsonData(packet.aesData)
-            console.log(jsonData)
+
+            const decodeFunction = opCodeDecodeFunctions[jsonData.op_code]
+
+            if (!decodeFunction) {
+                logger.error(`Decode function for op-code ${jsonData.op_code} does not exist. Op-code exists: ${Object.values(innerOpCodes).includes(jsonData.op_code)}`, { label: "sess", host: this.#hostAddress })
+                return new Data(encryptAes(this.#sharedSecret, encodeTCPError(`Op-code ${jsonData.op_code} is not valid`)))
+            }
+
+            const result = decodeFunction(jsonData);
+
+            if (result) {
+                return new Data(encryptAes(this.#sharedSecret, result))
+            }
+
             return
         }
 
@@ -66,7 +83,7 @@ class SessionHandler {
         const decryptedData = decryptAes(this.#sharedSecret, aesData)
         let jsonData = null
         try {
-            jsonData = JSON.parse(decryptedData)
+            jsonData = {...JSON.parse(decryptedData), public_key: this.#clientPublicKey}
         } catch (e) {
             throw new Error(`Could not parse JSON data: ${e.message}`)
         }

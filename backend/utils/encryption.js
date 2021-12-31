@@ -19,6 +19,9 @@ function computeSharedECHDSecret(senderPublicKey) {
 function encryptAes(secret, data) {
     const iv = crypto.randomBytes(16)
     const aesCipher = crypto.createCipheriv(config.encryption.aesAlgorithm, secret, iv)
+    if (!(data instanceof String)) {
+        data = JSON.stringify(data)
+    }
     let encryptedData = aesCipher.update(data)
     encryptedData = Buffer.concat([encryptedData, aesCipher.final()])
     return new AesData(iv, aesCipher.getAuthTag(), encryptedData)

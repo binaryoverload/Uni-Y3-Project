@@ -55,7 +55,7 @@ client.connect(9000, '192.168.1.248', function() {
 
     rl.on("line", () => {
         if (!sentHello) {
-            sendHello(client, JSON.stringify({"hi": "world"}))
+            sendHello(client, JSON.stringify({}))
             sentHello = true
             return
         }

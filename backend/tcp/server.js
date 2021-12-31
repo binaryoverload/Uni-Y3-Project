@@ -3,6 +3,7 @@ const net = require("net")
 const { logger } = require("../utils/logger")
 const { opCodeMapping, OuterMessage, HelloNAck, ErrorPacket } = require("./outerMessages")
 const SessionHandler = require("./sessionHandler")
+const { TcpError } = require("../utils/tcpExceptions")
 
 const server = net.createServer()
 
@@ -91,6 +92,10 @@ function handleConnection (conn) {
                 }
             }
         } catch (e) {
+            if (e instanceof TcpError) {
+                logger.error(e.message, { label: "tcp,err", host: remoteAddress   })
+                return
+            }
             logger.error(`Error processing final data: ${e.message}`, { label: "tcp,err", host: remoteAddress   })
         } finally {
             remainingLength = 0
