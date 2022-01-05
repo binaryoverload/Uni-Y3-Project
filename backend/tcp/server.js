@@ -85,7 +85,13 @@ function handleConnection (conn) {
             const data = processFinalData(finalData, remoteAddress)
             const result = sessionHandler.processOuterPacket(data)
             if (result && result instanceof OuterMessage) {
-                logger.debug(`Sending ${result.constructor.name} (${result.opCode}) to client. ${result.encode().length} bytes`, {label: "tcp,sen", host: remoteAddress})
+                const encodedResult = result.encode()
+                logger.debug(`Sending ${result.constructor.name} (${result.opCode}) to client. ${encodedResult.length} bytes`, {label: "tcp,sen", host: remoteAddress})
+
+                let lengthPacket = Buffer.alloc(4)
+                lengthPacket.writeUInt32BE(encodedResult.length)
+
+                conn.write(lengthPacket)
                 conn.write(result.encode())
                 if (result instanceof HelloNAck || result instanceof ErrorPacket) {
                     conn.end()
