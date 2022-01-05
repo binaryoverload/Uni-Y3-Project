@@ -20,16 +20,16 @@ class AesData {
         if (buffer.length <= 32) throw new Error("AES Data must contain IV (16 bytes), tag (16 bytes) and data (1+ bytes)")
         return new AesData(
             buffer.slice(0, 16),
-            buffer.slice(16, 32),
-            buffer.slice(32)
+            buffer.slice(buffer.length - 16),
+            buffer.slice(16, buffer.length - 16)
         )
     }
 
     encode() {
         const buffer = Buffer.alloc(32 + this.data.length)
-        this.iv.copy(buffer, 0, 0, 16)
-        this.tag.copy(buffer, 16, 0, 32)
-        this.data.copy(buffer, 32, 0)
+        this.iv.copy(buffer, 0)
+        this.data.copy(buffer, 16)
+        this.tag.copy(buffer, 16 + this.data.length)
         return buffer
     }
 

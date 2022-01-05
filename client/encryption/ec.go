@@ -3,6 +3,7 @@ package encryption
 import (
 	"client/config"
 	"crypto/aes"
+	"crypto/cipher"
 	"crypto/elliptic"
 	"crypto/rand"
 	ecdh "github.com/aead/ecdh"
@@ -24,8 +25,41 @@ func CalculateSharedSecret(publicKey []byte) []byte {
 	return ecdhInstance.ComputeSecret(privateKey, point)
 }
 
-func EncryptAes(secret []byte, data []byte) {
-	var iv = make([]byte, 16)
+func EncryptAes(secret []byte, data []byte) []byte {
+	iv := make([]byte, 16)
 	rand.Read(iv)
-	aes.NewCipher(secret)
+	block, err := aes.NewCipher(secret)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	cipherText := gcm.Seal(nil, iv, data, nil)
+
+	return append(iv, cipherText...)
+}
+
+func DecryptAes(secret []byte, data []byte) []byte {
+	iv := data[:16]
+
+	block, err := aes.NewCipher(secret)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	plaintext, err := gcm.Open(nil, iv, data[16:], nil)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return plaintext
 }
