@@ -42,6 +42,21 @@ func main() {
 	c.Write(length)
 	c.Write(packet)
 
+	length = make([]byte, 4)
+	_, err := c.Read(length)
+	if err != nil {
+		log.Fatalln("Could not read from TCP")
+	}
+
+	data = make([]byte, binary.BigEndian.Uint32(length))
+	c.Read(data)
+
+	ack, _ := packets.DecodeHelloAck(data)
+
+	decryptedData := encryption.DecryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), ack.(packets.HelloAckPacket).AesData)
+
+	println(data, ack, decryptedData)
+
 	c.Close()
 
 }
