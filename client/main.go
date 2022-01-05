@@ -3,9 +3,12 @@ package main
 import (
 	config "client/config"
 	"client/encryption"
+	"client/packets"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/binary"
 	"log"
+	"net"
 )
 
 func main() {
@@ -24,5 +27,21 @@ func main() {
 		log.Fatalln("Server Public Key is invalid! Please consult your administrator.")
 	}
 
-	println(encryption.CalculateSharedSecret(conf.ServerPublicKey))
+	data := encryption.EncryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), []byte("{}"))
+
+	packet := packets.EncodeHello(packets.HelloPacket{
+		PublicKey: encryption.GetPublicKey(),
+		AesData:   data,
+	})
+
+	c, _ := net.Dial("tcp", "localhost:9000")
+
+	length := make([]byte, 4)
+	binary.BigEndian.PutUint32(length, uint32(len(packet)))
+
+	c.Write(length)
+	c.Write(packet)
+
+	c.Close()
+
 }
