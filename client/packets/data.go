@@ -13,7 +13,7 @@ func (packet DataPacket) Encode() []byte {
 	return append(opCode, packet.AesData...)
 }
 
-func (packet *DataPacket) Decode(data []byte) error {
+func (packet *DataPacket) decode(data []byte) error {
 	if len(data) <= (1 + 32) {
 		return errors.New("data must be at least 33 bytes")
 	}

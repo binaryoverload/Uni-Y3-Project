@@ -25,12 +25,12 @@ func (packet *HelloPacket) Encode() []byte {
 	return output
 }
 
-func (packet *HelloPacket) Decode(data []byte) error {
-	if len(data) <= (1 + 33 + 32) {
+func (packet *HelloPacket) decode(data []byte) error {
+	if len(data) <= (33 + 32) {
 		return errors.New("hello data must be at least 66 bytes")
 	}
-	packet.PublicKey = data[1:34]
-	packet.AesData = data[34:]
+	packet.PublicKey = data[0:33]
+	packet.AesData = data[33:]
 	return nil
 }
 
@@ -44,12 +44,12 @@ func (packet *HelloAckPacket) Encode() []byte {
 	return output
 }
 
-func (packet *HelloAckPacket) Decode(data []byte) error {
-	if len(data) <= (1 + 33 + 32) {
+func (packet *HelloAckPacket) decode(data []byte) error {
+	if len(data) <= (33 + 32) {
 		return errors.New("helloack data must be at least 66 bytes")
 	}
-	packet.PublicKey = data[1:34]
-	packet.AesData = data[34:]
+	packet.PublicKey = data[0:33]
+	packet.AesData = data[33:]
 	return nil
 }
 
@@ -59,6 +59,6 @@ func (packet *HelloNAckPacket) Encode() []byte {
 	return output
 }
 
-func (packet *HelloNAckPacket) Decode(_ []byte) error {
+func (packet *HelloNAckPacket) decode(_ []byte) error {
 	return nil
 }

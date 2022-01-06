@@ -11,7 +11,7 @@ const (
 
 type IPacket interface {
 	Encode() []byte
-	Decode([]byte) error
+	decode([]byte) error
 }
 
 func Decode(data []byte) (IPacket, error) {
@@ -21,10 +21,12 @@ func Decode(data []byte) (IPacket, error) {
 		packet = &HelloPacket{}
 	case HelloAck:
 		packet = &HelloAckPacket{}
+	case HelloNAck:
+		packet = &HelloNAckPacket{}
 	case Data:
 		packet = &DataPacket{}
 	}
-	err := packet.Decode(data)
+	err := packet.decode(data[1:])
 	if err != nil {
 		return nil, err
 	}

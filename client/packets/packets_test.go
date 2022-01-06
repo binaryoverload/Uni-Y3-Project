@@ -8,7 +8,11 @@ import (
 const publicKey = "kbzn0B83wpKzQhJMmhRE5S1d5AtCn0wwW"
 const aesData = "ajD65IjjRpRAyauVcqmo0rwuEXn7XUc22"
 
+// Testing to ensure all packet types implement the interface!
 var _ IPacket = &HelloPacket{}
+var _ IPacket = &HelloAckPacket{}
+var _ IPacket = &HelloNAckPacket{}
+var _ IPacket = &DataPacket{}
 
 func TestHelloPacket_Encode(t *testing.T) {
 	packet := &HelloPacket{
