@@ -7,6 +7,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"net"
 )
@@ -29,10 +30,10 @@ func main() {
 
 	data := encryption.EncryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), []byte("{}"))
 
-	packet := packets.EncodeHello(packets.HelloPacket{
+	packet := (&packets.HelloPacket{
 		PublicKey: encryption.GetPublicKey(),
 		AesData:   data,
-	})
+	}).Encode()
 
 	c, _ := net.Dial("tcp", "localhost:9000")
 
@@ -51,11 +52,11 @@ func main() {
 	data = make([]byte, binary.BigEndian.Uint32(length))
 	c.Read(data)
 
-	ack, _ := packets.DecodeHelloAck(data)
+	helloAck, _ := packets.Decode(data)
 
-	decryptedData := encryption.DecryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), ack.(packets.HelloAckPacket).AesData)
+	decryptedData := encryption.DecryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), helloAck.(*packets.HelloAckPacket).AesData)
 
-	println(data, ack, decryptedData)
+	fmt.Printf("%s", decryptedData)
 
 	c.Close()
 
