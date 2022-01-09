@@ -61,8 +61,8 @@ A policy can be run on the client by aquring
 
 ### Policy
 - id - `uuid` - PK
-- `created_at` - `timestamp`
-- `updated_at` - `timestamp`
+- name - `varchar(255)`
+- description - `text`
 - created_at - `timestamp`
 - updated_at - `timestamp`
 - created_by - `uuid` - "Fake" FK - User UUID that could exist or not
