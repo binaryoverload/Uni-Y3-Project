@@ -22,6 +22,13 @@ Containing some sort of public/private key relationship with the client?
 
 Columns:
 - id - `serial` - PK
+- name - `varchar(255)`
+- public_key - `varchar(66)` 
+- last_activity - `timestamp`
+- mac_address - `macaddr`
+- last_known_ip - `inet`
+- last_known_hostname - `varchar(255)`
+- os_information - `jsonb`
 
 
 ## System Properties
@@ -53,18 +60,20 @@ Each policy item is linked to a policy. A policy contains the overarching inform
 A policy can be run on the client by aquring 
 
 ### Policy
-- `id` - `uuid` - PK
+- id - `uuid` - PK
 - `created_at` - `timestamp`
 - `updated_at` - `timestamp`
-- `created_by` - `uuid` - "Fake" FK - User UUID that could exist or not
+- created_at - `timestamp`
+- updated_at - `timestamp`
+- created_by - `uuid` - "Fake" FK - User UUID that could exist or not
 
 ### Policy Item
-- `id` - `uuid` - PK
-- `policy_id` - `uuid` - FK - on delete cascade
-- `policy_order` - `int` - The position of this item in the policy
-- `type` - `varchar(255)` - Type of policy item. Maybe use an enum? `file`, `command`, `package`, etc
-- `stop_on_error` - `bool`
-- `data` - `jsonb`
+- id - `uuid` - PK
+- policy_id - `uuid` - FK - on delete cascade
+- policy_order - `int` - The position of this item in the policy
+- type - `varchar(255)` - Type of policy item. Maybe use an enum? `file`, `command`, `package`, etc
+- stop_on_error - `bool`
+- data - `jsonb`
 
 ### Policy Condition
 NOT FOR MVP - Implement only if time

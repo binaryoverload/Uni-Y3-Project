@@ -62,6 +62,5 @@ CREATE TABLE clients (
     mac_address macaddr,
     last_known_ip inet,
     last_known_hostname varchar(255),
-    os_information jsonb default '{}',
-    labels varchar(255)[] default '[]'
+    os_information jsonb default '{}'
 );
