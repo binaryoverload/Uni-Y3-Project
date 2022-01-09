@@ -144,7 +144,7 @@ class Data extends OuterMessage {
         const aesData = this.aesData.encode()
         const buffer = Buffer.alloc(1 + aesData.length)
         buffer.writeUInt8(this.opCode)
-        aesData.copy(buffer, 1, 0)
+        aesData.copy(buffer, 1)
         return buffer
     }
 }

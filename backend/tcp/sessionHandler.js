@@ -83,7 +83,7 @@ class SessionHandler {
         const decryptedData = decryptAes(this.#sharedSecret, aesData)
         let jsonData = null
         try {
-            jsonData = {...JSON.parse(decryptedData), public_key: this.#clientPublicKey}
+            jsonData = {...JSON.parse(decryptedData)}
         } catch (e) {
             throw new Error(`Could not parse JSON data: ${e.message}`)
         }
