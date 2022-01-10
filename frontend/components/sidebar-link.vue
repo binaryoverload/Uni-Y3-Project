@@ -1,22 +1,37 @@
 <template>
-    <div :class="styles">
-        <span class="w-6 mr-4">
-            <font-awesome-icon :icon="icon" :class="active ? 'text-indigo-600 ' : ''"/>
-        </span><slot/>
-        </div>
+    <NuxtLink :to="to || '/'" v-slot="{ isActive, navigate, href }">
+        <a :href="href" @click="navigate">
+            <div
+                :class="
+                    commonStyles +
+                    ' ' +
+                    (isActive ? activeStyles : inactiveStyles)
+                "
+            >
+                <span class="w-6 mr-4">
+                    <font-awesome-icon
+                        :icon="icon"
+                        :class="active ? 'text-indigo-600 ' : ''"
+                    /> </span
+                ><slot />
+            </div>
+        </a>
+    </NuxtLink>
 </template>
 
 <script>
 export default {
     props: {
-        active: Boolean,
-        icon: String
+        to: String,
+        icon: String,
     },
-    computed: {
-        styles() {
-            let common = "w-full px-16 py-4 text-xl cursor-pointer"
-            return this.active ? common + " text-white bg-indigo-400 hover:bg-opacity-20 bg-opacity-10" : common + " text-slate-400 hover:text-slate-200"
-        }
-    }
-}
+    data() {
+        return {
+            commonStyles: "w-full px-16 py-4 text-xl cursor-pointer",
+            inactiveStyles: "text-slate-400 hover:text-slate-200",
+            activeStyles:
+                "text-white bg-indigo-400 hover:bg-opacity-20 bg-opacity-10",
+        };
+    },
+};
 </script>
