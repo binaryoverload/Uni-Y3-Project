@@ -11,7 +11,7 @@
                 <span class="w-6 mr-4">
                     <font-awesome-icon
                         :icon="icon"
-                        :class="active ? 'text-indigo-600 ' : ''"
+                        :class="isActive ? 'text-indigo-600' : ''"
                     /> </span
                 ><slot />
             </div>
@@ -27,7 +27,7 @@ export default {
     },
     data() {
         return {
-            commonStyles: "w-full px-16 py-4 text-xl cursor-pointer",
+            commonStyles: "transition transition-colors ease-in-out w-full px-16 py-4 text-xl cursor-pointer",
             inactiveStyles: "text-slate-400 hover:text-slate-200",
             activeStyles:
                 "text-white bg-indigo-400 hover:bg-opacity-20 bg-opacity-10",

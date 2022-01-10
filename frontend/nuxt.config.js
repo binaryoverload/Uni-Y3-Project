@@ -104,7 +104,7 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ['faScroll', 'faTicketAlt', 'faUser', 'faDesktop', "faSignOutAlt", "faSearch"]
+      solid: ['faScroll', 'faTicketAlt', 'faUser', 'faDesktop', "faSignOutAlt", "faSearch", "faArrowRight"]
     }
   },
 }
