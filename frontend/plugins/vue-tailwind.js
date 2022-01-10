@@ -41,7 +41,17 @@ Vue.use(VueTailwind, {
         component: TCheckbox
     },
     "t-button": {
-        component: TButton
+        component: TButton,
+        props: {
+            fixedClasses: 'block px-4 py-1 transition duration-100 ease-in-out  focus:ring-2  focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed',
+            classes: 'text-white bg-indigo-700 border border-transparent shadow-sm rounded hover:bg-indigo-800 focus:ring-indigo-500 focus:border-indigo-500',
+            variants: {
+                error: 'text-white bg-red-500 border border-transparent rounded shadow-sm hover:bg-red-600',
+                success: 'text-white bg-green-500 border border-transparent rounded shadow-sm hover:bg-green-600',
+                link: 'text-blue-500 underline hover:text-blue-600',
+                secondary: 'text-gray-800 bg-white border border-gray-300 shadow-sm focus:ring-indigo-500hover:text-gray-600'
+            }
+        }
     },
     "t-inputgroup": {
         component: TInputGroup
