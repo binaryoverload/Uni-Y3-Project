@@ -45,7 +45,9 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    ['nuxt-rfg-icon', { masterPicture: 'static/favicon.png' }],
+    '@nuxtjs/manifest', 
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
