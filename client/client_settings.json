@@ -1,1 +1,7 @@
-{"server_public_key":"0396a991c70bbdfba9b116a59c107a5cbb769260c32b8db23372224004f02469a2","client_private_key":"2dea37a824f52d82cd128471367c3d34b1621893321ad8d26b3092076f606d6a","test":""}
+{
+  "server_public_key": "0396a991c70bbdfba9b116a59c107a5cbb769260c32b8db23372224004f02469a2",
+  "client_private_key": "2dea37a824f52d82cd128471367c3d34b1621893321ad8d26b3092076f606d6a",
+  "client_id": null,
+  "server_host": "localhost",
+  "server_port": 9000
+}

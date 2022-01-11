@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"sync"
@@ -10,6 +11,9 @@ import (
 type Config struct {
 	ServerPublicKey  HexEncodedByteArray `json:"server_public_key"`
 	ClientPrivateKey HexEncodedByteArray `json:"client_private_key"`
+	ClientId uuid.NullUUID `json:"client_id"`
+	ServerHost string `json:"server_host"`
+	ServerPort int `json:"server_port"`
 }
 
 var instanceLock = &sync.Mutex{}
@@ -48,6 +52,11 @@ func loadConfig() Config {
 	if err != nil {
 		log.Fatalln("Could not decode JSON!", err)
 	}
+
+	if config.ServerPort == 0 {
+		config.ServerPort = 9000
+	}
+
 	return config
 }
 
@@ -58,6 +67,7 @@ func (c Config) SaveConfig() {
 	}
 
 	jsonEncoder := json.NewEncoder(file)
+	jsonEncoder.SetIndent("", "  ")
 	err = jsonEncoder.Encode(c)
 	if err != nil {
 		log.Println("Could not encode JSON!", err)
