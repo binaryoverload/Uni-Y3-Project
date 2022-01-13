@@ -33,7 +33,12 @@ export default {
   },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
+  components: [
+    {
+      path: "~/components",
+      pathPrefix: false
+    }
+  ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
@@ -104,7 +109,12 @@ export default {
 
   fontawesome: {
     icons: {
-      solid: ['faScroll', 'faTicketAlt', 'faUser', 'faDesktop', "faSignOutAlt", "faSearch", "faArrowRight", "faCheck", "faTimes", "faExclamation"]
+      solid: ['faScroll', 'faTicketAlt', 'faUser', 'faDesktop', "faSignOutAlt", "faSearch", "faArrowRight", "faCheck", "faTimes", "faExclamation", "faQuestion"]
     }
   },
+
+  eslint: {
+    cache: false,
+  },
+
 }

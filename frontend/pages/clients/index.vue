@@ -16,61 +16,29 @@
     </div>
     <div>
       <searchbar placeholder="Search by name"></searchbar>
-      <custom-table :rows="rows" :schema="schema" />
+      <clients-table :rows="rows"/>
     </div>
   </div>
 </template>
 
 <script>
-import table from "../../components/tables/table.vue";
 
 export default {
-  components: { CustomTable: table },
   layout: "dashboard",
   data() {
-    return { 
-        rows: [{
-            name: "Hi",
-            url: "https://google.com",
-            status: "online",
-            start: 2
-        }, {
-            name: "Hi1",
-            url: "https://google.com",
-            status: "warning",
-            start: 7,
-            end: 10
-        }, {
-            name: "Hi2",
-            url: "https://google.com",
-            status: "offline",
-            start: 11,
-            end: 10
-        }], 
-        schema: [{
-            display: "link",
-            url: (row) => row.url,
-            key: "name",
-            heading: "Name"
-        },
+    return {
+      rows: [
         {
-            display: "text",
-            key: "url",
-            heading: "URL"
-        },
-        {
-            display: "progress",
-            label: "uses",
-            startKey: "start",
-            endKey: "end",
-            heading: "Usage"
-        },
-        {
-            display: "statusIcon",
-            key: (row) => row.status,
-            heading: "Status"
-        }] 
-    };
-  },
+          "name": "JVS's PC",
+          "last_activity": new Date(),
+          "mac_address": "54:af:78:22:54:38",
+          "last_known_ip": "10.28.160.0",
+          "os_information": {
+            "name": "Windows 10"
+          }
+        }
+      ]
+    }
+  }
 };
 </script>

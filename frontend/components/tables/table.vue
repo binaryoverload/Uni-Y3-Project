@@ -5,7 +5,7 @@
         <th
           v-for="(schemaRow, i) of schema"
           :key="i"
-          class="px-6 py-4 font-bold text-left text-black"
+          class="py-4 pl-12 font-bold text-left text-black last:pr-12 whitespace-nowrap"
         >
           {{ schemaRow.heading }}
         </th>
@@ -16,7 +16,7 @@
           v-for="(row, y) of rows"
           :key="y"
         >
-          <td v-for="(schemaRow, x) of schema" :key="x" class="px-6 py-4">
+          <td v-for="(schemaRow, x) of schema" :key="x" class="w-full py-4 pl-12 last:pr-12 whitespace-nowrap" :style="{width: schemaRow.width}">
             <component
               :is="getComponentFromDisplay(schemaRow.display)"
               :schema="schemaRow"
