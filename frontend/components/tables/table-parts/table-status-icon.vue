@@ -2,8 +2,9 @@
     <div :class="{
         'bg-green-500': status == 'online',
         'bg-amber-500': status == 'warning',
-        'bg-red-500': status == 'offline'
-    }" class="flex items-center justify-center w-10 text-center text-white rounded-full h-7">
+        'bg-red-500': status == 'offline',
+        'bg-slate-500': status == 'unknown'
+    }" class="flex items-center justify-center text-center text-white rounded-full w-7 h-7">
         <font-awesome-icon :icon="icon"/>
     </div>
 </template>
@@ -13,7 +14,8 @@
 const icons = {
     "online": "check",
     "warning": "exclamation",
-    "offline": "times"
+    "offline": "times",
+    "unknown": "question"
 }
 
 export default {
