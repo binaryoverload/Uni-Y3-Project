@@ -41,7 +41,6 @@ const schema = [
   {
     display: "text",
     content: (row) => { 
-        console.log(row.os_information)
         return row.os_information && row.os_information.name },
     heading: "Operating System",
   },

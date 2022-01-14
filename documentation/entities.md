@@ -45,6 +45,7 @@ Storage for all keys that can be used to join a client to the system. Different 
 
 Columns:
 - id - `uuid` - PK
+- name - `varchar(255)`
 - token - `varchar(16)`
 - created_at - `timestamp`
 - expires_at - `timestamp`

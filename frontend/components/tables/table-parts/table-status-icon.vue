@@ -5,7 +5,7 @@
         'bg-red-500': status == 'offline',
         'bg-slate-500': status == 'unknown'
     }" class="flex items-center justify-center text-center text-white rounded-full w-7 h-7">
-        <font-awesome-icon :icon="icon"/>
+        <font-awesome-icon :icon="icon"/><span v-if="text && text[status]" class="ml-2">text[status]</span>
     </div>
 </template>
 
@@ -28,6 +28,9 @@ export default {
             type: Object,
             required: true,
         },
+        text: {
+            type: Object
+        }
     },
     computed: {
         status() {

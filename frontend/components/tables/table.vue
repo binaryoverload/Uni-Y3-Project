@@ -16,7 +16,7 @@
           v-for="(row, y) of rows"
           :key="y"
         >
-          <td v-for="(schemaRow, x) of schema" :key="x" class="w-full py-4 pl-12 last:pr-12 whitespace-nowrap" :style="{width: schemaRow.width}">
+          <td v-for="(schemaRow, x) of schema" :key="x" class="py-4 pl-12 last:pr-12 whitespace-nowrap" :style="{width: schemaRow.width}">
             <component
               :is="getComponentFromDisplay(schemaRow.display)"
               :schema="schemaRow"
