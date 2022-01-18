@@ -13,3 +13,11 @@
 - Talked through how different parts of the system shall work:
   - Communication with clients: Clients shall contact the server. Not vice versa. Reason being is that clients contacting the server is a more highly scalable architecture and also allows the server to not need to know about the clients network configuration which might not be static.
   - Login system: Login system is plainly for the web dashboard and API. When a user logs in successfully, they receive an access token and refresh token. The access token has a much shorter expiry to protect against MITM attacks. The refresh token is only sent to the server when the client needs a new access token while the access token is sent for every API request.
+
+## Week 11 ? - w/c 10th Jan
+ - Make sure to take screenshots of Gantt chart for reflection
+ - Look at Assessment 2
+ - Talked about risks and MVP
+ - "Perfect package manager" - Possible research paper?
+ - Try and find up to date literature
+ - Config problem in robotics, specialised ecosystem 
