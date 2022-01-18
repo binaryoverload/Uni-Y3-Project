@@ -14,9 +14,9 @@ func (packet DataPacket) Encode() []byte {
 }
 
 func (packet *DataPacket) decode(data []byte) error {
-	if len(data) <= (1 + 32) {
-		return errors.New("data must be at least 33 bytes")
+	if len(data) <= (32) {
+		return errors.New("data must be at least 32 bytes")
 	}
-	packet.AesData = data[1:]
+	packet.AesData = data
 	return nil
 }
