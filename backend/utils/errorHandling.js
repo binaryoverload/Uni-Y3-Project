@@ -17,7 +17,7 @@ function handlePostgresError (err) {
         case "foreign_key_violation":
             throw new ForeignKeyError(err.detail)
         default:
-            throw new DBError(err.code, errName, err.detail)
+            throw new DBError(err.code, errName, err.detail || errName)
     }
 }
 
