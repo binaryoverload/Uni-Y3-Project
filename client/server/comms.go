@@ -33,7 +33,10 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	decodedData, _ := packets.Decode(data)
+	decodedData, err := packets.Decode(data)
+	if err != nil {
+		return nil, err
+	}
 
 	dataPacket, ok := decodedData.(*packets.DataPacket)
 
@@ -41,7 +44,10 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, errors.New("expected packet was not a datapacket")
 	}
 
-	decryptedData := encryption.DecryptAes(dataPacket.AesData)
+	decryptedData, err := encryption.DecryptAes(dataPacket.AesData)
+	if err != nil {
+		return nil, err
+	}
 
 	var jsonData interface{}
 

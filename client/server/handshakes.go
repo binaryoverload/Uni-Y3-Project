@@ -10,7 +10,10 @@ import (
 )
 
 func SendHello(conn *net.Conn, _ interface{}) (interface{}, error) {
-	data := encryption.EncryptAes([]byte("{}"))
+	data, err := encryption.EncryptAes([]byte("{}"))
+	if err != nil {
+		return nil, err
+	}
 
 	packet := (&packets.HelloPacket{
 		PublicKey: encryption.GetPublicKey(),
@@ -33,7 +36,10 @@ func RecieveHelloAck(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	decodedData, _ := packets.Decode(data)
+	decodedData, err := packets.Decode(data)
+	if err != nil {
+		return nil, err
+	}
 
 	helloAck, ok := decodedData.(*packets.HelloAckPacket)
 
@@ -41,7 +47,10 @@ func RecieveHelloAck(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, errors.New("expected packet was not helloack")
 	}
 
-	decryptedData := encryption.DecryptAes(helloAck.AesData)
+	decryptedData, err := encryption.DecryptAes(helloAck.AesData)
+	if err != nil {
+		return nil, err
+	}
 
 	return decryptedData, nil
 }

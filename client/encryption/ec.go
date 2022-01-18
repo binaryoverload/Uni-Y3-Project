@@ -27,50 +27,50 @@ func CalculateSharedSecret(publicKey []byte) []byte {
 	return ecdhInstance.ComputeSecret(privateKey, point)
 }
 
-func encryptAes(secret []byte, data []byte) []byte {
+func encryptAes(secret []byte, data []byte) ([]byte, error) {
 	iv := make([]byte, 16)
 	rand.Read(iv)
 	block, err := aes.NewCipher(secret)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	cipherText := gcm.Seal(nil, iv, data, nil)
 
-	return append(iv, cipherText...)
+	return append(iv, cipherText...), nil
 }
 
 
-func decryptAes(secret []byte, data []byte) []byte {
+func decryptAes(secret []byte, data []byte) ([]byte, error) {
 	iv := data[:16]
 
 	block, err := aes.NewCipher(secret)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	plaintext, err := gcm.Open(nil, iv, data[16:], nil)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
-	return plaintext
+	return plaintext, nil
 }
 
-func EncryptAes(data []byte) []byte {
+func EncryptAes(data []byte) ([]byte, error) {
 	return encryptAes(CalculateSharedSecret(conf.ServerPublicKey), data)
 }
 
-func DecryptAes(data []byte) []byte {
+func DecryptAes(data []byte) ([]byte, error) {
 	return decryptAes(CalculateSharedSecret(conf.ServerPublicKey), data)
 }
