@@ -5,32 +5,31 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
-	"time"
 )
 
 var conf = config.GetConfigInstance()
 
 type TcpAction func(conn *net.Conn, prevData interface{}) (interface{}, error)
 
-func RunTcpActions(actions []TcpAction) error {
+func RunTcpActions(actions []TcpAction) (interface{}, error) {
 	conf := config.GetConfigInstance()
 	c, err := net.Dial("tcp", fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var currentData interface{} = nil
 	for i := 0; i < len(actions); i++ {
-		err := c.SetDeadline(time.Now().Add(15 * time.Second))
+		//err := c.SetDeadline(time.Now().Add(15 * time.Second))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		currentData, err = actions[i](&c, currentData)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	err = c.Close()
-	return err
+	return currentData, err
 }
 
 func WriteWithLength(conn *net.Conn, data []byte) error {
