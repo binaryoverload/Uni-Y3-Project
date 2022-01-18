@@ -2,9 +2,11 @@ package main
 
 import (
 	config "client/config"
+	"client/encryption"
 	"client/server"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/hex"
 	"log"
 )
 
@@ -14,13 +16,18 @@ func main() {
 	configInitValidation(conf)
 
 	if !conf.ClientId.Valid {
+		_, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendClientRegistration, server.RecieveData})
+		if err != nil {
+			log.Println("Error in TCP: ", err.Error())
+		}
+
+
 
 	}
 
-	err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck})
-	if err != nil {
-		log.Println("Error in TCP: ", err.Error())
-	}
+	log.Println(hex.EncodeToString(encryption.GetPublicKey()))
+
+
 
 	//length := make([]byte, 4)
 	//_, err := c.Read(length)
