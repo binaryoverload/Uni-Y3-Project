@@ -1,6 +1,6 @@
-const { getEnrolmentTokenByToken } = require("../models/enrolmentTokens")
+const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
 const { cli } = require("triple-beam/config")
-const { createClient } = require("../models/clients")
+const { createClient, getClientByPublicKey } = require("../models/clients")
 const opCodes = {
     registerClient: 1,
     registeredClient: 2,
@@ -39,18 +39,40 @@ function encodeRegisteredClient(clientId) {
     }
 }
 
-function decodeRegisterClient(data) {
+async function decodeRegisterClient(data) {
     checkRequiredKeys(opCodes.registerClient, data)
-    const { enrolment_token: enrolmentToken } = data
+    const { enrolment_token: enrolmentToken, public_key: publicKey } = data
 
-    const token = getEnrolmentTokenByToken(enrolmentToken)
+    const token = await getEnrolmentTokenByToken(enrolmentToken)
 
     if (!token) {
         return encodeTCPError(`Enrolment token ${token} is invalid`)
     }
 
-    createClient()
+    if (token.usage_limit && token.usage_current >= token.usage_limit) {
+        return encodeTCPError("Enrolment token has reached the max usage limit")
+    }
 
+    if (token.expires_at >= new Date()) {
+        return encodeTCPError("Enrolment token has expired")
+    }
+
+    // We now have a valid token
+
+    let client = await getClientByPublicKey(publicKey)
+
+    // If client already exists, we don't want to recreate!
+    if (client) {
+        return encodeTCPError("Client already registered")
+    }
+
+    client = await createClient(data)
+
+    await updateEnrolmentToken(token.id, {
+        usage_current: token.usage_current + 1
+    })
+
+    return encodeRegisteredClient(client.id)
 }
 
 module.exports = { opCodes, encodeTCPError, opCodeDecodeFunctions }
