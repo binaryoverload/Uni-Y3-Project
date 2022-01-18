@@ -21,6 +21,7 @@ CREATE TABLE system_properties (
 
 CREATE TABLE enrolment_tokens (
     id uuid default gen_random_uuid(),
+    name varchar(255) not null,
     token varchar(16) not null,
     created_at timestamp not null default timezone('UTC', now()),
     expires_at timestamp,
@@ -33,7 +34,10 @@ CREATE TABLE enrolment_tokens (
 
 CREATE TABLE policies (
     id uuid default gen_random_uuid(),
+    name varchar(255) not null,
+    description text,
     created_at timestamp not null default timezone('UTC', now()),
+    updated_at timestamp not null default timezone('UTC', now()),
     created_by uuid not null,
 
     primary key (id)

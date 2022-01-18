@@ -6,7 +6,9 @@ const { POLICY_ITEMS_TABLE_NAME } = require("./policyItems")
 
 const POLICIES_TABLE_NAME = "policies"
 
-async function createPolicy (created_by) {
+async function createPolicy (data) {
+
+    const { name, created_by } = data
 
     // This is manually checked since there is no foreign key constraint in the DB
     // This is so a policy does not require the user to exist and may point to a deleted user in the future
@@ -16,7 +18,7 @@ async function createPolicy (created_by) {
 
     return await knex(POLICIES_TABLE_NAME)
         .insert({
-            created_by
+            name, created_by
         })
         .returning("id")
         .then(r => {
@@ -48,10 +50,20 @@ async function getAll () {
         .catch(handlePostgresError)
 }
 
+async function updatePolicy(id, data) {
+    const { name, description } = data
+
+    return await knex(POLICIES_TABLE_NAME)
+        .update({ name, description, updated_at: new Date() })
+        .where("id", id)
+        .catch(handlePostgresError)
+}
+
 module.exports = {
     POLICIES_TABLE_NAME,
     createPolicy,
     deletePolicy,
+    updatePolicy,
     getById,
     getAll
 }

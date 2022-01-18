@@ -5,7 +5,7 @@ const ENROLMENT_TOKENS_TABLE_NAME = "enrolment_tokens"
 
 async function getEnrolmentToken (id) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .where("id", id)
         .first()
         .catch(handlePostgresError)
@@ -13,7 +13,7 @@ async function getEnrolmentToken (id) {
 
 async function getEnrolmentTokenByToken (token) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .where("token", token)
         .first()
         .catch(handlePostgresError)
@@ -21,7 +21,7 @@ async function getEnrolmentTokenByToken (token) {
 
 async function getAllEnrolmentTokens () {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .select(["id", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
+        .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .catch(handlePostgresError)
 }
 
@@ -32,20 +32,19 @@ async function deleteEnrolmentToken (id) {
         .catch(handlePostgresError)
 }
 
-async function createEnrolmentToken (token) {
-    const [insertedRecord] = await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .insert({ token })
-        .returning(["id", "token", "created_at", "usage_current"])
+async function createEnrolmentToken (name, token) {
+    return await knex(ENROLMENT_TOKENS_TABLE_NAME)
+        .insert({ name, token })
+        .returning(["id", "name", "token", "created_at", "usage_current"])
         .then(r => r[0])
         .catch(handlePostgresError)
-    return insertedRecord
 }
 
 async function updateEnrolmentToken (id, data) {
-    const { expires_at, usage_current, usage_limit } = data
+    const { name, expires_at, usage_current, usage_limit } = data
 
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .update({ expires_at, usage_current, usage_limit })
+        .update({ name, expires_at, usage_current, usage_limit })
         .where("id", id)
         .catch(handlePostgresError)
 }

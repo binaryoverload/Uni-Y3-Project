@@ -1,7 +1,7 @@
 const { Router } = require("express")
 const { checkValidationErrors, executeQuery } = require("../utils/http")
 const { getAllEnrolmentTokens, getEnrolmentToken, deleteEnrolmentToken, createEnrolmentToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
-const { tokenGet, tokenDelete, tokenUpdate } = require("../validation/enrolmentTokens")
+const { tokenGet, tokenDelete, tokenUpdate, tokenCreate } = require("../validation/enrolmentTokens")
 const { NotFoundError } = require("../utils/httpExceptions")
 const { userPost } = require("../validation/user")
 const { createUser } = require("../models/user")
@@ -27,10 +27,10 @@ router.delete("/:id", validateJwt, checkValidationErrors(tokenDelete), executeQu
     return token
 }))
 
-router.post("/", validateJwt, executeQuery(async () => {
+router.post("/", validateJwt, checkValidationErrors(tokenCreate), executeQuery(async ({ body }) => {
     const token = generateToken()
 
-    return await createEnrolmentToken(token)
+    return await createEnrolmentToken(body.name, token)
 }))
 
 router.patch("/:id", validateJwt, checkValidationErrors(tokenUpdate), executeQuery(async ({ params, body }) => {

@@ -1,18 +1,17 @@
 const { knex } = require("../setup/db")
 const { handlePostgresError } = require("../utils/errorHandling")
 
-const CLIENTS_TABLE_NAME = "users"
+const CLIENTS_TABLE_NAME = "clients"
 
 async function createClient (data) {
-    const { name, public_key, mac_address, os_information, labels } = data
+    const { name, public_key, mac_address, os_information } = data
 
     return await knex(CLIENTS_TABLE_NAME)
         .insert({
             name,
             public_key,
             mac_address,
-            os_information,
-            labels
+            os_information
         })
         .returning("id")
         .then(r => {
@@ -37,8 +36,7 @@ async function updateClient (id, data) {
         mac_address,
         last_known_ip,
         last_known_hostname,
-        os_information,
-        labels
+        os_information
     } = data
 
     return await knex(CLIENTS_TABLE_NAME)
@@ -49,8 +47,7 @@ async function updateClient (id, data) {
             mac_address,
             last_known_ip,
             last_known_hostname,
-            os_information,
-            labels
+            os_information
         })
         .where("id", id)
         .catch(handlePostgresError)
@@ -66,9 +63,24 @@ async function getClientById (id) {
             "mac_address",
             "last_known_ip",
             "last_known_hostname",
-            "os_information",
-            "labels"])
+            "os_information"])
         .where("id", id)
+        .first()
+        .catch(handlePostgresError)
+}
+
+async function getClientByPublicKey (public_key) {
+    return await knex(CLIENTS_TABLE_NAME)
+        .select([
+            "id",
+            "name",
+            "public_key",
+            "last_activity",
+            "mac_address",
+            "last_known_ip",
+            "last_known_hostname",
+            "os_information"])
+        .where("public_key", public_key)
         .first()
         .catch(handlePostgresError)
 }
@@ -83,8 +95,7 @@ async function getAllClients (id) {
             "mac_address",
             "last_known_ip",
             "last_known_hostname",
-            "os_information",
-            "labels"])
+            "os_information"])
         .first()
         .catch(handlePostgresError)
 }
@@ -94,5 +105,6 @@ module.exports = {
     deleteClient,
     updateClient,
     getClientById,
+    getClientByPublicKey,
     getAllClients
 }

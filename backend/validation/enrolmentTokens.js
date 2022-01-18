@@ -21,6 +21,10 @@ module.exports = {
             .isInt(),
     ],
     tokenCreate: [
-
+        body("name", "Enrolment tokens must be provided with a name")
+            .exists()
+            .isLength({ min: 1, max: 100 })
+            .withMessage("Token name must be between 1 and 100 characters long")
+            .isString()
     ]
 }
