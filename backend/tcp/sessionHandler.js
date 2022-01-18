@@ -19,19 +19,21 @@ class SessionHandler {
         logger.debug(`Started TCP session`, { label: "sess", host: hostAddress })
     }
 
-    processOuterPacket(packet) {
+    async processOuterPacket (packet) {
         try {
-            return this.#processOuterPacket(packet)
+            return await this.#processOuterPacket(packet)
         } catch (e) {
-            logger.error(`Error processing ${packet.constructor.name || "unknown"} packet: ${e.message}`, { label: "sess", host: this.#hostAddress })
+            logger.error(`Error processing ${packet.constructor.name || "unknown"} packet: ${e.message}`,
+                { label: "sess", host: this.#hostAddress })
         }
     }
 
     // Make a pass-through function to handle errors
-    #processOuterPacket(packet) {
+    async #processOuterPacket (packet) {
         if (packet instanceof Hello) {
             if (this.#receivedHello) {
-                logger.error("Session has already been established with Hello!", { label: "sess", host: this.#hostAddress })
+                logger.error("Session has already been established with Hello!",
+                    { label: "sess", host: this.#hostAddress })
                 return new HelloNAck()
             }
             this.#invalidPacketCount = 0
@@ -56,11 +58,19 @@ class SessionHandler {
             const decodeFunction = opCodeDecodeFunctions[jsonData.op_code]
 
             if (!decodeFunction) {
-                logger.error(`Decode function for op-code ${jsonData.op_code} does not exist. Op-code exists: ${Object.values(innerOpCodes).includes(jsonData.op_code)}`, { label: "sess", host: this.#hostAddress })
-                return new Data(encryptAes(this.#sharedSecret, encodeTCPError(`Op-code ${jsonData.op_code} is not valid`)))
+                logger.error(
+                    `Decode function for op-code ${jsonData.op_code} does not exist. Op-code exists: ${Object.values(
+                        innerOpCodes).includes(jsonData.op_code)}`, { label: "sess", host: this.#hostAddress })
+                return new Data(
+                    encryptAes(this.#sharedSecret, encodeTCPError(`Op-code ${jsonData.op_code} is not valid`)))
             }
 
-            const result = decodeFunction(jsonData);
+            let result = null;
+            try {
+                result = await decodeFunction(jsonData)
+            } catch (e) {
+                result = encodeTCPError(`${e.name}: ${e.message}`)
+            }
 
             if (result) {
                 return new Data(encryptAes(this.#sharedSecret, result))
@@ -73,10 +83,12 @@ class SessionHandler {
 
         this.#invalidPacketCount += 1
         if (this.#invalidPacketCount > maxAllowedInvalid) {
-            logger.error(`Received ${maxAllowedInvalid} invalid packets, closing connection`, { label: "sess", host: this.#hostAddress })
+            logger.error(`Received ${maxAllowedInvalid} invalid packets, closing connection`,
+                { label: "sess", host: this.#hostAddress })
             return new ErrorPacket()
         }
-        logger.warn(`Received invalid packet of type ${packet.constructor.name || "unknown"}. Ignoring...`, { label: "sess", host: this.#hostAddress })
+        logger.warn(`Received invalid packet of type ${packet.constructor.name || "unknown"}. Ignoring...`,
+            { label: "sess", host: this.#hostAddress })
     }
 
     #decryptJsonData(aesData) {

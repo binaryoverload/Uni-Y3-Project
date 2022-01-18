@@ -47,7 +47,7 @@ function handleConnection (conn) {
     let remainingLength = 0
     const buffers = []
 
-    function onConnData (d) {
+    async function onConnData (d) {
         if (remainingLength === 0) {
             const buffer = d.slice(0, 4)
             remainingLength = buffer.readUInt32BE()
@@ -83,7 +83,7 @@ function handleConnection (conn) {
             logger.debug(`Received final ${finalData.length} bytes (${buffers.length} packets)`,
                 { label: "tcp,fin", host: remoteAddress  })
             const data = processFinalData(finalData, remoteAddress)
-            const result = sessionHandler.processOuterPacket(data)
+            const result = await sessionHandler.processOuterPacket(data)
             if (result && result instanceof OuterMessage) {
                 const encodedResult = result.encode()
                 logger.debug(`Sending ${result.constructor.name} (${result.opCode}) to client. ${encodedResult.length} bytes`, {label: "tcp,sen", host: remoteAddress})
