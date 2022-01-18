@@ -10,11 +10,30 @@ import (
 	"net"
 )
 
+
+
 func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) {
-	data := encryption.EncryptAes([]byte("{\"op_code\":1,\"enrolment_token\":\"6212abe6a1aee40a\",\"public_key\":\"02738d0a56bcf554e7829c8dc18c1f8a9a128b5b0842896c2f95c1fd770906e045\",\"name\":\"test\"}"))
+	type ClientRegistration struct {
+		OpCode         int    `json:"op_code"`
+		EnrolmentToken string `json:"enrolment_token"`
+		PublicKey      string `json:"public_key"`
+		Name           string `json:"name"`
+	}
+
+	inputData := ClientRegistration{
+		OpCode: 1,
+		EnrolmentToken: conf.EnrolmentToken,
+		PublicKey: encryption.GetPublicKeyHex(),
+		Name: "HI",
+	}
+    jsonData, _ := json.Marshal(inputData)
+	data, err := encryption.EncryptAes(jsonData)
+	if err != nil {
+		return nil, err
+	}
 
 	packet := (&packets.DataPacket{
-		AesData:   data,
+		AesData: data,
 	}).Encode()
 
 	return nil, WriteWithLength(conn, packet)

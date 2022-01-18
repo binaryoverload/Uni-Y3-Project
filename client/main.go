@@ -4,11 +4,14 @@ import (
 	config "client/config"
 	"client/encryption"
 	"client/server"
+	"client/utils"
 	"crypto/elliptic"
 	"crypto/rand"
-	"encoding/hex"
+	"github.com/google/uuid"
 	"log"
 )
+
+var logger = utils.GetLogger()
 
 func main() {
 	conf := config.GetConfigInstance()
@@ -16,16 +19,38 @@ func main() {
 	configInitValidation(conf)
 
 	if !conf.ClientId.Valid {
-		_, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendClientRegistration, server.RecieveData})
+		data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendClientRegistration, server.RecieveData})
 		if err != nil {
-			log.Println("Error in TCP: ", err.Error())
+			logger.Fatal("Error in attempting to register client:", err.Error())
 		}
 
+		jsonData, ok := data.(map[string]interface{})
 
+		if !ok {
+			logger.Fatal("Did not receive response from client registration")
+		}
 
+		if jsonData["op_code"].(float64) == 100 {
+			logger.Fatal("Could not register client. Error:", jsonData["message"])
+		}
+
+		if jsonData["op_code"].(float64) == 2 {
+			clientId, err := uuid.Parse(jsonData["client_id"].(string))
+			if err != nil {
+				log.Fatalln(err)
+			}
+			conf.ClientId = uuid.NullUUID{
+				UUID:  clientId,
+				Valid: true,
+			}
+			conf.SaveConfig()
+			logger.Info("Registered client! ID:", jsonData["client_id"])
+		} else {
+			logger.Fatal("Unexpected response from registering client")
+		}
 	}
 
-	log.Println(hex.EncodeToString(encryption.GetPublicKey()))
+	logger.Infof("Client public key: %x", encryption.GetPublicKey())
 
 
 
@@ -59,10 +84,14 @@ func configInitValidation(conf *config.Config) {
 	}
 
 	if len(conf.ServerPublicKey) != 33 {
-		log.Fatalln("Server Public Key is invalid! Please consult your administrator.")
+		logger.Fatal("Server Public Key is invalid! Please consult your administrator.")
 	}
 
 	if len(conf.ServerHost) == 0 {
-		log.Fatalln("Server address is invalid! Please consult your administrator.")
+		logger.Fatal("Server address is invalid! Please consult your administrator.")
+	}
+
+	if len(conf.EnrolmentToken) == 0 {
+		logger.Fatal("Enrolment token is invalid! Please consult your administrator.")
 	}
 }

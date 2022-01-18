@@ -6,22 +6,28 @@ import (
 	"crypto/cipher"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/hex"
 	ecdh "github.com/aead/ecdh"
 )
 
 var curve = elliptic.P256()
 
 var ecdhInstance = ecdh.Generic(curve)
-var privateKey = []byte(config.GetConfigInstance().ClientPrivateKey)
 
 var conf = config.GetConfigInstance()
 
 func GetPublicKey() []byte {
+	var privateKey = []byte(config.GetConfigInstance().ClientPrivateKey)
 	var publicKey = ecdhInstance.PublicKey(privateKey).(ecdh.Point)
 	return elliptic.MarshalCompressed(curve, publicKey.X, publicKey.Y)
 }
 
+func GetPublicKeyHex() string {
+	return hex.EncodeToString(GetPublicKey())
+}
+
 func CalculateSharedSecret(publicKey []byte) []byte {
+	var privateKey = []byte(config.GetConfigInstance().ClientPrivateKey)
 	var x, y = elliptic.UnmarshalCompressed(curve, publicKey)
 	var point = ecdh.Point{X: x, Y: y}
 	return ecdhInstance.ComputeSecret(privateKey, point)
