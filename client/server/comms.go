@@ -46,6 +46,34 @@ func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) 
 	return nil, WriteWithLength(conn, packet)
 }
 
+func SendHeartbeat(conn *net.Conn, _ interface{}) (interface{}, error) {
+	type Heartbeat struct {
+		OpCode         int                 `json:"op_code"`
+		OSInformation  goInfo.GoInfoObject `json:"os_information"`
+		MACAddress     string              `json:"mac_address"`
+	}
+
+	osInfo := utils.GetOSInfo()
+
+	inputData := Heartbeat{
+		OpCode: packets.OpCodeHeartbeat,
+		OSInformation: osInfo,
+		MACAddress: utils.GetMACAddress(),
+	}
+
+	jsonData, _ := json.Marshal(inputData)
+	data, err := encryption.EncryptAes(jsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	packet := (&packets.DataPacket{
+		AesData: data,
+	}).Encode()
+
+	return nil, WriteWithLength(conn, packet)
+}
+
 func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 	length := make([]byte, 4)
 	_, err := io.ReadFull(*conn, length)

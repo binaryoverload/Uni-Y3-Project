@@ -1,16 +1,18 @@
 const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
 const { cli } = require("triple-beam/config")
-const { createClient, getClientByPublicKey } = require("../models/clients")
+const { createClient, getClientByPublicKey, getClientById, updateClient } = require("../models/clients")
 const { splitHostAddress } = require("../utils/misc")
 const opCodes = {
     heartbeat: 1,
     heartbeatAck: 2,
     registerClient: 5,
     registerClientAck: 6,
+    invalidClient: 99,
     error: 100
 }
 
 const opCodeDecodeFunctions = {
+    [opCodes.heartbeat]: decodeHeartbeat,
     [opCodes.registerClient]: decodeRegisterClient
 }
 
@@ -35,14 +37,26 @@ function encodeTCPError(message) {
     }
 }
 
-function encodeRegisteredClient(clientId) {
+function encodeRegisterClientAck(clientId) {
     return {
         op_code: opCodes.registerClientAck,
         client_id: clientId
     }
 }
 
-async function decodeRegisterClient(hostAddress, data) {
+function encodeHeartbeatAck() {
+    return {
+        op_code: opCodes.heartbeatAck
+    }
+}
+
+function encodeInvalidClient() {
+    return {
+        op_code: opCodes.invalidClient
+    }
+}
+
+async function decodeRegisterClient(ctx, data) {
     checkRequiredKeys(opCodes.registerClient, data)
     const { enrolment_token: enrolmentToken, public_key: publicKey } = data
 
@@ -69,7 +83,7 @@ async function decodeRegisterClient(hostAddress, data) {
         return encodeTCPError("Client already registered")
     }
 
-    const { ip } = splitHostAddress(hostAddress)
+    const { ip } = splitHostAddress(ctx.hostAddress)
 
     data = {
         ...data,
@@ -83,7 +97,31 @@ async function decodeRegisterClient(hostAddress, data) {
         usage_current: token.usage_current + 1
     })
 
-    return encodeRegisteredClient(client.id)
+    return encodeRegisterClientAck(client.id)
+}
+
+async function decodeHeartbeat(ctx, data) {
+    const { os_information, mac_address } = data
+
+    const client = await getClientById(ctx.clientId)
+
+    if (!client) {
+        return encodeInvalidClient()
+    }
+
+    const { ip } = splitHostAddress(ctx.hostAddress)
+
+    const updateData = {
+        last_known_ip: ip,
+        last_known_hostname: os_information?.Hostname,
+        mac_address,
+        os_information,
+        last_activity: new Date()
+    }
+
+    await updateClient(client.id, updateData)
+
+    return encodeHeartbeatAck()
 }
 
 module.exports = { opCodes, encodeTCPError, opCodeDecodeFunctions }

@@ -13,6 +13,7 @@ const (
 	OpCodeHeartbeatAck          = 2
 	OpCodeClientRegistration    = 5
 	OpCodeClientRegistrationAck = 6
+	OpCodeInvalidClient         = 99
 	OpCodeError                 = 100
 )
 
