@@ -4,6 +4,8 @@ const { Hello, Data, HelloNAck, HelloAck, ErrorPacket } = require("./outerMessag
 const { computeSharedECHDSecret, decryptAes, ecPublicKey, encryptAes } = require("../utils/encryption")
 const { opCodeDecodeFunctions, encodeError, encodeTCPError, opCodes: innerOpCodes } = require("./innerMessages")
 const { CloseConnectionError } = require("../utils/tcpExceptions")
+const { getClientByPublicKey } = require("../models/clients")
+const { cli } = require("triple-beam/config")
 
 class SessionHandler {
 
@@ -37,12 +39,21 @@ class SessionHandler {
                 return new HelloNAck()
             }
             this.#invalidPacketCount = 0
-            this.#clientPublicKey = packet.senderPublicKey
+            this.#clientPublicKey = packet.senderPublicKey.toString("hex")
             this.#sharedSecret = computeSharedECHDSecret(packet.senderPublicKey)
             const jsonData = this.#decryptJsonData(packet.aesData)
             if (Object.keys(jsonData).length > 0) {
                 logger.error("Received non-empty data from client on Hello", { label: "sess", host: this.#hostAddress })
                 return new HelloNAck()
+            }
+
+            const client = await getClientByPublicKey(this.#clientPublicKey)
+
+            if (client) {
+                this.#clientId = client.id
+                logger.debug("Known client connected. Id: " + client.id, { label: "sess", host: this.#hostAddress })
+            } else {
+                logger.debug("Unknown client connected", { label: "sess", host: this.#hostAddress })
             }
 
             this.#receivedHello = true
@@ -67,7 +78,11 @@ class SessionHandler {
 
             let result = null;
             try {
-                result = await decodeFunction(this.#hostAddress, jsonData)
+                result = await decodeFunction({
+                    hostAddress: this.#hostAddress,
+                    clientId: this.#clientId,
+                    clientPubKey: this.#clientPublicKey
+                }, jsonData)
             } catch (e) {
                 result = encodeTCPError(`${e.name}: ${e.message}`)
             }
