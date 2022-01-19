@@ -67,7 +67,7 @@ class SessionHandler {
 
             let result = null;
             try {
-                result = await decodeFunction(jsonData)
+                result = await decodeFunction(this.#hostAddress, jsonData)
             } catch (e) {
                 result = encodeTCPError(`${e.name}: ${e.message}`)
             }

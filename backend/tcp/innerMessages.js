@@ -1,6 +1,7 @@
 const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
 const { cli } = require("triple-beam/config")
 const { createClient, getClientByPublicKey } = require("../models/clients")
+const { splitHostAddress } = require("../utils/misc")
 const opCodes = {
     registerClient: 1,
     registeredClient: 2,
@@ -39,7 +40,7 @@ function encodeRegisteredClient(clientId) {
     }
 }
 
-async function decodeRegisterClient(data) {
+async function decodeRegisterClient(hostAddress, data) {
     checkRequiredKeys(opCodes.registerClient, data)
     const { enrolment_token: enrolmentToken, public_key: publicKey } = data
 
@@ -64,6 +65,14 @@ async function decodeRegisterClient(data) {
     // If client already exists, we don't want to recreate!
     if (client) {
         return encodeTCPError("Client already registered")
+    }
+
+    const { ip } = splitHostAddress(hostAddress)
+
+    data = {
+        ...data,
+        last_known_ip: ip,
+        last_known_hostname: data.os_information?.Hostname
     }
 
     client = await createClient(data)

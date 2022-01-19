@@ -4,14 +4,16 @@ const { handlePostgresError } = require("../utils/errorHandling")
 const CLIENTS_TABLE_NAME = "clients"
 
 async function createClient (data) {
-    const { name, public_key, mac_address, os_information } = data
+    const { name, public_key, mac_address, os_information, last_known_ip, last_known_hostname } = data
 
     return await knex(CLIENTS_TABLE_NAME)
         .insert({
             name,
             public_key,
             mac_address,
-            os_information
+            os_information,
+            last_known_ip,
+            last_known_hostname
         })
         .returning("id")
         .then(r => {

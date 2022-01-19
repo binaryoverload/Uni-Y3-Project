@@ -3,30 +3,37 @@ package server
 import (
 	"client/encryption"
 	"client/packets"
+	"client/utils"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"github.com/matishsiao/goInfo"
 	"io"
 	"net"
 )
 
-
-
 func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) {
 	type ClientRegistration struct {
-		OpCode         int    `json:"op_code"`
-		EnrolmentToken string `json:"enrolment_token"`
-		PublicKey      string `json:"public_key"`
-		Name           string `json:"name"`
+		OpCode         int                 `json:"op_code"`
+		EnrolmentToken string              `json:"enrolment_token"`
+		PublicKey      string              `json:"public_key"`
+		Name           string              `json:"name"`
+		OSInformation  goInfo.GoInfoObject `json:"os_information"`
+		MACAddress     string              `json:"mac_address"`
 	}
 
+	osInfo := utils.GetOSInfo()
+
 	inputData := ClientRegistration{
-		OpCode: 1,
+		OpCode:         packets.OpCodeClientRegistration,
 		EnrolmentToken: conf.EnrolmentToken,
-		PublicKey: encryption.GetPublicKeyHex(),
-		Name: "HI",
+		PublicKey:      encryption.GetPublicKeyHex(),
+		Name:           osInfo.Hostname,
+		OSInformation:  osInfo,
+		MACAddress:     utils.GetMACAddress(),
 	}
-    jsonData, _ := json.Marshal(inputData)
+
+	jsonData, _ := json.Marshal(inputData)
 	data, err := encryption.EncryptAes(jsonData)
 	if err != nil {
 		return nil, err
