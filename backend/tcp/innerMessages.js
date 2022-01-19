@@ -70,7 +70,7 @@ async function decodeRegisterClient(ctx, data) {
         return encodeTCPError("Enrolment token has reached the max usage limit")
     }
 
-    if (token.expires_at >= new Date()) {
+    if (token.expires_at && token.expires_at <= new Date()) {
         return encodeTCPError("Enrolment token has expired")
     }
 
