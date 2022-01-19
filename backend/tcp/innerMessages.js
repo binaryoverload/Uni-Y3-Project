@@ -3,8 +3,10 @@ const { cli } = require("triple-beam/config")
 const { createClient, getClientByPublicKey } = require("../models/clients")
 const { splitHostAddress } = require("../utils/misc")
 const opCodes = {
-    registerClient: 1,
-    registeredClient: 2,
+    heartbeat: 1,
+    heartbeatAck: 2,
+    registerClient: 5,
+    registerClientAck: 6,
     error: 100
 }
 
@@ -13,8 +15,8 @@ const opCodeDecodeFunctions = {
 }
 
 const requiredKeys = {
-    [opCodes.registerClient]: ["enrolment_token", "os_information", "mac_address", "name", "public_key"],
-    [opCodes.registeredClient]: ["client_id"]
+    [opCodes.registerClient]: ["enrolment_token"/*, "os_information", "mac_address"*/, "name", "public_key"],
+    [opCodes.registerClientAck]: ["client_id"]
 }
 
 function checkRequiredKeys(opCode, data) {
@@ -35,7 +37,7 @@ function encodeTCPError(message) {
 
 function encodeRegisteredClient(clientId) {
     return {
-        op_code: opCodes.registeredClient,
+        op_code: opCodes.registerClientAck,
         client_id: clientId
     }
 }

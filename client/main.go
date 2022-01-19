@@ -3,6 +3,7 @@ package main
 import (
 	config "client/config"
 	"client/encryption"
+	"client/packets"
 	"client/server"
 	"client/utils"
 	"crypto/elliptic"
@@ -30,11 +31,11 @@ func main() {
 			logger.Fatal("Did not receive response from client registration")
 		}
 
-		if jsonData["op_code"].(float64) == 100 {
+		if jsonData["op_code"].(float64) == packets.OpCodeError {
 			logger.Fatal("Could not register client. Error:", jsonData["message"])
 		}
 
-		if jsonData["op_code"].(float64) == 2 {
+		if jsonData["op_code"].(float64) == packets.OpCodeClientRegistrationAck {
 			clientId, err := uuid.Parse(jsonData["client_id"].(string))
 			if err != nil {
 				log.Fatalln(err)
@@ -53,23 +54,6 @@ func main() {
 	logger.Infof("Client public key: %x", encryption.GetPublicKey())
 
 
-
-	//length := make([]byte, 4)
-	//_, err := c.Read(length)
-	//if err != nil {
-	//	log.Fatalln("Could not read from TCP")
-	//}
-	//
-	//data = make([]byte, binary.BigEndian.Uint32(length))
-	//c.Read(data)
-	//
-	//helloAck, _ := packets.Decode(data)
-	//
-	//decryptedData := encryption.DecryptAes(encryption.CalculateSharedSecret(conf.ServerPublicKey), helloAck.(*packets.HelloAckPacket).AesData)
-	//
-	//fmt.Printf("%s", decryptedData)
-	//
-	//c.Close()
 
 }
 

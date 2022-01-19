@@ -3,8 +3,18 @@ package packets
 import "errors"
 
 type DataPacket struct {
-	AesData   []byte
+	AesData []byte
 }
+
+type InnerMessageOpCode uint8
+
+const (
+	OpCodeHeartbeat             = 1
+	OpCodeHeartbeatAck          = 2
+	OpCodeClientRegistration    = 5
+	OpCodeClientRegistrationAck = 6
+	OpCodeError                 = 100
+)
 
 func (packet DataPacket) Encode() []byte {
 	opCode := make([]byte, 1)
