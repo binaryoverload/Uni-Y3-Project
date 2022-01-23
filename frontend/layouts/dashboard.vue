@@ -10,8 +10,11 @@
         >Enrolment Tokens</sidebar-link
       >
       <sidebar-link to="/users" icon="user">Users</sidebar-link>
-      <sidebar-link to="/logout" icon="sign-out-alt" class="mt-auto mb-4"
-        >Logout</sidebar-link
+      <sidebar-button
+        @click="$auth.logout()"
+        icon="sign-out-alt"
+        class="mt-auto mb-4"
+        >Logout</sidebar-button
       >
     </div>
     <div class="flex-1 px-24 py-20 overflow-x-auto">
