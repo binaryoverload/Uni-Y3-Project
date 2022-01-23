@@ -7,7 +7,7 @@ const { UnauthorizedError, exceptionCodes } = require("../utils/httpExceptions")
 
 const validateJwt = async (req, res, next) => {
     if (!req.headers.authorization) {
-        throw UnauthorizedError("Missing authorization header")
+        throw new UnauthorizedError("Missing authorization header")
     }
 
     const authHeader = req.headers.authorization
@@ -15,13 +15,13 @@ const validateJwt = async (req, res, next) => {
     const accessToken = authHeader.split(" ")[1]
 
     if (!(authHeader.startsWith("Bearer ") && validator.isJWT(accessToken))) {
-        throw UnauthorizedError("Authorization header malformed")
+        throw new UnauthorizedError("Authorization header malformed")
     }
 
     const decoded = jwt.verify(accessToken, config.jwt.secret)
 
     if (decoded?.token_type !== "access") {
-        throw UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`, exceptionCodes.invalidTokenType)
+        throw new UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`, exceptionCodes.invalidTokenType)
     }
 
     const { username, checksum } = decoded

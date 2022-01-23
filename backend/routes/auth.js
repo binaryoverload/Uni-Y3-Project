@@ -19,11 +19,11 @@ router.post("/login", checkValidationErrors(loginValidator), executeQuery(async 
     const user = await getUserByUsername(username)
 
     if (user == null) {
-        throw UnauthorizedError("Invalid username or password")
+        throw new UnauthorizedError("Invalid username or password")
     }
 
     if (!(await verifyPassword(user.password, password))) {
-        throw UnauthorizedError("Invalid username or password")
+        throw new UnauthorizedError("Invalid username or password")
     }
 
     const accessToken = signAccessJwt(username, user.checksum)
@@ -38,7 +38,7 @@ router.post("/refresh", checkValidationErrors(refreshValidator), executeQuery(as
     let decoded = jwt.verify(refreshToken, config.jwt.secret)
 
     if (decoded?.token_type !== "refresh") {
-        throw UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
+        throw new UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
             exceptionCodes.invalidTokenType)
     }
 

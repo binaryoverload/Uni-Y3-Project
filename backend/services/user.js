@@ -6,11 +6,11 @@ async function authorizeUser (username, checksum) {
     const user = await getUserByUsername(username)
 
     if (!user) {
-        throw UnauthorizedError("User does not exist")
+        throw new UnauthorizedError("User does not exist")
     }
 
     if (user.checksum !== checksum) {
-        throw UnauthorizedError()
+        throw new UnauthorizedError()
     }
 
     return user
