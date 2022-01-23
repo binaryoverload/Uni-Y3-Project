@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div v-if="row[schema.endKey]" class="flex items-center">
-            <span class="flex-1 flex max-w-[4em] h-3 bg-gray-200 rounded-full mr-2"><span :class="{
+        <div v-if="row[schema.endKey]" class="flex items-center w-32">
+            <span class="flex flex-1 h-3 mr-2 bg-gray-200 rounded-full"><span :class="{
                   'bg-red-500': percentage >= 0.8,
                   'bg-amber-500': percentage >= 0.6 && percentage < 0.8,
                   'bg-green-500': percentage < 0.6,

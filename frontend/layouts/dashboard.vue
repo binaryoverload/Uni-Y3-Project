@@ -14,7 +14,7 @@
         >Logout</sidebar-link
       >
     </div>
-    <div class="w-full px-24 py-20">
+    <div class="flex-1 px-24 py-20 overflow-x-auto">
       <nuxt />
     </div>
   </div>
