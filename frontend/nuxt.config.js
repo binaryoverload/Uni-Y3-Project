@@ -65,25 +65,25 @@ export default {
       local: {
         scheme: "refresh",
         token: {
-          property: "access_token",
+          property: "data.access_token",
           global: true,
           maxAge: process.env.JWT_ACCESS_VALID_DURATION || (60 * 30) // 30 Minutes
         },
         refreshToken: {
-          property: "refresh_token",
+          property: "data.refresh_token",
           data: "refresh_token",
           maxAge: process.env.JWT_REFRESH_VALID_DURATION || (60 * 60 * 24 * 30), // 30 Days
           required: true
         },
         user: {
-          property: false,
+          property: "data",
           autoFetch: true
         },
         endpoints: {
           login: {url: '/auth/login', method: 'post'},
           refresh: {url: '/auth/refresh', method: 'post'},
-          logout: {},
-          user: {url: '/user', method: 'get'}
+          logout: false,
+          user: {url: '/users/@me', method: 'get'}
         },
       }
     },
@@ -94,7 +94,12 @@ export default {
         maxAge: 60 * 60 * 24 * 30
       }
     },
-    resetOnError: true
+    resetOnError: true,
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      home: '/',
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
