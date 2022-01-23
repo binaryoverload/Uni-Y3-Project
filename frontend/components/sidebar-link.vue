@@ -1,5 +1,5 @@
 <template>
-  <nuxt-link :to="to || '/'" v-slot="{ isActive, navigate, href }">
+  <nuxt-link :to="to || '/'" v-slot="{ isActive, navigate, href }" custom>
     <a :href="href" @click="navigate">
       <div
         :class="commonStyles + ' ' + (isActive ? activeStyles : inactiveStyles)"
