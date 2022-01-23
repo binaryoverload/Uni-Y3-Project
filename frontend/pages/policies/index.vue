@@ -18,6 +18,7 @@ import table from "../../components/tables/table.vue";
 
 export default {
   layout: "dashboard",
+  middleware: "authed",
   components: { CustomTable: table },
   data() {
     return {

@@ -25,6 +25,7 @@
 
 export default {
   layout: "dashboard",
+  middleware: "authed",
   data() {
     return {
       rows: [

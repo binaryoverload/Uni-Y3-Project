@@ -8,7 +8,9 @@
 <script>
 
 export default {
-    name: "App"
+    name: "App",
+    middleware: "authed",
+    layout: "dashboard",
 };
 </script>
 
