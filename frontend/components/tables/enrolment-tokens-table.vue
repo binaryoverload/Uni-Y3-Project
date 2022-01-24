@@ -17,14 +17,23 @@ const schema = [
     key: (row) => {
         if (!row.expires_at && !row.usage_limit) return "online"
 
+        const usageRatio = row.usage_current / row.usage_limit
+        let status = "unknown"
+
+        if (usageRatio >= 0.8) {
+          return "offline"
+        } else if (usageRatio < 0.8 && usageRatio >= 0.6) {
+          return "warning"
+        }
+
         if (row.usage_current >= row.usage_limit) return "offline"
 
-        const timeSinceLastActivity = Date.now() - row.expires_at.getTime()
-        if (isNaN(timeSinceLastActivity)) {
+        const timeUntilExpiry = Date.now() - row.expires_at.getTime()
+        if (isNaN(timeUntilExpiry)) {
             return "unknown"
-        } else if (timeSinceLastActivity < (60 * 10 * 1000)) { // < 10 Minutes is considered healthy
+        } else if (timeUntilExpiry < (60 * 10 * 1000)) { // < 10 Minutes is considered healthy
             return "online" 
-        } else if (timeSinceLastActivity < (60 * 60 * 1000)) { // < 1 Hour
+        } else if (timeUntilExpiry < (60 * 60 * 1000)) { // < 1 Hour
             return "warning"
         } else {
             return "offline"
