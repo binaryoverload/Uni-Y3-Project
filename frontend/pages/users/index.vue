@@ -7,7 +7,10 @@
       </div>
     </div>
     <div>
-      <searchbar placeholder="Search by name"></searchbar>
+      <searchbar
+        placeholder="Search by name"
+        v-model="searchFilter"
+      ></searchbar>
     </div>
   </div>
 </template>
@@ -16,5 +19,10 @@
 export default {
   layout: "dashboard",
   middleware: "authed",
+  data() {
+    return {
+      searchFilter: "",
+    };
+  },
 };
 </script>

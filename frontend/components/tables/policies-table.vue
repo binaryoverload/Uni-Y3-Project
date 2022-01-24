@@ -1,5 +1,5 @@
 <template>
-    <custom-table :rows="rows" :schema="schema"/>
+  <custom-table :rows="rows" :schema="schema" :filter="filter" />
 </template>
 
 <script>
@@ -32,15 +32,18 @@ const schema = [
 export default {
   components: { CustomTable: table },
   props: {
-      rows: {
-          type: Array,
-          required: true
-      }
+    rows: {
+      type: Array,
+      required: true,
+    },
+    filter: {
+      type: String,
+    },
   },
   data() {
-      return {
-          schema
-      }
-  }
+    return {
+      schema,
+    };
+  },
 };
 </script>

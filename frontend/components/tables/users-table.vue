@@ -1,5 +1,5 @@
 <template>
-    <custom-table :rows="rows" :schema="schema"/>
+  <custom-table :rows="rows" :schema="schema" :filter="filter" />
 </template>
 
 <script>
@@ -11,9 +11,9 @@ const schema = [
     url: (row) => row.name,
     content: (row) => {
       if (row.first_name && row.last_name) {
-        return row.first_name + " " + row.last_name
+        return row.first_name + " " + row.last_name;
       } else {
-        return row.username
+        return row.username;
       }
     },
     heading: "Name",
@@ -37,15 +37,18 @@ const schema = [
 export default {
   components: { CustomTable: table },
   props: {
-      rows: {
-          type: Array,
-          required: true
-      }
+    rows: {
+      type: Array,
+      required: true,
+    },
+    filter: {
+      type: String,
+    },
   },
   data() {
-      return {
-          schema
-      }
-  }
+    return {
+      schema,
+    };
+  },
 };
 </script>

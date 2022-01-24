@@ -7,8 +7,11 @@
       </div>
     </div>
     <div>
-      <searchbar placeholder="Search by name"></searchbar>
-      <custom-table :rows="rows" :schema="schema" />
+      <searchbar
+        placeholder="Search by name"
+        v-model="searchFilter"
+      ></searchbar>
+      <custom-table :rows="rows" :schema="schema" :filter="searchFilter" />
     </div>
   </div>
 </template>
@@ -76,6 +79,7 @@ export default {
           heading: "Status",
         },
       ],
+      searchFilter: "",
     };
   },
 };

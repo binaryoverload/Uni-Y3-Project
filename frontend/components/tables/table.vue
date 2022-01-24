@@ -13,7 +13,7 @@
       <tbody>
         <tr
           class="bg-opacity-0 border-b bg-slate-100 hover:bg-opacity-50 border-slate-200 text-slate-600"
-          v-for="(row, y) of rows"
+          v-for="(row, y) of filteredRows"
           :key="y"
         >
           <td v-for="(schemaRow, x) of schema" :key="x" class="py-4 pl-12 last:pr-12 whitespace-nowrap" :style="{width: schemaRow.width}">
@@ -52,11 +52,21 @@ export default {
       type: Array,
       required: true,
     },
+    filter: {
+      type: String,
+      required: false
+    }
   },
   methods: {
     getComponentFromDisplay(display) {
       return componentMap[display] || componentMap.text;
     },
   },
+  computed: {
+    filteredRows() {
+      if (!this.filter) return this.rows
+      return this.rows.filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(this.filter.toLowerCase())))
+    }
+  }
 };
 </script>

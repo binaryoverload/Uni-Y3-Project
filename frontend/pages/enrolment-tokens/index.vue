@@ -7,8 +7,11 @@
       </div>
     </div>
     <div>
-      <searchbar placeholder="Search by name"></searchbar>
-      <enrolment-tokens-table :rows="rows" />
+      <searchbar
+        placeholder="Search by name"
+        v-model="searchFilter"
+      ></searchbar>
+      <enrolment-tokens-table :rows="rows" :filter="searchFilter" />
     </div>
   </div>
 </template>
@@ -25,6 +28,7 @@ export default {
   data() {
     return {
       rows: [],
+      searchFilter: "",
     };
   },
 };

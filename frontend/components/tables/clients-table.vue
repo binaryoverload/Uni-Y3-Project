@@ -1,5 +1,5 @@
 <template>
-    <custom-table :rows="rows" :schema="schema"/>
+  <custom-table :rows="rows" :schema="schema" :filter="filter" />
 </template>
 
 <script>
@@ -9,18 +9,20 @@ const schema = [
   {
     display: "statusIcon",
     key: (row) => {
-        const timeSinceLastActivity = Date.now() - row.last_activity.getTime()
-        if (isNaN(timeSinceLastActivity)) {
-            return "unknown"
-        } else if (timeSinceLastActivity < (60 * 10 * 1000)) { // < 10 Minutes is considered healthy
-            return "online" 
-        } else if (timeSinceLastActivity < (60 * 60 * 1000)) { // < 1 Hour
-            return "warning"
-        } else {
-            return "offline"
-        }
+      const timeSinceLastActivity = Date.now() - row.last_activity.getTime();
+      if (isNaN(timeSinceLastActivity)) {
+        return "unknown";
+      } else if (timeSinceLastActivity < 60 * 10 * 1000) {
+        // < 10 Minutes is considered healthy
+        return "online";
+      } else if (timeSinceLastActivity < 60 * 60 * 1000) {
+        // < 1 Hour
+        return "warning";
+      } else {
+        return "offline";
+      }
     },
-    width: "0"
+    width: "0",
   },
   {
     display: "link",
@@ -40,8 +42,9 @@ const schema = [
   },
   {
     display: "text",
-    content: (row) => { 
-        return row.os_information && row.os_information.name },
+    content: (row) => {
+      return row.os_information && row.os_information.name;
+    },
     heading: "Operating System",
   },
   {
@@ -54,15 +57,18 @@ const schema = [
 export default {
   components: { CustomTable: table },
   props: {
-      rows: {
-          type: Array,
-          required: true
-      }
+    rows: {
+      type: Array,
+      required: true,
+    },
+    filter: {
+      type: String,
+    },
   },
   data() {
-      return {
-          schema
-      }
-  }
+    return {
+      schema,
+    };
+  },
 };
 </script>

@@ -15,8 +15,11 @@
       </div>
     </div>
     <div>
-      <searchbar placeholder="Search by name"></searchbar>
-      <clients-table :rows="rows" />
+      <searchbar
+        placeholder="Search by name"
+        v-model="searchFilter"
+      ></searchbar>
+      <clients-table :rows="rows" :filter="searchFilter" />
     </div>
   </div>
 </template>
@@ -38,6 +41,7 @@ export default {
           },
         },
       ],
+      searchFilter: "",
     };
   },
 };
