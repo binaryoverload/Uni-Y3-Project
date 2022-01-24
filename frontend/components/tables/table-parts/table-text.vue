@@ -25,7 +25,13 @@ export default {
                     return this.schema.content
                 }
             } else {
-                return this.row[this.schema.key]
+                const value = this.row[this.schema.key]
+
+                if (value instanceof Date) {
+                    return value.toLocaleString()
+                }
+
+                return value 
             }
         }
     }

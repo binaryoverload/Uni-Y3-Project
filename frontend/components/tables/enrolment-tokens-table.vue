@@ -18,7 +18,7 @@ const schema = [
       if (!row.expires_at && !row.usage_limit) return "online";
 
       const usageRatio = row.usage_current / row.usage_limit;
-      
+
       if (usageRatio >= 0.8) {
         return "offline";
       } else if (usageRatio < 0.8 && usageRatio >= 0.6) {
@@ -58,7 +58,7 @@ const schema = [
     display: "text",
     content: (row) => {
       if (row.expires_at) {
-        return row.expires_at;
+        return (new Date(row.expires_at)).toLocaleString();
       } else {
         return "No expiry";
       }
