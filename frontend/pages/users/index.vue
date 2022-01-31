@@ -11,6 +11,7 @@
         placeholder="Search by name"
         v-model="searchFilter"
       ></searchbar>
+      <users-table :rows="rows" :filter="searchFilter" />
     </div>
   </div>
 </template>
@@ -19,9 +20,13 @@
 export default {
   layout: "dashboard",
   middleware: "authed",
+  async fetch() {
+    this.rows = (await this.$axios.$get("/users")).data;
+  },
   data() {
     return {
       searchFilter: "",
+      rows: []
     };
   },
 };

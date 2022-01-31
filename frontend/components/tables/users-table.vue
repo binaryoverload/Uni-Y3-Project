@@ -8,7 +8,7 @@ import table from "./table.vue";
 const schema = [
   {
     display: "link",
-    url: (row) => row.name,
+    url: (row) => row.id,
     content: (row) => {
       if (row.first_name && row.last_name) {
         return row.first_name + " " + row.last_name;
@@ -47,7 +47,7 @@ export default {
   },
   data() {
     return {
-      schema,
+      schema
     };
   },
 };
