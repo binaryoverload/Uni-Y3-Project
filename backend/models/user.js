@@ -25,7 +25,7 @@ async function createUser (data) {
 
 async function getUserByUsername (username) {
     return await knex(USERS_TABLE_NAME)
-        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .where("username", username)
         .first()
         .catch(handlePostgresError)
@@ -33,7 +33,7 @@ async function getUserByUsername (username) {
 
 async function getUserById (id) {
     return await knex(USERS_TABLE_NAME)
-        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .where("id", id)
         .first()
         .catch(handlePostgresError)
@@ -41,7 +41,7 @@ async function getUserById (id) {
 
 async function getAllUsers () {
     return await knex(USERS_TABLE_NAME)
-        .select(["id", "username", "password", "checksum", "first_name", "last_name"])
+        .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .catch(handlePostgresError)
 }
 

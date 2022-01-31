@@ -20,12 +20,14 @@ async function authorizeUser (username, checksum) {
 function getSafeUser (user) {
     if (!user) return null
 
-    const { username, first_name, last_name } = user
+    const { id, username, first_name, last_name, updated_at } = user
 
     return {
+        id,
         username,
         first_name,
-        last_name
+        last_name,
+        updated_at
     }
 }
 
