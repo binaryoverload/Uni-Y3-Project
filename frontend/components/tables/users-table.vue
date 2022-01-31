@@ -31,6 +31,17 @@ const schema = [
   {
     display: "actions",
     heading: "Actions",
+    actions: [
+      {
+        icon: "key",
+        onClick(row) {
+          alert("reset password for " + row.username)
+        },
+        showCondition(row) {
+          return row.username !== this.$auth.user.username
+        }
+      }
+    ]
   },
 ];
 

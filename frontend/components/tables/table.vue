@@ -34,12 +34,14 @@ import TableText from "./table-parts/table-text.vue";
 import TableLink from "./table-parts/table-link.vue";
 import TableProgressBar from "./table-parts/table-progress-bar.vue";
 import TableStatusIcon from "./table-parts/table-status-icon.vue";
+import TableActions from "./table-parts/table-actions.vue"
 
 const componentMap = {
   text: TableText,
   link: TableLink,
   progress: TableProgressBar,
   statusIcon: TableStatusIcon,
+  actions: TableActions,
 };
 
 export default {
