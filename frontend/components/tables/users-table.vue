@@ -35,13 +35,13 @@ const schema = [
       {
         icon: "key",
         onClick(row) {
-          alert("reset password for " + row.username)
+          alert("reset password for " + row.username);
         },
         showCondition(row) {
-          return row.username !== this.$auth.user.username
-        }
-      }
-    ]
+          return row.username !== this.$auth.user.username;
+        },
+      },
+    ],
   },
 ];
 
@@ -58,7 +58,7 @@ export default {
   },
   data() {
     return {
-      schema
+      schema,
     };
   },
 };

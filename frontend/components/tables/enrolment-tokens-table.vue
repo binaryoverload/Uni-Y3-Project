@@ -58,7 +58,7 @@ const schema = [
     display: "text",
     content: (row) => {
       if (row.expires_at) {
-        return (new Date(row.expires_at)).toLocaleString();
+        return new Date(row.expires_at).toLocaleString();
       } else {
         return "No expiry";
       }
@@ -72,20 +72,23 @@ const schema = [
       {
         icon: "copy",
         onClick: (row) => {
-          navigator.clipboard.writeText(row.token).then(function() {
-            alert("Copied enrolment token to clipboard!")
-          }, function(err) {
-            console.error('Could not copy enrolment token: ', err);
-          });
-        }
+          navigator.clipboard.writeText(row.token).then(
+            function () {
+              alert("Copied enrolment token to clipboard!");
+            },
+            function (err) {
+              console.error("Could not copy enrolment token: ", err);
+            }
+          );
+        },
       },
       {
         icon: "download",
         onClick: (row) => {
-          alert("downloaded!!")
-        }
-      }
-    ]
+          alert("downloaded!!");
+        },
+      },
+    ],
   },
 ];
 

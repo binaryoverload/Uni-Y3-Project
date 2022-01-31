@@ -1,19 +1,19 @@
 export default {
-    namespaced: true,
-    state() {
-        return {
-            type: null,
-            message: null
-        }
+  namespaced: true,
+  state() {
+    return {
+      type: null,
+      message: null,
+    };
+  },
+  mutations: {
+    setAlert(state, alert) {
+      state.message = alert.message;
+      state.type = alert.type || null;
     },
-    mutations: {
-        setAlert(state, alert) {
-            state.message = alert.message
-            state.type = alert.type || null
-        },
-        clearAlert(state) {
-            state.message = null
-            state.type = null
-        }
-    }
-}
+    clearAlert(state) {
+      state.message = null;
+      state.type = null;
+    },
+  },
+};

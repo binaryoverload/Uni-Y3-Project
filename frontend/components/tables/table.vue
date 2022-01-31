@@ -1,5 +1,5 @@
 <template>
-      <div class="overflow-x-auto ">
+  <div class="overflow-x-auto">
     <table class="w-full my-8 rounded-tl-md rounded-tr-md">
       <thead class="border-b bg-slate-100">
         <th
@@ -16,7 +16,12 @@
           v-for="(row, y) of filteredRows"
           :key="y"
         >
-          <td v-for="(schemaRow, x) of schema" :key="x" class="py-4 pl-12 last:pr-12 whitespace-nowrap" :style="{width: schemaRow.width}">
+          <td
+            v-for="(schemaRow, x) of schema"
+            :key="x"
+            class="py-4 pl-12 last:pr-12 whitespace-nowrap"
+            :style="{ width: schemaRow.width }"
+          >
             <component
               :is="getComponentFromDisplay(schemaRow.display)"
               :schema="schemaRow"
@@ -34,7 +39,7 @@ import TableText from "./table-parts/table-text.vue";
 import TableLink from "./table-parts/table-link.vue";
 import TableProgressBar from "./table-parts/table-progress-bar.vue";
 import TableStatusIcon from "./table-parts/table-status-icon.vue";
-import TableActions from "./table-parts/table-actions.vue"
+import TableActions from "./table-parts/table-actions.vue";
 
 const componentMap = {
   text: TableText,
@@ -56,8 +61,8 @@ export default {
     },
     filter: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   methods: {
     getComponentFromDisplay(display) {
@@ -66,9 +71,13 @@ export default {
   },
   computed: {
     filteredRows() {
-      if (!this.filter) return this.rows
-      return this.rows.filter(row => Object.values(row).some(value => String(value).toLowerCase().includes(this.filter.toLowerCase())))
-    }
-  }
+      if (!this.filter) return this.rows;
+      return this.rows.filter((row) =>
+        Object.values(row).some((value) =>
+          String(value).toLowerCase().includes(this.filter.toLowerCase())
+        )
+      );
+    },
+  },
 };
 </script>

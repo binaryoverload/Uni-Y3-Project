@@ -30,9 +30,11 @@
         "@nuxtjs/fontawesome": "^1.1.2",
         "autoprefixer": "^10.4.2",
         "eslint": "^7.29.0",
+        "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-nuxt": "^2.0.0",
         "eslint-plugin-vue": "^7.12.1",
         "postcss": "^8.4.5",
+        "prettier": "2.5.1",
         "tailwindcss": "^3.0.12"
     }
 }

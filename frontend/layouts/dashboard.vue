@@ -26,9 +26,9 @@
 <script>
 export default {
   head() {
-      return {
-        title: "Themis",
-      }
-  }
-}
+    return {
+      title: "Themis",
+    };
+  },
+};
 </script>

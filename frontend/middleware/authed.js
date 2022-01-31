@@ -1,5 +1,5 @@
 export default async function ({ $auth, redirect }) {
-    if (!$auth.user) {
-        redirect('/login')
-    }
+  if (!$auth.user) {
+    redirect("/login");
+  }
 }
