@@ -8,7 +8,7 @@ import table from "./table.vue";
 const schema = [
   {
     display: "link",
-    url: (row) => row.name,
+    url: (row) => "/enrolment-tokens/" + row.id,
     key: "name",
     heading: "Name",
   },
