@@ -68,7 +68,7 @@ Vue.use(VueTailwind, {
     component: TAlert,
     props: {
       fixedClasses: {
-        wrapper: "relative flex items-center p-4 border-l-4  rounded shadow-sm",
+        wrapper: "relative flex items-center px-4 py-2 border-l-4  rounded shadow-sm",
         body: "flex-grow",
         close:
           "absolute relative flex items-center justify-center ml-4 flex-shrink-0 w-6 h-6 transition duration-100 ease-in-out rounded  focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-opacity-50",
