@@ -44,5 +44,8 @@ export default {
       searchFilter: "",
     };
   },
+  async fetch() {
+    this.rows = (await this.$axios.$get("/clients")).data;
+  }
 };
 </script>

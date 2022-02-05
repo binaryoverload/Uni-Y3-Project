@@ -11,18 +11,16 @@
         placeholder="Search by name"
         v-model="searchFilter"
       ></searchbar>
-      <custom-table :rows="rows" :schema="schema" :filter="searchFilter" />
+      <policies-table :rows="rows" :filter="searchFilter"/> 
     </div>
   </div>
 </template>
 
 <script>
-import table from "../../components/tables/table.vue";
 
 export default {
   layout: "dashboard",
   middleware: "authed",
-  components: { CustomTable: table },
   data() {
     return {
       rows: [

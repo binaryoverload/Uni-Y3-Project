@@ -1,5 +1,5 @@
 <template>
-    <p>{{ tokenData }}</p>
+    <p>{{ policiesData }}</p>
 </template>
 
 <script>
@@ -8,12 +8,12 @@ export default {
   layout: "dashboard",
   data() {
       return {
-          tokenData: {}
+          policiesData: {}
       }
   },
   async fetch() {
       const id = this.$route.params.id
-      this.tokenData = (await this.$axios.$get("/enrolment-tokens/" + id)).data
+      this.policiesData = (await this.$axios.$get("/policies/" + id)).data
   }
 }
 </script>
