@@ -90,14 +90,59 @@ func registerClient(conf *config.Config) {
 	}
 }
 
+var lastBackoff = -1
+
+func getCurrentBackoff() time.Duration {
+	minIndex := len(getBackoffs()) - 1
+	if lastBackoff < minIndex {
+		lastBackoff++
+		minIndex = lastBackoff
+	}
+
+	return getBackoffs()[minIndex]
+}
+
+func getBackoffs() []time.Duration {
+	return []time.Duration{
+		time.Minute * 5,
+		time.Minute * 10,
+		time.Minute * 30,
+		time.Hour,
+	}
+}
+
+var numberErrors = 0
+var backoffUntil time.Time
+
 func heartbeat(ctx context.Context) {
 	logger.Info("sending heartbeat...")
+
+	if !backoffUntil.IsZero() {
+
+		if !(time.Until(backoffUntil) <= 0) {
+			logger.Info(fmt.Sprintf("heartback backoff active for %s", time.Until(backoffUntil).Round(time.Second)))
+			return
+		}
+
+		backoffUntil = time.Time{}
+	}
+
 	data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendHeartbeat, server.RecieveData})
 
 	if err != nil {
 		logger.Error("error in attempting to send heartbeat:", err.Error())
+		numberErrors++
+
+		if numberErrors >= 3 {
+			backoffDuration := getCurrentBackoff()
+			backoffUntil = time.Now().Add(backoffDuration)
+			logger.Info(fmt.Sprintf("heartbeat failed 3 times. backing off for %s", backoffDuration))
+		}
+
 		return
 	}
+
+	numberErrors = 0
 
 	jsonData, ok := data.(map[string]interface{})
 
