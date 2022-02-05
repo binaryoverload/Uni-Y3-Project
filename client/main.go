@@ -25,7 +25,7 @@ var taskScheduler = chrono.NewDefaultTaskScheduler()
 var Finished = make(chan bool)
 
 func main() {
-	defer func() {<- taskScheduler.Shutdown()}()
+	defer func() { <-taskScheduler.Shutdown() }()
 	conf := config.GetConfigInstance()
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
