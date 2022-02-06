@@ -16,6 +16,8 @@ func GetLogger() *log.Logger {
 		if debugLogging {
 			instance = instance.WithDebug()
 		}
+
+		instance.Infof("debug logging enabled: %t", instance.IsDebug())
 	}
 
 	return instance

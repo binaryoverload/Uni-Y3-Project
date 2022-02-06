@@ -1,9 +1,9 @@
 package config
 
 import (
-	"client/utils"
 	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/withmandala/go-log"
 	"os"
 	"sync"
 )
@@ -20,6 +20,8 @@ type Config struct {
 
 var instanceLock = &sync.Mutex{}
 var instance *Config
+
+var configLogger = log.New(os.Stdout).WithColor()
 
 func GetConfigInstance() *Config {
 	instanceLock.Lock()
@@ -38,16 +40,15 @@ func loadConfig() Config {
 		ServerPort:   9000,
 		DebugLogging: false,
 	}
-	logger := utils.GetLogger()
 
 	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_RDONLY, 660)
 	if err != nil {
-		logger.Fatal("Could not open settings file to load!", err)
+		configLogger.Fatal("Could not open settings file to load!", err)
 	}
 
 	fileInfo, err := file.Stat()
 	if err != nil {
-		logger.Fatal("Could not stat settings file", err)
+		configLogger.Fatal("Could not stat settings file", err)
 	}
 
 	if fileInfo.Size() == 0 {
@@ -57,23 +58,22 @@ func loadConfig() Config {
 	jsonDecoder := json.NewDecoder(file)
 	err = jsonDecoder.Decode(&config)
 	if err != nil {
-		logger.Fatal("Could not decode JSON!", err)
+		configLogger.Fatal("Could not decode JSON!", err)
 	}
 
 	return config
 }
 
 func (c Config) SaveConfig() {
-	logger := utils.GetLogger()
 	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_WRONLY, 660)
 	if err != nil {
-		logger.Error("Could not open settings file to save!", err)
+		configLogger.Error("Could not open settings file to save!", err)
 	}
 
 	jsonEncoder := json.NewEncoder(file)
 	jsonEncoder.SetIndent("", "  ")
 	err = jsonEncoder.Encode(c)
 	if err != nil {
-		logger.Error("Could not encode JSON!", err)
+		configLogger.Error("Could not encode JSON!", err)
 	}
 }
