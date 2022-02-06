@@ -2,6 +2,7 @@ package policies
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"strings"
@@ -47,6 +48,57 @@ func (p CommandPolicy) GetProcessEnv() []string {
 	return output
 }
 
+type PackageAction int64
+
+const (
+	Install   PackageAction = 0
+	Uninstall               = 1
+)
+
+func (action PackageAction) MarshalJSON() ([]byte, error) {
+	actionString := action.String()
+	if actionString == "" {
+		return nil, errors.New("illegal package action")
+	}
+	return json.Marshal(actionString)
+}
+
+func (action *PackageAction) UnmarshalJSON(data []byte) (err error) {
+	convertedString := string(data)
+	switch convertedString {
+	case "install":
+		*action = Install
+		return nil
+	case "uninstall":
+		*action = Uninstall
+		return nil
+	}
+	return errors.New("illegal package action")
+}
+
+func (action PackageAction) String() string {
+	switch action {
+	case Install:
+		return "install"
+	case Uninstall:
+		return "uninstall"
+	default:
+		return ""
+	}
+}
+
+func (action PackageAction) Command() string {
+	switch action {
+	case Install:
+		return "install"
+	case Uninstall:
+		return "remove"
+	default:
+		return ""
+	}
+}
+
 type PackagePolicy struct {
-	Packages []string `json:"packages"`
+	Packages []string      `json:"packages"`
+	Action   PackageAction `json:"action"`
 }

@@ -4,6 +4,7 @@ import (
 	"client/utils"
 	"errors"
 	"os/exec"
+	"strings"
 )
 
 var logger = utils.GetLogger()
@@ -51,7 +52,29 @@ func evalFilePolicy(policy Policy) error {
 }
 
 func evalPackagePolicy(policy Policy) error {
+	packagePolicy, ok := policy.Data.(PackagePolicy)
+	if !ok {
+		return errors.New("policy data was not expected package type")
+	}
 
+	commandArgs := []string{"-y", packagePolicy.Action.Command()}
+	commandArgs = append(commandArgs, packagePolicy.Packages...)
+
+	cmd := exec.Command("/usr/bin/apt-get", commandArgs...)
+	fullCommand := strings.Join(cmd.Args, " ")
+
+	err := cmd.Run()
+
+	if err != nil {
+		exitError, isExitError := err.(*exec.ExitError)
+		if isExitError {
+			logger.Errorf("command \"%s\" for policy %s failed with exit code %d: %s", fullCommand, policy.Id, exitError.ExitCode(), exitError.Error())
+			return nil
+		}
+		return err
+	}
+
+	logger.Debugf("command \"%s\" for policy %s completed with exit code 0", fullCommand, policy.Id)
 	return nil
 }
 
@@ -77,6 +100,5 @@ func evalCommandPolicy(policy Policy) error {
 	}
 
 	logger.Debugf("command \"%s\" for policy %s completed with exit code 0", commandPolicy.Command, policy.Id)
-
 	return nil
 }
