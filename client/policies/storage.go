@@ -3,13 +3,15 @@ package policies
 import (
 	"client/utils"
 	"encoding/json"
+	"github.com/google/uuid"
 	"os"
 	"sync"
 	"time"
 )
 
 type Policy struct {
-	PolicyType  string `json:"type"`
+	Id          uuid.UUID `json:"id"`
+	PolicyType  string    `json:"type"`
 	LastUpdated time.Time
 	Data        interface{}
 }
