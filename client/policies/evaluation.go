@@ -57,6 +57,10 @@ func evalPackagePolicy(policy Policy) error {
 		return errors.New("policy data was not expected package type")
 	}
 
+	if !utils.IsRoot() {
+		return errors.New("package management requires the client should be running as root")
+	}
+
 	commandArgs := []string{"-y", packagePolicy.Action.Command()}
 	commandArgs = append(commandArgs, packagePolicy.Packages...)
 

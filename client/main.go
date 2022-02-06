@@ -49,7 +49,7 @@ func main() {
 		}
 	}()
 
-	_, err := taskScheduler.ScheduleAtFixedRate(heartbeat, 20*time.Second)
+	_, err := taskScheduler.ScheduleAtFixedRate(heartbeat, 30*time.Second)
 	if err != nil {
 		logger.Fatal("failed to setup heartbeat scheduler. error")
 	}
