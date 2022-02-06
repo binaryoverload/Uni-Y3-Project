@@ -15,6 +15,7 @@ type Config struct {
 	ServerHost       string              `json:"server_host"`
 	ServerPort       int                 `json:"server_port"`
 	EnrolmentToken   string              `json:"enrolment_token"`
+	DebugLogging     bool                `json:"debug_logging"`
 }
 
 var instanceLock = &sync.Mutex{}
@@ -32,7 +33,11 @@ func GetConfigInstance() *Config {
 }
 
 func loadConfig() Config {
-	var config Config
+	config := Config{
+		ServerHost:   "localhost",
+		ServerPort:   9000,
+		DebugLogging: false,
+	}
 	logger := utils.GetLogger()
 
 	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_RDONLY, 660)
@@ -53,10 +58,6 @@ func loadConfig() Config {
 	err = jsonDecoder.Decode(&config)
 	if err != nil {
 		logger.Fatal("Could not decode JSON!", err)
-	}
-
-	if config.ServerPort == 0 {
-		config.ServerPort = 9000
 	}
 
 	return config
