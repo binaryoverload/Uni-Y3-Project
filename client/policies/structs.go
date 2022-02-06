@@ -2,6 +2,7 @@ package policies
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"strings"
 )
@@ -26,9 +27,24 @@ func (args *CommandArgs) UnmarshalJSON(data []byte) (err error) {
 }
 
 type CommandPolicy struct {
-	Command          string      `json:"command"`
-	Args             CommandArgs `json:"args"`
-	WorkingDirectory string      `json:"working_directory"`
+	Command          string            `json:"command"`
+	Args             CommandArgs       `json:"args"`
+	WorkingDirectory string            `json:"working_directory"`
+	Env              map[string]string `json:"env"`
+}
+
+func (p CommandPolicy) GetProcessEnv() []string {
+	if p.Env == nil {
+		return make([]string, 0)
+	}
+
+	output := make([]string, len(p.Env))
+	i := 0
+	for key, value := range p.Env {
+		output[i] = fmt.Sprintf("%s=%s", key, value)
+		i++
+	}
+	return output
 }
 
 type PackagePolicy struct {

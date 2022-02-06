@@ -1,6 +1,10 @@
 package policies
 
-import "client/utils"
+import (
+	"client/utils"
+	"errors"
+	"os/exec"
+)
 
 var logger = utils.GetLogger()
 
@@ -52,6 +56,27 @@ func evalPackagePolicy(policy Policy) error {
 }
 
 func evalCommandPolicy(policy Policy) error {
+	commandPolicy, ok := policy.Data.(CommandPolicy)
+	if !ok {
+		return errors.New("policy data was not expected command type")
+	}
+
+	cmd := exec.Command(commandPolicy.Command, commandPolicy.Args...)
+	cmd.Dir = commandPolicy.WorkingDirectory
+	cmd.Env = commandPolicy.GetProcessEnv()
+
+	err := cmd.Run()
+
+	if err != nil {
+		exitError, isExitError := err.(*exec.ExitError)
+		if isExitError {
+			logger.Errorf("command \"%s\" for policy %s failed with exit code %d: %s", commandPolicy.Command, policy.Id, exitError.ExitCode(), exitError.Error())
+			return nil
+		}
+		return err
+	}
+
+	logger.Debugf("command \"%s\" for policy %s completed with exit code 0", commandPolicy.Command, policy.Id)
 
 	return nil
 }
