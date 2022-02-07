@@ -34,6 +34,11 @@ func getBackoffs() []time.Duration {
 	}
 }
 
+type HeartbeatAck struct {
+	OpCode packets.InnerMessageOpCode
+	Policies []Polic
+}
+
 func heartbeat(ctx context.Context) {
 	if PauseHeartbeat.IsSet() {
 		logger.Debug("heartbeat paused. not sending")
@@ -74,7 +79,7 @@ func heartbeat(ctx context.Context) {
 	jsonData, ok := data.(map[string]interface{})
 
 	if !ok {
-		logger.Error("did not receive response from heartbeat")
+		logger.Error("did not receive json response from heartbeat")
 		return
 	}
 
@@ -91,6 +96,10 @@ func heartbeat(ctx context.Context) {
 
 	if jsonData["op_code"].(float64) == packets.OpCodeHeartbeatAck {
 		logger.Info("heartbeat acknowledged")
+
+		if jsonData["policies"] != nil
+
+
 	} else {
 		logger.Error("unexpected response from heartbeat. opcode:", jsonData["op_code"])
 	}

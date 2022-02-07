@@ -3,6 +3,7 @@ package policies
 import (
 	"client/utils"
 	"errors"
+	"github.com/mitchellh/mapstructure"
 	"os/exec"
 	"strings"
 )
@@ -42,6 +43,22 @@ func choosePolicyEvalFunction(policy Policy) (func(policy Policy) error, bool) {
 			return nil, false
 		}
 		return evalPackagePolicy, true
+	case map[string]interface{}:
+		var data interface{}
+		decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{Result: &data, TagName: "json"})
+		switch policy.PolicyType {
+		case "command":
+			data = CommandPolicy{}
+		case "package":
+			data = PackagePolicy{}
+		case "file":
+			data = FilePolicy{}
+		}
+		err := decoder.Decode(policy.Data)
+		if err != nil {
+			logger.Errorf("failed to decode %s policy", policy.PolicyType)
+			return nil, false
+		}
 	}
 	return nil, false
 }

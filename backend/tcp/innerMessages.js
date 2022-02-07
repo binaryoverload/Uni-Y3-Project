@@ -46,7 +46,8 @@ function encodeRegisterClientAck(clientId) {
 
 function encodeHeartbeatAck() {
     return {
-        op_code: opCodes.heartbeatAck
+        op_code: opCodes.heartbeatAck,
+        policies: []
     }
 }
 
