@@ -9,12 +9,12 @@ type DataPacket struct {
 type InnerMessageOpCode uint8
 
 const (
-	OpCodeHeartbeat             = 1
-	OpCodeHeartbeatAck          = 2
-	OpCodeClientRegistration    = 5
-	OpCodeClientRegistrationAck = 6
-	OpCodeInvalidClient         = 99
-	OpCodeError                 = 100
+	OpCodeHeartbeat             InnerMessageOpCode = 1
+	OpCodeHeartbeatAck                             = 2
+	OpCodeClientRegistration                       = 5
+	OpCodeClientRegistrationAck                    = 6
+	OpCodeInvalidClient                            = 99
+	OpCodeError                                    = 100
 )
 
 func (packet DataPacket) Encode() []byte {

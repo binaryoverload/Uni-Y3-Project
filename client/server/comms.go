@@ -48,17 +48,17 @@ func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) 
 
 func SendHeartbeat(conn *net.Conn, _ interface{}) (interface{}, error) {
 	type Heartbeat struct {
-		OpCode         int                 `json:"op_code"`
-		OSInformation  goInfo.GoInfoObject `json:"os_information"`
-		MACAddress     string              `json:"mac_address"`
+		OpCode        packets.InnerMessageOpCode `json:"op_code"`
+		OSInformation goInfo.GoInfoObject        `json:"os_information"`
+		MACAddress    string                     `json:"mac_address"`
 	}
 
 	osInfo := utils.GetOSInfo()
 
 	inputData := Heartbeat{
-		OpCode: packets.OpCodeHeartbeat,
+		OpCode:        packets.OpCodeHeartbeat,
 		OSInformation: osInfo,
-		MACAddress: utils.GetMACAddress(),
+		MACAddress:    utils.GetMACAddress(),
 	}
 
 	jsonData, _ := json.Marshal(inputData)
