@@ -63,8 +63,12 @@ func (action PackageAction) MarshalJSON() ([]byte, error) {
 	return json.Marshal(actionString)
 }
 
-func (action *PackageAction) UnmarshalJSON(data []byte) (err error) {
-	convertedString := string(data)
+func (action *PackageAction) UnmarshalJSON(data []byte) error {
+	var convertedString string
+	err := json.Unmarshal(data, &convertedString)
+	if err != nil {
+		return err
+	}
 	switch convertedString {
 	case "install":
 		*action = Install
@@ -101,4 +105,34 @@ func (action PackageAction) Command() string {
 type PackagePolicy struct {
 	Packages []string      `json:"packages"`
 	Action   PackageAction `json:"action"`
+}
+
+func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, bool) {
+	policyItemJson, _ := json.Marshal(policyItem)
+	var data interface{}
+	var err error
+	switch policyItem["type"] {
+	case "command":
+		commandPolicy := CommandPolicy{}
+		err = json.Unmarshal(policyItemJson, &commandPolicy)
+		data = commandPolicy
+	case "package":
+		packagePolicy := PackagePolicy{}
+		err = json.Unmarshal(policyItemJson, &packagePolicy)
+		data = packagePolicy
+	case "file":
+		filePolicy := FilePolicy{}
+		err = json.Unmarshal(policyItemJson, &filePolicy)
+		data = filePolicy
+	default:
+		logger.Errorf("could not find policy item type %s", policyItem["type"])
+		return nil, false
+	}
+
+	if err != nil {
+		logger.Errorf("could not decode policy item type %s: %s", policyItem["type"], err.Error())
+		return nil, false
+	}
+
+	return data, true
 }

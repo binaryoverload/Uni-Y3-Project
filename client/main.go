@@ -49,7 +49,7 @@ func main() {
 		PolicyType:  "package",
 		LastUpdated: time.Now(),
 		PolicyItems: []map[string]interface{}{
-			{"type": "package", "packages": "rolldice", "action": "uninstall"},
+			{"type": "package", "packages": []string{"rolldice"}, "action": "uninstall"},
 		},
 	})
 

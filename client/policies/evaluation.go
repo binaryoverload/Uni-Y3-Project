@@ -34,37 +34,6 @@ func EvaluatePolicy(policy Policy) {
 
 }
 
-func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, bool) {
-	var data interface{}
-	switch policyItem["type"] {
-	case "command":
-		data = CommandPolicy{
-			Command:          policyItem["command"].(string),
-			Args:             strings.Split(policyItem["args"].(string), " "),
-			WorkingDirectory: policyItem["working_directory"].(string),
-			Env:              policyItem["working_directory"].(map[string]string),
-		}
-	case "package":
-		var action PackageAction
-		switch policyItem["action"] {
-		case "install":
-			action = Install
-		case "uninstall":
-			action = Uninstall
-		}
-		data = PackagePolicy{
-			Packages: strings.Split(policyItem["packages"].(string), " "),
-			Action:   action,
-		}
-	case "file":
-		data = FilePolicy{}
-	default:
-		logger.Errorf("could not find policy item type %s", policyItem["type"])
-		return nil, false
-	}
-	return data, true
-}
-
 func choosePolicyEvalFunction(policyItem map[string]interface{}) (func(policy Policy, policyItem interface{}) error, bool) {
 	switch policyItem["type"] {
 	case "command":
