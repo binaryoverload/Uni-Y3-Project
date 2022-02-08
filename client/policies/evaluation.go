@@ -3,7 +3,6 @@ package policies
 import (
 	"client/utils"
 	"errors"
-	"github.com/mitchellh/mapstructure"
 	"os/exec"
 	"strings"
 )
@@ -11,65 +10,82 @@ import (
 var logger = utils.GetLogger()
 
 func EvaluatePolicy(policy Policy) {
-	function, ok := choosePolicyEvalFunction(policy)
+	for _, policyItem := range policy.PolicyItems {
 
-	if !ok {
-		logger.Errorf("could not determine policy type to evaluate. got: %s", policy.PolicyType)
-		return
-	}
+		function, ok := choosePolicyEvalFunction(policyItem)
 
-	err := function(policy)
+		if !ok {
+			logger.Errorf("could not determine policy type to evaluate. got: %s", policy.PolicyType)
+			return
+		}
 
-	if err != nil {
-		logger.Errorf("error in evaluating policy with id %s: %s", policy.Id, err)
-		return
-	}
-}
+		policyItemStruct, ok := structFromPolicyItem(policyItem)
+		if !ok {
+			return
+		}
 
-func choosePolicyEvalFunction(policy Policy) (func(policy Policy) error, bool) {
-	switch policy.Data.(type) {
-	case CommandPolicy:
-		if policy.PolicyType != "command" {
-			return nil, false
-		}
-		return evalCommandPolicy, true
-	case FilePolicy:
-		if policy.PolicyType != "file" {
-			return nil, false
-		}
-		return evalFilePolicy, true
-	case PackagePolicy:
-		if policy.PolicyType != "package" {
-			return nil, false
-		}
-		return evalPackagePolicy, true
-	case map[string]interface{}:
-		var data interface{}
-		decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{Result: &data, TagName: "json"})
-		switch policy.PolicyType {
-		case "command":
-			data = CommandPolicy{}
-		case "package":
-			data = PackagePolicy{}
-		case "file":
-			data = FilePolicy{}
-		}
-		err := decoder.Decode(policy.Data)
+		err := function(policy, policyItemStruct)
+
 		if err != nil {
-			logger.Errorf("failed to decode %s policy", policy.PolicyType)
-			return nil, false
+			logger.Errorf("error in evaluating policy with id %s: %s", policy.Id, err)
+			return
 		}
 	}
-	return nil, false
+
 }
 
-func evalFilePolicy(policy Policy) error {
+func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, bool) {
+	var data interface{}
+	switch policyItem["type"] {
+	case "command":
+		data = CommandPolicy{
+			Command:          policyItem["command"].(string),
+			Args:             strings.Split(policyItem["args"].(string), " "),
+			WorkingDirectory: policyItem["working_directory"].(string),
+			Env:              policyItem["working_directory"].(map[string]string),
+		}
+	case "package":
+		var action PackageAction
+		switch policyItem["action"] {
+		case "install":
+			action = Install
+		case "uninstall":
+			action = Uninstall
+		}
+		data = PackagePolicy{
+			Packages: strings.Split(policyItem["packages"].(string), " "),
+			Action:   action,
+		}
+	case "file":
+		data = FilePolicy{}
+	default:
+		logger.Errorf("could not find policy item type %s", policyItem["type"])
+		return nil, false
+	}
+	return data, true
+}
+
+func choosePolicyEvalFunction(policyItem map[string]interface{}) (func(policy Policy, policyItem interface{}) error, bool) {
+	switch policyItem["type"] {
+	case "command":
+		return evalCommandPolicy, true
+	case "package":
+		return evalPackagePolicy, true
+	case "file":
+		return evalFilePolicy, true
+	default:
+		logger.Errorf("could not find policy item type %s", policyItem["type"])
+		return nil, false
+	}
+}
+
+func evalFilePolicy(policy Policy, policyItem interface{}) error {
 
 	return nil
 }
 
-func evalPackagePolicy(policy Policy) error {
-	packagePolicy, ok := policy.Data.(PackagePolicy)
+func evalPackagePolicy(policy Policy, policyItem interface{}) error {
+	packagePolicy, ok := policyItem.(PackagePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
@@ -99,8 +115,8 @@ func evalPackagePolicy(policy Policy) error {
 	return nil
 }
 
-func evalCommandPolicy(policy Policy) error {
-	commandPolicy, ok := policy.Data.(CommandPolicy)
+func evalCommandPolicy(policy Policy, policyItem interface{}) error {
+	commandPolicy, ok := policyItem.(CommandPolicy)
 	if !ok {
 		return errors.New("policy data was not expected command type")
 	}

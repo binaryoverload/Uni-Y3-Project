@@ -13,7 +13,7 @@ type Policy struct {
 	Id          uuid.UUID `json:"id"`
 	PolicyType  string    `json:"type"`
 	LastUpdated time.Time
-	Data        interface{}
+	PolicyItems []map[string]interface{}
 }
 
 type PolicyStorage struct {
