@@ -10,7 +10,7 @@ import (
 var logger = utils.GetLogger()
 
 func EvaluatePolicy(policy Policy) {
-	for _, policyItem := range policy.PolicyItems {
+	for index, policyItem := range policy.PolicyItems {
 
 		function, ok := choosePolicyEvalFunction(policyItem)
 
@@ -27,7 +27,7 @@ func EvaluatePolicy(policy Policy) {
 		err := function(policy, policyItemStruct)
 
 		if err != nil {
-			logger.Errorf("error in evaluating policy with id %s: %s", policy.Id, err)
+			logger.Errorf("policy item eval failed (policy id: %s, item index: #%d) : %s", policy.Id, index, err)
 			return
 		}
 	}
