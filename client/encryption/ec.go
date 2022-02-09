@@ -7,6 +7,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	ecdh "github.com/aead/ecdh"
 )
 
@@ -38,12 +39,12 @@ func encryptAes(secret []byte, data []byte) ([]byte, error) {
 	rand.Read(iv)
 	block, err := aes.NewCipher(secret)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err creating cipher: %w", err)
 	}
 
 	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err creating gcm: %w", err)
 	}
 
 	cipherText := gcm.Seal(nil, iv, data, nil)
@@ -51,23 +52,22 @@ func encryptAes(secret []byte, data []byte) ([]byte, error) {
 	return append(iv, cipherText...), nil
 }
 
-
 func decryptAes(secret []byte, data []byte) ([]byte, error) {
 	iv := data[:16]
 
 	block, err := aes.NewCipher(secret)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating cipher: %w", err)
 	}
 
 	gcm, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating gcm: %w", err)
 	}
 
 	plaintext, err := gcm.Open(nil, iv, data[16:], nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decryting data: %w", err)
 	}
 
 	return plaintext, nil

@@ -67,7 +67,7 @@ func (action *PackageAction) UnmarshalJSON(data []byte) error {
 	var convertedString string
 	err := json.Unmarshal(data, &convertedString)
 	if err != nil {
-		return err
+		return fmt.Errorf("error unmarshalling packageaction: %w", err)
 	}
 	switch convertedString {
 	case "install":
@@ -107,32 +107,26 @@ type PackagePolicy struct {
 	Action   PackageAction `json:"action"`
 }
 
-func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, bool) {
-	policyItemJson, _ := json.Marshal(policyItem)
-	var data interface{}
-	var err error
+func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, error) {
+	policyItemJson, err := json.Marshal(policyItem)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode policy item type %s: %w", policyItem["type"], err)
+	}
+
 	switch policyItem["type"] {
 	case "command":
 		commandPolicy := CommandPolicy{}
-		err = json.Unmarshal(policyItemJson, &commandPolicy)
-		data = commandPolicy
+		err := json.Unmarshal(policyItemJson, &commandPolicy)
+		return commandPolicy, err
 	case "package":
 		packagePolicy := PackagePolicy{}
-		err = json.Unmarshal(policyItemJson, &packagePolicy)
-		data = packagePolicy
+		err := json.Unmarshal(policyItemJson, &packagePolicy)
+		return packagePolicy, err
 	case "file":
 		filePolicy := FilePolicy{}
-		err = json.Unmarshal(policyItemJson, &filePolicy)
-		data = filePolicy
-	default:
-		logger.Errorf("could not find policy item type %s", policyItem["type"])
-		return nil, false
+		err := json.Unmarshal(policyItemJson, &filePolicy)
+		return filePolicy, err
 	}
 
-	if err != nil {
-		logger.Errorf("could not decode policy item type %s: %s", policyItem["type"], err.Error())
-		return nil, false
-	}
-
-	return data, true
+	return nil, fmt.Errorf("could not find policy item type %s", policyItem["type"])
 }

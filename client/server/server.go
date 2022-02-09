@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"time"
 )
 
 var conf = config.GetConfigInstance()
@@ -15,13 +16,13 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 	conf := config.GetConfigInstance()
 	c, err := net.Dial("tcp", fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("connecting: %w", err)
 	}
 	var currentData interface{} = nil
 	for i := 0; i < len(actions); i++ {
-		//err := c.SetDeadline(time.Now().Add(15 * time.Second))
+		err := c.SetDeadline(time.Now().Add(15 * time.Second))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("setting tcp ttl: %w", err)
 		}
 		currentData, err = actions[i](&c, currentData)
 		if err != nil {
@@ -29,7 +30,7 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 		}
 	}
 	err = c.Close()
-	return currentData, err
+	return currentData, fmt.Errorf("closing connection: %w", err)
 }
 
 func WriteWithLength(conn *net.Conn, data []byte) error {
@@ -39,8 +40,8 @@ func WriteWithLength(conn *net.Conn, data []byte) error {
 	connection := *conn
 	_, err := connection.Write(length)
 	if err != nil {
-		return err
+		return fmt.Errorf("writing data length: %w", err)
 	}
 	_, err = connection.Write(data)
-	return err
+	return fmt.Errorf("writing data: %w", err)
 }

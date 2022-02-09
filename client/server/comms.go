@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/matishsiao/goInfo"
 	"io"
 	"net"
@@ -78,18 +79,18 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 	length := make([]byte, 4)
 	_, err := io.ReadFull(*conn, length)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err while reading data length: %w", err)
 	}
 
 	data := make([]byte, binary.BigEndian.Uint32(length))
 	_, err = io.ReadFull(*conn, data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err while reading data: %w", err)
 	}
 
 	decodedData, err := packets.Decode(data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err while decoding data: %w", err)
 	}
 
 	dataPacket, ok := decodedData.(*packets.DataPacket)
@@ -100,14 +101,14 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 
 	decryptedData, err := encryption.DecryptAes(dataPacket.AesData)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err while decrypting data: %w", err)
 	}
 
 	var jsonData interface{}
 
 	err = json.Unmarshal(decryptedData, &jsonData)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("err while unmarshalling json data: %w", err)
 	}
 
 	return jsonData, nil
