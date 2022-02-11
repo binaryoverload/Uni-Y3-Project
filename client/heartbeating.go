@@ -110,7 +110,20 @@ func heartbeat(ctx context.Context) {
 
 		if heartbeatAck.Policies != nil {
 			logger.Debugf("received %d policies", len(heartbeatAck.Policies))
+
+			polStore := policies.GetPolicyStorage()
+
 			for _, policy := range heartbeatAck.Policies {
+				if storedPolicy, ok := polStore.Policies[policy.Id.String()]; ok {
+					logger.Debugf("(p_id: %s): Stored policy found", policy.Id)
+					if policy.LastUpdated.After(storedPolicy.LastUpdated) {
+						logger.Debugf("(p_id: %s): Stored policy is out of date, evaluating...", policy.Id)
+					} else {
+						logger.Debugf("(p_id: %s): Stored policy is latest version, skipping policy", policy.Id)
+						continue
+					}
+				}
+
 				policy.EvaluatePolicy()
 			}
 		}
