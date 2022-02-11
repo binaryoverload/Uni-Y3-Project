@@ -1,7 +1,11 @@
 const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
 const { cli } = require("triple-beam/config")
+const Cache = require('node-cache');
+
 const { createClient, getClientByPublicKey, getClientById, updateClient } = require("../models/clients")
 const { splitHostAddress } = require("../utils/misc")
+const { getAllPolicyItems } = require("../models/policyItems")
+const { getAllPolicies } = require("../models/policies")
 const opCodes = {
     heartbeat: 1,
     heartbeatAck: 2,
@@ -44,10 +48,10 @@ function encodeRegisterClientAck(clientId) {
     }
 }
 
-function encodeHeartbeatAck() {
+function encodeHeartbeatAck(policies) {
     return {
         op_code: opCodes.heartbeatAck,
-        policies: []
+        policies
     }
 }
 
@@ -101,6 +105,10 @@ async function decodeRegisterClient(ctx, data) {
     return encodeRegisterClientAck(client.id)
 }
 
+const policyCache = new Cache({
+    stdTTL: 60 * 10
+})
+
 async function decodeHeartbeat(ctx, data) {
     const { os_information, mac_address } = data
 
@@ -122,7 +130,12 @@ async function decodeHeartbeat(ctx, data) {
 
     await updateClient(client.id, updateData)
 
-    return encodeHeartbeatAck()
+    if (!policyCache.has("policies") || process.env.NODE_ENV === "development") {
+        const policies = await getAllPolicies()
+        policyCache.set("policies", policies)
+    }
+
+    return encodeHeartbeatAck(policyCache.get("policies"))
 }
 
 module.exports = { opCodes, encodeTCPError, opCodeDecodeFunctions }
