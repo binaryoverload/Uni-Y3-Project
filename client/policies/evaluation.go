@@ -44,13 +44,13 @@ func (policy Policy) EvaluatePolicy() {
 				return
 			}
 		} else {
-			polStore := GetPolicyStorage()
-			polStore.Policies = append(polStore.Policies, policy)
-			SavePolicyStorage()
 			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
 		}
 	}
 
+	polStore := GetPolicyStorage()
+	polStore.Policies[policy.Id.String()] = policy
+	SavePolicyStorage()
 }
 
 func choosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem) error, bool) {

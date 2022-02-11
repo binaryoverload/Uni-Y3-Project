@@ -26,7 +26,7 @@ type PolicyItem struct {
 }
 
 type PolicyStorage struct {
-	Policies []Policy
+	Policies map[string]Policy
 }
 
 var storageLock = &sync.Mutex{}
@@ -50,7 +50,7 @@ func GetPolicyStorage() *PolicyStorage {
 }
 
 func loadPolicyStorage() (PolicyStorage, bool) {
-	policies := make([]Policy, 0)
+	policies := make(map[string]Policy)
 
 	logger := utils.GetLogger()
 
