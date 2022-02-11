@@ -10,10 +10,19 @@ import (
 )
 
 type Policy struct {
-	Id          uuid.UUID `json:"id"`
-	PolicyType  string    `json:"type"`
-	LastUpdated time.Time
-	PolicyItems []map[string]interface{}
+	Id          uuid.UUID    `json:"id"`
+	Name        string       `json:"name"`
+	PolicyType  string       `json:"type"`
+	LastUpdated time.Time    `json:"updated_at"`
+	PolicyItems []PolicyItem `json:"policy_items"`
+}
+
+type PolicyItem struct {
+	Id          uuid.UUID   `json:"id"`
+	Order       int         `json:"policy_order"`
+	Type        string      `json:"type"`
+	StopOnError bool        `json:"stop_on_error"`
+	Data        interface{} `json:"data"`
 }
 
 type PolicyStorage struct {
