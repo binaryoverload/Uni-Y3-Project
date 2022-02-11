@@ -12,7 +12,6 @@ import (
 type Policy struct {
 	Id          uuid.UUID    `json:"id"`
 	Name        string       `json:"name"`
-	PolicyType  string       `json:"type"`
 	LastUpdated time.Time    `json:"updated_at"`
 	PolicyItems []PolicyItem `json:"policy_items"`
 }

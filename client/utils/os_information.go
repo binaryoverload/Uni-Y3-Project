@@ -18,12 +18,12 @@ func GetMACAddress() string {
 
 	for _, netInterface := range interfaces {
 		// Skip loopback interfaces
-		if netInterface.Flags & net.FlagLoopback != 0 {
+		if netInterface.Flags&net.FlagLoopback != 0 {
 			continue
 		}
 
 		// Skip locally administered MACs
-		if netInterface.HardwareAddr[1] & 2 != 0 {
+		if len(netInterface.HardwareAddr) == 0 || netInterface.HardwareAddr[1]&2 != 0 {
 			continue
 		}
 
