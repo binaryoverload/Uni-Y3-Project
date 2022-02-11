@@ -30,7 +30,10 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 		}
 	}
 	err = c.Close()
-	return currentData, fmt.Errorf("closing connection: %w", err)
+	if err != nil {
+		return nil, fmt.Errorf("closing connection: %w", err)
+	}
+	return currentData, nil
 }
 
 func WriteWithLength(conn *net.Conn, data []byte) error {
@@ -43,5 +46,8 @@ func WriteWithLength(conn *net.Conn, data []byte) error {
 		return fmt.Errorf("writing data length: %w", err)
 	}
 	_, err = connection.Write(data)
-	return fmt.Errorf("writing data: %w", err)
+	if err != nil {
+		return fmt.Errorf("writing data: %w", err)
+	}
+	return nil
 }

@@ -104,12 +104,5 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("err while decrypting data: %w", err)
 	}
 
-	var jsonData interface{}
-
-	err = json.Unmarshal(decryptedData, &jsonData)
-	if err != nil {
-		return nil, fmt.Errorf("err while unmarshalling json data: %w", err)
-	}
-
-	return jsonData, nil
+	return decryptedData, nil
 }

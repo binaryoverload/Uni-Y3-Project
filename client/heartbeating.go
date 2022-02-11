@@ -3,8 +3,10 @@ package main
 import (
 	"client/config"
 	"client/packets"
+	"client/policies"
 	"client/server"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/tevino/abool/v2"
 	"time"
@@ -35,7 +37,9 @@ func getBackoffs() []time.Duration {
 }
 
 type HeartbeatAck struct {
-	OpCode packets.InnerMessageOpCode
+	OpCode   packets.InnerMessageOpCode `json:"op_code"`
+	Policies []policies.Policy          `json:"policies"`
+	Message  string                     `json:"message"`
 }
 
 func heartbeat(ctx context.Context) {
@@ -75,33 +79,44 @@ func heartbeat(ctx context.Context) {
 
 	numberErrors = 0
 
-	jsonData, ok := data.(map[string]interface{})
+	var heartbeatAck HeartbeatAck
+
+	byteData, ok := data.([]byte)
 
 	if !ok {
-		logger.Error("did not receive json response from heartbeat")
+		logger.Error("did not receive response from heartbeat")
 		return
 	}
 
-	if jsonData["op_code"].(float64) == packets.OpCodeError {
-		logger.Error("could not heartbeat. error:", jsonData["message"])
+	err = json.Unmarshal(byteData, &heartbeatAck)
+	if err != nil {
+		logger.Error("error unmarshalling heartbeat: %s", err)
 		return
 	}
 
-	if jsonData["op_code"].(float64) == packets.OpCodeInvalidClient {
+	if heartbeatAck.OpCode == packets.OpCodeError {
+		logger.Error("could not heartbeat. error:", heartbeatAck.Message)
+		return
+	}
+
+	if heartbeatAck.OpCode == packets.OpCodeInvalidClient {
 		logger.Warn("client marked as invalid. attempting to register...")
 		registerClient(config.GetConfigInstance())
 		return
 	}
 
-	if jsonData["op_code"].(float64) == packets.OpCodeHeartbeatAck {
+	if heartbeatAck.OpCode == packets.OpCodeHeartbeatAck {
 		logger.Info("heartbeat acknowledged")
 
-		if jsonData["policies"] != nil {
-
+		if heartbeatAck.Policies != nil {
+			logger.Debugf("received %d policies", len(heartbeatAck.Policies))
+			for _, policy := range heartbeatAck.Policies {
+				policy.EvaluatePolicy()
+			}
 		}
 
 	} else {
-		logger.Error("unexpected response from heartbeat. opcode:", jsonData["op_code"])
+		logger.Error("unexpected response from heartbeat. opcode:", heartbeatAck.OpCode)
 	}
 
 }

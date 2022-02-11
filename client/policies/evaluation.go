@@ -4,13 +4,23 @@ import (
 	"client/utils"
 	"errors"
 	"os/exec"
+	"sort"
 	"strings"
 )
 
 var logger = utils.GetLogger()
 
-func EvaluatePolicy(policy Policy) {
-	for index, policyItem := range policy.PolicyItems {
+func (policy Policy) EvaluatePolicy() {
+	logger.Debugf("(p_id: %s): begin eval", policy.Id)
+
+	policyItems := make([]PolicyItem, len(policy.PolicyItems))
+	copy(policyItems, policy.PolicyItems)
+	sort.Slice(policyItems, func(i, j int) bool {
+		return policyItems[i].Order < policyItems[j].Order
+	})
+
+	for index, policyItem := range policyItems {
+		logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
 
 		function, ok := choosePolicyEvalFunction(policyItem)
 
@@ -19,23 +29,32 @@ func EvaluatePolicy(policy Policy) {
 			return
 		}
 
-		policyItemStruct, ok := structFromPolicyItem(policyItem)
-		if !ok {
+		err := policyItem.ParseData()
+		if err != nil {
+			logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
 			return
 		}
 
-		err := function(policy, policyItemStruct)
+		err = function(policyItem)
 
 		if err != nil {
-			logger.Errorf("policy item eval failed (policy id: %s, item index: #%d) : %s", policy.Id, index, err)
-			return
+			logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
+			if policyItem.StopOnError {
+				logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
+				return
+			}
+		} else {
+			polStore := GetPolicyStorage()
+			polStore.Policies = append(polStore.Policies, policy)
+			SavePolicyStorage()
+			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
 		}
 	}
 
 }
 
-func choosePolicyEvalFunction(policyItem map[string]interface{}) (func(policy Policy, policyItem interface{}) error, bool) {
-	switch policyItem["type"] {
+func choosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem) error, bool) {
+	switch policyItem.Type {
 	case "command":
 		return evalCommandPolicy, true
 	case "package":
@@ -43,18 +62,18 @@ func choosePolicyEvalFunction(policyItem map[string]interface{}) (func(policy Po
 	case "file":
 		return evalFilePolicy, true
 	default:
-		logger.Errorf("could not find policy item type %s", policyItem["type"])
+		logger.Errorf("could not find policy item type %s", policyItem.Type)
 		return nil, false
 	}
 }
 
-func evalFilePolicy(policy Policy, policyItem interface{}) error {
+func evalFilePolicy(policyItem PolicyItem) error {
 
 	return nil
 }
 
-func evalPackagePolicy(policy Policy, policyItem interface{}) error {
-	packagePolicy, ok := policyItem.(PackagePolicy)
+func evalPackagePolicy(policyItem PolicyItem) error {
+	packagePolicy, ok := policyItem.Data.(PackagePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
@@ -74,18 +93,18 @@ func evalPackagePolicy(policy Policy, policyItem interface{}) error {
 	if err != nil {
 		exitError, isExitError := err.(*exec.ExitError)
 		if isExitError {
-			logger.Errorf("command \"%s\" for policy %s failed with exit code %d: %s", fullCommand, policy.Id, exitError.ExitCode(), exitError.Error())
+			logger.Errorf("(pi_id: %s): command \"%s\" failed with exit code %d: %s", policyItem.Id, fullCommand, exitError.ExitCode(), exitError.Error())
 			return nil
 		}
 		return err
 	}
 
-	logger.Debugf("command \"%s\" for policy %s completed with exit code 0", fullCommand, policy.Id)
+	logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, fullCommand)
 	return nil
 }
 
-func evalCommandPolicy(policy Policy, policyItem interface{}) error {
-	commandPolicy, ok := policyItem.(CommandPolicy)
+func evalCommandPolicy(policyItem PolicyItem) error {
+	commandPolicy, ok := policyItem.Data.(CommandPolicy)
 	if !ok {
 		return errors.New("policy data was not expected command type")
 	}
@@ -99,12 +118,12 @@ func evalCommandPolicy(policy Policy, policyItem interface{}) error {
 	if err != nil {
 		exitError, isExitError := err.(*exec.ExitError)
 		if isExitError {
-			logger.Errorf("command \"%s\" for policy %s failed with exit code %d: %s", commandPolicy.Command, policy.Id, exitError.ExitCode(), exitError.Error())
+			logger.Errorf("(pi_id: %s): command \"%s\"  failed with exit code %d: %s", policyItem.Id, commandPolicy.Command, exitError.ExitCode(), exitError.Error())
 			return nil
 		}
 		return err
 	}
 
-	logger.Debugf("command \"%s\" for policy %s completed with exit code 0", commandPolicy.Command, policy.Id)
+	logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, commandPolicy.Command)
 	return nil
 }

@@ -4,7 +4,6 @@ import (
 	config "client/config"
 	"client/encryption"
 	"client/packets"
-	"client/policies"
 	"client/server"
 	"client/utils"
 	"crypto/elliptic"
@@ -43,15 +42,6 @@ func main() {
 	}
 
 	logger.Infof("ecdh client public key: %x", encryption.GetPublicKey())
-
-	policies.EvaluatePolicy(policies.Policy{
-		Id:          uuid.New(),
-		PolicyType:  "package",
-		LastUpdated: time.Now(),
-		PolicyItems: []map[string]interface{}{
-			{"type": "package", "packages": []string{"rolldice"}, "action": "uninstall"},
-		},
-	})
 
 	defer func() {
 		if r := recover(); r != nil {

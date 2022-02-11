@@ -107,26 +107,29 @@ type PackagePolicy struct {
 	Action   PackageAction `json:"action"`
 }
 
-func structFromPolicyItem(policyItem map[string]interface{}) (interface{}, error) {
-	policyItemJson, err := json.Marshal(policyItem)
+func (policyItem *PolicyItem) ParseData() error {
+	policyItemDataJson, err := json.Marshal(policyItem.Data)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode policy item type %s: %w", policyItem["type"], err)
+		return fmt.Errorf("could not decode policy item type %s: %w", policyItem.Type, err)
 	}
 
-	switch policyItem["type"] {
+	switch policyItem.Type {
 	case "command":
 		commandPolicy := CommandPolicy{}
-		err := json.Unmarshal(policyItemJson, &commandPolicy)
-		return commandPolicy, err
+		err := json.Unmarshal(policyItemDataJson, &commandPolicy)
+		policyItem.Data = commandPolicy
+		return err
 	case "package":
 		packagePolicy := PackagePolicy{}
-		err := json.Unmarshal(policyItemJson, &packagePolicy)
-		return packagePolicy, err
+		err := json.Unmarshal(policyItemDataJson, &packagePolicy)
+		policyItem.Data = packagePolicy
+		return err
 	case "file":
 		filePolicy := FilePolicy{}
-		err := json.Unmarshal(policyItemJson, &filePolicy)
-		return filePolicy, err
+		err := json.Unmarshal(policyItemDataJson, &filePolicy)
+		policyItem.Data = filePolicy
+		return err
 	}
 
-	return nil, fmt.Errorf("could not find policy item type %s", policyItem["type"])
+	return fmt.Errorf("could not find policy item type %s", policyItem.Type)
 }
