@@ -33,4 +33,15 @@
 - Create Golang project for client
 
 ## Week 5 - w/c 20th December - Christmas Week 🎄
-- 
+- Document package structure
+- Implement TCP server on backend
+
+## Week 6 - w/c 27th December
+- Improve backend logging format
+- Backend: Implement TCP encryption, packet decoding and packet encoding.
+
+## Week 7 - w/c 3rd January
+- Client: Implement configuration and encryption
+- Setup TCP client on the Client application
+- Added TCP decoding to the client.
+- Created a design 
