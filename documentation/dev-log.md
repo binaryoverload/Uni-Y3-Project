@@ -44,4 +44,29 @@
 - Client: Implement configuration and encryption
 - Setup TCP client on the Client application
 - Added TCP decoding to the client.
-- Created a design 
+- Created a design for front-end listing pages and navigation
+- Implemented design using Tailwind CSS, Nuxt.JS and Vue.JS
+
+# Week 8 - w/c 10th January
+- Frontend: Create users and policies table components
+- Client: Create packet handling and TCP flow
+
+# Week 9 - w/c 17th January
+- Backend: Improve database error handling and schema
+- Client: Add ability for client to register with server
+- Client: Add heart-beating between client and backend
+- Client: Add OS information collector and include this in heartbeats
+- Frontend: Add authentication middleware
+- Frontend: Edit styles to be more responsive 
+- Frontend: Add navigation buttons
+- Frontend: Search filter on tables and format dates
+
+# Week 11 - w/c 31st January
+- Frontend: Request data from backend, Add action buttons to tables, create frontend
+- Document policy structure
+- Client: Add storage for policy item
+- Client: Add evaluation for command and package policy types
+
+# Week 12 - w/c 7th February
+- Backend: Send policies in heart-beats
+- Client: Parse policies from heart-beats, store policies in a map instead of list for de-duplication and only evaluate policies which haven't been applied to the client.
