@@ -76,6 +76,14 @@ A policy can be run on the client by aquring
 - stop_on_error - `bool`
 - data - `jsonb`
 
+### Files
+- id - `uuid` - PK
+- name - `varchar(255)`
+- original_filename - `varchar(255)`
+- hash - `varchar(255)`
+- size - `int`
+
+
 ### Policy Condition
 NOT FOR MVP - Implement only if time
 
