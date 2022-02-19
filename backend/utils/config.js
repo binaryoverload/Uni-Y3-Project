@@ -31,6 +31,10 @@ const defaultConfig = {
         memoryCost: 4096,
         parallelism: 1
     },
+    fileUploads: {
+        sizeLimit: 100 * 1024 * 1024, // 100MiB
+        uploadDirectory: "./uploads/"
+    },
     encryption: {
         ecCurve: "prime256v1",
         aesAlgorithm: "aes-256-gcm"
@@ -55,6 +59,10 @@ const envConfig = {
         timeCost: process.env.PASSWORD_TIME_COST,
         memoryCost: process.env.PASSWORD_MEMORY_COST,
         parallelism: process.env.PASSWORD_PARALLELISM
+    },
+    fileUploads: {
+        sizeLimit: process.env.UPLOADS_SIZE_LIMIT,
+        uploadDirectory: process.env.UPLOADS_DIRECTORY
     },
     encryption: {
         ecCurve: process.env.EC_CURVE,
@@ -104,7 +112,8 @@ if (!(mergedConfig.encryption.ecPrivateKey.length === 64)) {
 }
 
 if (!getCurves().includes(mergedConfig.encryption.ecCurve)) {
-    console.error(`The elliptical curve "${mergedConfig.encryption.ecCurve}" is not supported! Please use crypto.getCurves() to find a supported curve. Default is "${defaultConfig.encryption.ecCurve}"`)
+    console.error(
+        `The elliptical curve "${mergedConfig.encryption.ecCurve}" is not supported! Please use crypto.getCurves() to find a supported curve. Default is "${defaultConfig.encryption.ecCurve}"`)
     process.exit(exitCodes.configEncryptionCurve)
 }
 

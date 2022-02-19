@@ -2,6 +2,9 @@ const express = require("express")
 require('express-async-errors')
 
 const cors = require("cors")
+const fileUpload = require("express-fileupload")
+const fs = require("fs")
+const path = require("path")
 
 const config = require("./utils/config")
 const { logger, expressLogger } = require("./utils/logger")
@@ -19,6 +22,10 @@ const app = express()
 app.use(expressLogger)
 app.use(cors())
 app.use(express.json())
+fs.mkdirSync(config.fileUploads.uploadDirectory, { recursive: true })
+app.use(fileUpload({
+    limits: { fileSize: config.fileUploads.fileSize }, // 100MiB
+}));
 
 setupRoutes(app)
 
