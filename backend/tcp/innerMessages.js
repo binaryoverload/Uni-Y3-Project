@@ -2,22 +2,34 @@ const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/en
 const { cli } = require("triple-beam/config")
 const Cache = require('node-cache');
 
+const fs = require("fs")
+const fsPromise = require("fs/promises")
+
+const crc32 = require("crc-32")
+
 const { createClient, getClientByPublicKey, getClientById, updateClient } = require("../models/clients")
 const { splitHostAddress } = require("../utils/misc")
 const { getAllPolicyItems } = require("../models/policyItems")
 const { getAllPolicies } = require("../models/policies")
+const { getFileById } = require("../models/files")
+const path = require("path")
+const config = require("../utils/config")
+const FS = require("fs")
 const opCodes = {
     heartbeat: 1,
     heartbeatAck: 2,
     registerClient: 5,
     registerClientAck: 6,
+    reqFile: 7,
+    resFile: 8,
     invalidClient: 99,
     error: 100
 }
 
 const opCodeDecodeFunctions = {
     [opCodes.heartbeat]: decodeHeartbeat,
-    [opCodes.registerClient]: decodeRegisterClient
+    [opCodes.registerClient]: decodeRegisterClient,
+    [opCodes.reqFile]: decodeFileRequest
 }
 
 const requiredKeys = {
@@ -136,6 +148,46 @@ async function decodeHeartbeat(ctx, data) {
     }
 
     return encodeHeartbeatAck(policyCache.get("policies"))
+}
+
+async function decodeFileRequest(ctx, data) {
+    const { file_id: fileId, chunk_number: chunkNumber } = data
+
+    if (chunkNumber < 0) {
+        return encodeTCPError("Requested chunk must be 0 minimum")
+    }
+
+    const file = await getFileById(fileId)
+
+    const fileChunks = Math.ceil(file.size / config.files.chunkSize)
+
+    if (chunkNumber >= fileChunks) {
+        return encodeTCPError("Requested chunk exceeds number of chunks in file")
+    }
+
+    try {
+        const fd = await fsPromise.open(path.join(config.files.uploadDirectory, fileId), "r")
+
+        const { size: statsSize } = await fd.stat()
+
+        if (statsSize !== file.size) {
+            return encodeTCPError("Requested file has been modified on disk")
+        }
+
+        const start = chunkNumber * config.files.chunkSize
+        const length = Math.min(file.size - start, config.files.chunkSize)
+
+        const fileBuffer = Buffer.alloc(length)
+
+        await fd.read(fileBuffer, 0, length, start)
+
+        const crc = Buffer.alloc(4)
+        crc.writeInt32BE(crc32.buf(fileBuffer))
+
+        return Buffer.concat(fileBuffer, crc)
+    } catch (e) {
+        return encodeTCPError("Error sending file: " + e.message)
+    }
 }
 
 module.exports = { opCodes, encodeTCPError, opCodeDecodeFunctions }

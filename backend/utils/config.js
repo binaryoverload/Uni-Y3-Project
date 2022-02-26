@@ -31,8 +31,9 @@ const defaultConfig = {
         memoryCost: 4096,
         parallelism: 1
     },
-    fileUploads: {
+    files: {
         sizeLimit: 100 * 1024 * 1024, // 100MiB
+        chunkSize: 10 * 1024 * 1024,
         uploadDirectory: "./uploads/"
     },
     encryption: {
@@ -60,8 +61,9 @@ const envConfig = {
         memoryCost: process.env.PASSWORD_MEMORY_COST,
         parallelism: process.env.PASSWORD_PARALLELISM
     },
-    fileUploads: {
+    files: {
         sizeLimit: process.env.UPLOADS_SIZE_LIMIT,
+        chunkSize: process.env.FILE_CHUNK_SIZE,
         uploadDirectory: process.env.UPLOADS_DIRECTORY
     },
     encryption: {

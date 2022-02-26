@@ -19,7 +19,7 @@ function computeSharedECHDSecret(senderPublicKey) {
 function encryptAes(secret, data) {
     const iv = crypto.randomBytes(16)
     const aesCipher = crypto.createCipheriv(config.encryption.aesAlgorithm, secret, iv)
-    if (!(data instanceof String)) {
+    if (!(data instanceof String) || !Buffer.isBuffer(data)) {
         data = JSON.stringify(data)
     }
     let encryptedData = aesCipher.update(data)

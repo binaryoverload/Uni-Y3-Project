@@ -22,9 +22,9 @@ const app = express()
 app.use(expressLogger)
 app.use(cors())
 app.use(express.json())
-fs.mkdirSync(config.fileUploads.uploadDirectory, { recursive: true })
+fs.mkdirSync(config.files.uploadDirectory, { recursive: true })
 app.use(fileUpload({
-    limits: { fileSize: config.fileUploads.fileSize }, // 100MiB
+    limits: { fileSize: config.files.sizeLimit }, // 100MiB
 }));
 
 setupRoutes(app)

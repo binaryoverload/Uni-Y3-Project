@@ -17,7 +17,7 @@ router.post("/upload", validateJwt,  executeQuery(async ({ req, res }) => {
     const { file } = req.files
 
     if (file) {
-        await file.mv(path.join(config.fileUploads.uploadDirectory, id))
+        await file.mv(path.join(config.files.uploadDirectory, id))
 
         return await createFile({
             id,
