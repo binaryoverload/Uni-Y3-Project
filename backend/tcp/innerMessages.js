@@ -20,8 +20,10 @@ const opCodes = {
     heartbeatAck: 2,
     registerClient: 5,
     registerClientAck: 6,
-    reqFile: 7,
-    resFile: 8,
+    reqFileInfo: 7,
+    resFileInfo: 8,
+    reqFileChunk: 9,
+    resFileChunk: 10,
     invalidClient: 99,
     error: 100
 }
@@ -29,7 +31,7 @@ const opCodes = {
 const opCodeDecodeFunctions = {
     [opCodes.heartbeat]: decodeHeartbeat,
     [opCodes.registerClient]: decodeRegisterClient,
-    [opCodes.reqFile]: decodeFileRequest
+    [opCodes.reqFileChunk]: decodeFileChunkRequest
 }
 
 const requiredKeys = {
@@ -150,7 +152,7 @@ async function decodeHeartbeat(ctx, data) {
     return encodeHeartbeatAck(policyCache.get("policies"))
 }
 
-async function decodeFileRequest(ctx, data) {
+async function decodeFileChunkRequest(ctx, data) {
     const { file_id: fileId, chunk_number: chunkNumber } = data
 
     if (chunkNumber < 0) {
@@ -181,10 +183,13 @@ async function decodeFileRequest(ctx, data) {
 
         await fd.read(fileBuffer, 0, length, start)
 
+        const opCode = Buffer.alloc(1)
+        opCode.writeUInt8(opCodes.resFileChunk)
+
         const crc = Buffer.alloc(4)
         crc.writeInt32BE(crc32.buf(fileBuffer))
 
-        return Buffer.concat(fileBuffer, crc)
+        return Buffer.concat([opCode, fileBuffer, crc])
     } catch (e) {
         return encodeTCPError("Error sending file: " + e.message)
     }
