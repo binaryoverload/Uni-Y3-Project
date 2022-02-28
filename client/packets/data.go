@@ -13,6 +13,10 @@ const (
 	OpCodeHeartbeatAck                             = 2
 	OpCodeClientRegistration                       = 5
 	OpCodeClientRegistrationAck                    = 6
+	OpCodeFileInfoReq                              = 7
+	OpCodeFileInfoRes                              = 8
+	OpCodeFileChunkReq                             = 9
+	OpCodeFileChunkRes                             = 10
 	OpCodeInvalidClient                            = 99
 	OpCodeError                                    = 100
 )

@@ -29,7 +29,7 @@ const opCodes = {
 const opCodeDecodeFunctions = {
     [opCodes.heartbeat]: decodeHeartbeat,
     [opCodes.registerClient]: decodeRegisterClient,
-    [opCodes.reqFile]: decodeFileRequest
+    [opCodes.reqFile]: decodeFileChunkRequest
 }
 
 const requiredKeys = {
@@ -150,7 +150,7 @@ async function decodeHeartbeat(ctx, data) {
     return encodeHeartbeatAck(policyCache.get("policies"))
 }
 
-async function decodeFileRequest(ctx, data) {
+async function decodeFileChunkRequest(ctx, data) {
     const { file_id: fileId, chunk_number: chunkNumber } = data
 
     if (chunkNumber < 0) {

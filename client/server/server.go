@@ -2,7 +2,10 @@ package server
 
 import (
 	"client/config"
+	"client/encryption"
+	"client/packets"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -34,6 +37,26 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 		return nil, fmt.Errorf("closing connection: %w", err)
 	}
 	return currentData, nil
+}
+
+func GetSendDataFunction(data interface{}) TcpAction {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil
+	}
+
+	return func(conn *net.Conn, _ interface{}) (interface{}, error) {
+		data, err := encryption.EncryptAes(jsonData)
+		if err != nil {
+			return nil, err
+		}
+
+		packet := (&packets.DataPacket{
+			AesData: data,
+		}).Encode()
+
+		return nil, WriteWithLength(conn, packet)
+	}
 }
 
 func WriteWithLength(conn *net.Conn, data []byte) error {
