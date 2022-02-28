@@ -1,0 +1,5 @@
+The report is well prepared, with a serial of illustrations with figures and tables. The abstract summarises the project context, aim and work to do. The background and rationale for the project have been explained well. It would be better to move some descriptions in the introduction to the literature review section. e.g. you could move GUI related description to the section 3 academic literature, though it’s fine that you present an outline of the literature review.  The project aim is clear, and the objectives are stated to achieve the aim. The objectives align with the SMART model, measurable. The backend development could be the development of a web service.
+
+The project plan is presented with figures and a task list, the project-specific risk analysis is stated with their mitigation. It’s good to see that you have considered the compatibility of OS in the risk analysis.
+
+As a web-based system development with B/S architecture, I would suggest that you consider the compatibility of different web-browsers and the compatibility of clint agents to different devices.  References are in accordance with Harvard style. The correct EA forms have been completed.
