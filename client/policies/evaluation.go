@@ -25,7 +25,7 @@ func (policy Policy) EvaluatePolicy() {
 		function, ok := choosePolicyEvalFunction(policyItem)
 
 		if !ok {
-			logger.Errorf("could not determine policy type to evaluate. got: %s", policy.PolicyType)
+			logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
 			return
 		}
 
