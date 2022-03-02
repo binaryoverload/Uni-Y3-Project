@@ -186,10 +186,7 @@ async function decodeFileChunkRequest(ctx, data) {
         const opCode = Buffer.alloc(1)
         opCode.writeUInt8(opCodes.resFileChunk)
 
-        const crc = Buffer.alloc(4)
-        crc.writeInt32BE(crc32.buf(fileBuffer))
-
-        return Buffer.concat([opCode, fileBuffer, crc])
+        return Buffer.concat([opCode, fileBuffer])
     } catch (e) {
         return encodeTCPError("Error sending file: " + e.message)
     }

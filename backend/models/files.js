@@ -4,7 +4,7 @@ const { handlePostgresError } = require("../utils/errorHandling")
 const FILES_TABLE_NAME = "files"
 
 async function createFile (data) {
-    const { id, name, original_filename, hash, size } = data
+    const { id, name, original_filename, hash, size, owner_user, owner_group } = data
 
     return await knex(FILES_TABLE_NAME)
         .insert({
@@ -12,7 +12,9 @@ async function createFile (data) {
             name,
             original_filename,
             hash,
-            size
+            size,
+            owner_user,
+            owner_group
         })
         .returning("id")
         .then(r => {
@@ -37,7 +39,7 @@ async function getFileById (id) {
             "original_filename",
             "hash",
             "size",
-            "updated_at"])
+            "created_at"])
         .where("id", id)
         .first()
         .catch(handlePostgresError)
