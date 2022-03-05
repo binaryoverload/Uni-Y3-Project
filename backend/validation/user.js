@@ -29,7 +29,7 @@ module.exports = {
             .withMessage("The last name must be at least 1 character long"),
     ],
     userPatch: [
-        idParamValidator,
+        ...idParamValidator,
         body("username", "The username must be a string")
             .optional()
             .isString()

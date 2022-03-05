@@ -3,7 +3,7 @@ const { idParamValidator } = require("./common")
 
 module.exports = {
     clientPatch: [
-        idParamValidator,
+        ...idParamValidator,
         // TODO
     ],
 }

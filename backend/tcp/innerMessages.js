@@ -8,7 +8,6 @@ const fsPromise = require("fs/promises")
 const crc32 = require("crc-32")
 
 const { createClient, getClientByPublicKey, getClientById, updateClient } = require("../models/clients")
-const { splitHostAddress } = require("../utils/misc")
 const { getAllPolicyItems } = require("../models/policyItems")
 const { getAllPolicies } = require("../models/policies")
 const { getFileById } = require("../models/files")

@@ -3,7 +3,7 @@ const { idParamValidator } = require("./common")
 
 module.exports = {
     tokenUpdate: [
-        idParamValidator,
+        ...idParamValidator,
         body("expires_at", "Expires at must be null or a epoch value").optional({ nullable: true }).isInt(),
         body("usage_limit", "Usage limit must be null or a epoch value").optional({ nullable: true }).isInt(),
     ],
