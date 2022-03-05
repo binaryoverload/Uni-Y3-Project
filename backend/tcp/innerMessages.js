@@ -132,10 +132,8 @@ async function decodeHeartbeat(ctx, data) {
         return encodeInvalidClient()
     }
 
-    const { ip } = splitHostAddress(ctx.hostAddress)
-
     const updateData = {
-        last_known_ip: ip,
+        last_known_ip: ctx.hostAddress.ip,
         last_known_hostname: os_information?.Hostname,
         mac_address,
         os_information,
