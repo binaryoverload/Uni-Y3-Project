@@ -87,7 +87,7 @@ async function getClientByPublicKey (public_key) {
         .catch(handlePostgresError)
 }
 
-async function getAllClients (id) {
+async function getAllClients () {
     return await knex(CLIENTS_TABLE_NAME)
         .select([
             "id",
@@ -98,7 +98,6 @@ async function getAllClients (id) {
             "last_known_ip",
             "last_known_hostname",
             "os_information"])
-        .first()
         .catch(handlePostgresError)
 }
 
