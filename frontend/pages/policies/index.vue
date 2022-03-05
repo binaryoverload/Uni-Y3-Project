@@ -3,7 +3,7 @@
     <div class="flex items-end mb-10">
       <p class="text-5xl font-bold leading-[3rem]">Policies</p>
       <div class="ml-auto">
-        <t-button>Create new</t-button>
+        <t-button to="/policies/create" href="/policies/create" tagName="a">Create new</t-button>
       </div>
     </div>
     <div>
