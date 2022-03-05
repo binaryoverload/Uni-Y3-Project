@@ -30,7 +30,7 @@ func RequestFileChunk(fileId uuid.UUID, chunkNum int) error {
 		ChunkNumber: chunkNum,
 	}
 
-	data, err := RunTcpActions([]TcpAction{SendFileChunkReq(fileChunkReq), RecieveData})
+	data, err := RunTcpActions([]TcpAction{SendHello, RecieveHelloAck, SendFileChunkReq(fileChunkReq), RecieveData})
 
 	if err != nil {
 		return err
@@ -41,6 +41,12 @@ func RequestFileChunk(fileId uuid.UUID, chunkNum int) error {
 	if !ok {
 		return errors.New("data returned is not []byte")
 	}
+
+	if dataBytes[0] != packets.OpCodeFileChunkRes {
+		return errors.New("opcode returned is not correct")
+	}
+
+	dataBytes = dataBytes[1:]
 
 	file, err := os.Create(fmt.Sprintf("temp/%s.%d.chunk", fileId, chunkNum))
 	if err != nil {
@@ -62,7 +68,7 @@ func FileRequestWorker(wg *sync.WaitGroup, jobs <-chan int, outputErrors *map[in
 	for chunkNum := range jobs {
 		var err error
 
-		for retry := 0; retry < fileRequestRetries; retry++ {
+		for retry := 1; retry <= fileRequestRetries; retry++ {
 			logger.Debugf("(f_id: %s, r: %d, c: %d) starting chunk download", fileId, retry, chunkNum)
 			err = RequestFileChunk(fileId, chunkNum)
 			if err != nil {
@@ -86,7 +92,17 @@ func RequestFileChunks(fileId uuid.UUID, numChunks int) {
 	var wg sync.WaitGroup
 	wg.Add(numChunks)
 
-	for workerNum := 0; workerNum < numWorkers; workerNum++ {
+	for i := 0; i < numChunks; i++ {
+		jobs <- i
+	}
+	close(jobs)
+
+	numberWorkers := numChunks
+	if numberWorkers > numWorkers {
+		numberWorkers = numWorkers
+	}
+
+	for workerNum := 0; workerNum < numberWorkers; workerNum++ {
 		go FileRequestWorker(&wg, jobs, &outputErrors, fileId)
 	}
 

@@ -21,17 +21,19 @@ router.post(
         if (file) {
             await file.mv(path.join(config.files.uploadDirectory, id))
 
-            return await createFile({
-                id,
-                name: file.name,
-                original_filename: file.name,
-                hash: file.md5,
-                size: file.size,
-            })
-        }
+    if (file) {
 
-        throw new BadRequest()
-    })
-)
+        await createFile({
+            id,
+            name: file.name,
+            original_filename: file.name,
+            hash: file.md5,
+            size: file.size,
+            owner_user: "root"
+        })
+
+        return await file.mv(path.join(config.files.uploadDirectory, id))
+
+    }
 
 module.exports = router

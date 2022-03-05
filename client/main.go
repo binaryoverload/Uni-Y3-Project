@@ -8,6 +8,7 @@ import (
 	"client/utils"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/procyon-projects/chrono"
@@ -43,6 +44,9 @@ func main() {
 
 	logger.Infof("ecdh client public key: %x", encryption.GetPublicKey())
 
+	u, _ := uuid.Parse("d44548a1-5d84-4ba2-85df-10554f9649d9")
+	server.RequestFileChunks(u, 2)
+
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Recovered", r)
@@ -63,10 +67,16 @@ func registerClient(conf *config.Config) {
 		logger.Fatal("error in attempting to register client:", err.Error())
 	}
 
-	jsonData, ok := data.(map[string]interface{})
-
+	dataBytes, ok := data.([]byte)
 	if !ok {
 		logger.Fatal("did not receive response from client registration")
+	}
+
+	var jsonData map[string]interface{}
+
+	err = json.Unmarshal(dataBytes, &jsonData)
+	if err != nil {
+		logger.Fatal("did not parse response from client registration")
 	}
 
 	if jsonData["op_code"].(float64) == packets.OpCodeError {
