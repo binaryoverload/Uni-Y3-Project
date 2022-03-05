@@ -2,14 +2,15 @@
   <nuxt-link :to="to || '/'" v-slot="{ isActive, navigate, href }" custom>
     <a :href="href" @click="navigate">
       <div
-        :class="commonStyles + ' ' + (isActive ? activeStyles : inactiveStyles)"
-      >
+        :class="
+          commonStyles + ' ' + (isActive ? activeStyles : inactiveStyles)
+        ">
         <span class="w-6 mr-4">
           <font-awesome-icon
             :icon="icon"
-            :class="{ 'text-indigo-500': isActive }"
-          /> </span
-        ><slot />
+            :class="{ 'text-indigo-500': isActive }" />
+        </span>
+        <slot />
       </div>
     </a>
   </nuxt-link>
@@ -28,7 +29,7 @@ export default {
       inactiveStyles: "text-slate-400 hover:text-slate-200",
       activeStyles:
         "text-white bg-indigo-400 hover:bg-opacity-20 bg-opacity-10",
-    };
+    }
   },
-};
+}
 </script>

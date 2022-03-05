@@ -17,8 +17,7 @@
     <div>
       <searchbar
         placeholder="Search by name"
-        v-model="searchFilter"
-      ></searchbar>
+        v-model="searchFilter"></searchbar>
       <clients-table :rows="rows" :filter="searchFilter" />
     </div>
   </div>
@@ -42,10 +41,10 @@ export default {
         },
       ],
       searchFilter: "",
-    };
+    }
   },
   async fetch() {
-    this.rows = (await this.$axios.$get("/clients")).data;
-  }
-};
+    this.rows = (await this.$axios.$get("/clients")).data
+  },
+}
 </script>
