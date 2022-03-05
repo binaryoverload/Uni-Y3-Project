@@ -1,5 +1,5 @@
 const express = require("express")
-require('express-async-errors')
+require("express-async-errors")
 
 const cors = require("cors")
 const fileUpload = require("express-fileupload")
@@ -23,21 +23,25 @@ app.use(expressLogger)
 app.use(cors())
 app.use(express.json())
 fs.mkdirSync(config.files.uploadDirectory, { recursive: true })
-app.use(fileUpload({
-    limits: { fileSize: config.files.sizeLimit }, // 100MiB
-}));
+app.use(
+    fileUpload({
+        limits: { fileSize: config.files.sizeLimit }, // 100MiB
+    })
+)
 
 setupRoutes(app)
 
 app.use(notFound)
-app.use(internalError);
+app.use(internalError)
 
 app.get("/", (req, res) => res.send("Hello world"))
 
 startTCPServer()
-app.listen(config.port, () => logger.info(`Server running on http://localhost:${config.port}/ in ${config.environment} mode`));
+app.listen(config.port, () =>
+    logger.info(`Server running on http://localhost:${config.port}/ in ${config.environment} mode`)
+)
 
-[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `SIGTERM`].forEach((eventType) => {
+;[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `SIGTERM`].forEach(eventType => {
     process.on(eventType, () => {
         pool.end()
     })

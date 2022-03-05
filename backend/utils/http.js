@@ -10,14 +10,14 @@ const { JsonWebTokenError, TokenExpiredError } = require("jsonwebtoken")
 const respondSuccess = (res, status, data) => {
     res.status(status).send({
         status: "success",
-        data: data || null
+        data: data || null,
     })
 }
 
 const respondFail = (res, status, data = null) => {
     res.status(status).send({
         status: "fail",
-        data: data
+        data: data,
     })
 }
 
@@ -25,11 +25,11 @@ const respondError = (res, message, data) => {
     res.status(500).send({
         status: "error",
         message,
-        data
+        data,
     })
 }
 
-const validationErrorsToJsend = (errors) => {
+const validationErrorsToJsend = errors => {
     const finalObject = {}
 
     for (let error of errors) {
@@ -40,7 +40,7 @@ const validationErrorsToJsend = (errors) => {
     return finalObject
 }
 
-const checkValidationErrors = (validator) => {
+const checkValidationErrors = validator => {
     const validationCheck = (req, res, next) => {
         const errors = validationResult(req).array({ onlyFirstError: true })
 
@@ -54,35 +54,32 @@ const checkValidationErrors = (validator) => {
         respondFail(res, 400, { code: exceptionCodes.validation, ...dataErrors })
     }
 
-    return [
-        ...validator,
-        validationCheck
-    ]
+    return [...validator, validationCheck]
 }
 
-function handleRequestError (err, res) {
+function handleRequestError(err, res) {
     if (err instanceof DatabaseDataError) {
         return respondFail(res, 400, {
             code: err.code,
-            message: err.message
+            message: err.message,
         })
     }
     if (err instanceof HttpError) {
         return respondFail(res, err.status, {
-            code: err.code
+            code: err.code,
         })
     }
     if (err instanceof JsonWebTokenError) {
         const code = err instanceof TokenExpiredError ? exceptionCodes.jwtExpired : exceptionCodes.jwtGeneral
         return respondFail(res, 401, {
             code,
-            "message": `JWT: ${err.message}`
+            message: `JWT: ${err.message}`,
         })
     }
     throw err
 }
 
-function executeQuery (callback) {
+function executeQuery(callback) {
     return async (req, res) => {
         let returnValue
         try {
@@ -91,7 +88,7 @@ function executeQuery (callback) {
                 params: req.params,
                 user: req.user,
                 req: req,
-                res: res
+                res: res,
             })
 
             if (returnValue instanceof Promise) {

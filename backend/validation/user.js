@@ -26,7 +26,7 @@ module.exports = {
             .isString()
             .trim()
             .isLength({ min: 1 })
-            .withMessage("The last name must be at least 1 character long")
+            .withMessage("The last name must be at least 1 character long"),
     ],
     userPatch: [
         idParamValidator,
@@ -53,6 +53,6 @@ module.exports = {
             .isString()
             .trim()
             .isLength({ min: 1 })
-            .withMessage("The last name must be at least 1 character long")
-    ]
+            .withMessage("The last name must be at least 1 character long"),
+    ],
 }

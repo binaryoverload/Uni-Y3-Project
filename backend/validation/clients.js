@@ -5,5 +5,5 @@ module.exports = {
     clientPatch: [
         idParamValidator,
         // TODO
-    ]
+    ],
 }

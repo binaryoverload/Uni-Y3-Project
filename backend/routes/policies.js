@@ -1,10 +1,10 @@
 const { validateJwt } = require("../middlewares/validateJwt")
-const { checkValidationErrors, executeQuery } = require("../utils/http")
+const { executeQuery, checkValidationErrors } = require("../utils/http")
 
+const { clientPatch } = require("../validation/clients")
 const { NotFoundError } = require("../utils/httpExceptions")
 const { Router } = require("express")
-const { clientPatch } = require("../validation/clients")
-const { getAllClients, getClientById, deleteClient, updateClient } = require("../models/clients")
+const { getAllPolicies, getPolicyById, deletePolicy, updatePolicy } = require("../models/policies")
 const { idParamValidator } = require("../validation/common")
 
 const router = Router()
@@ -13,7 +13,7 @@ router.get(
     "/",
     validateJwt,
     executeQuery(async () => {
-        return getAllClients()
+        return getAllPolicies()
     })
 )
 
@@ -22,7 +22,7 @@ router.get(
     validateJwt,
     checkValidationErrors(idParamValidator),
     executeQuery(async ({ params }) => {
-        return getClientById(params.id)
+        return getPolicyById(params.id)
     })
 )
 
@@ -31,7 +31,7 @@ router.delete(
     validateJwt,
     checkValidationErrors(idParamValidator),
     executeQuery(async ({ params }) => {
-        const deletedId = await deleteClient(params.id)
+        const deletedId = await deletePolicy(params.id)
 
         if (!deletedId || deletedId.length === 0) throw new NotFoundError()
 
@@ -44,7 +44,7 @@ router.patch(
     validateJwt,
     checkValidationErrors(clientPatch),
     executeQuery(async ({ params, body }) => {
-        return await updateClient(params.id, body)
+        return await updatePolicy(params.id, body)
     })
 )
 

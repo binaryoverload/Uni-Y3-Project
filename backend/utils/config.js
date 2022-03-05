@@ -23,28 +23,28 @@ const defaultConfig = {
     port: 8080,
     jwt: {
         accessValidDuration: "30m",
-        refreshValidDuration: "30d"
+        refreshValidDuration: "30d",
     },
     loggingLevel: "info",
     passwordHashing: {
         timeCost: 3,
         memoryCost: 4096,
-        parallelism: 1
+        parallelism: 1,
     },
     files: {
         sizeLimit: 100 * 1024 * 1024, // 100MiB
         chunkSize: 10 * 1024 * 1024,
-        uploadDirectory: "./uploads/"
+        uploadDirectory: "./uploads/",
     },
     encryption: {
         ecCurve: "prime256v1",
-        aesAlgorithm: "aes-256-gcm"
+        aesAlgorithm: "aes-256-gcm",
     },
     postgres: {
         db: "postgres",
         user: "postgres",
-        port: 5432
-    }
+        port: 5432,
+    },
 }
 
 const envConfig = {
@@ -53,30 +53,30 @@ const envConfig = {
     jwt: {
         secret: process.env.JWT_SECRET,
         accessValidDuration: process.env.JWT_ACCESS_VALID_DURATION,
-        refreshValidDuration: process.env.JWT_REFRESH_VALID_DURATION
+        refreshValidDuration: process.env.JWT_REFRESH_VALID_DURATION,
     },
     loggingLevel: process.env.LOGGING_LEVEL?.toLowerCase(),
     passwordHashing: {
         timeCost: process.env.PASSWORD_TIME_COST,
         memoryCost: process.env.PASSWORD_MEMORY_COST,
-        parallelism: process.env.PASSWORD_PARALLELISM
+        parallelism: process.env.PASSWORD_PARALLELISM,
     },
     files: {
         sizeLimit: process.env.UPLOADS_SIZE_LIMIT,
         chunkSize: process.env.FILE_CHUNK_SIZE,
-        uploadDirectory: process.env.UPLOADS_DIRECTORY
+        uploadDirectory: process.env.UPLOADS_DIRECTORY,
     },
     encryption: {
         ecCurve: process.env.EC_CURVE,
-        ecPrivateKey: process.env.EC_PRIVATE_KEY
+        ecPrivateKey: process.env.EC_PRIVATE_KEY,
     },
     postgres: {
         db: process.env.POSTGRES_DB,
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
         host: process.env.POSTGRES_HOST,
-        port: process.env.POSTGRES_PORT
-    }
+        port: process.env.POSTGRES_PORT,
+    },
 }
 
 const mergedConfig = merge(defaultConfig, envConfig)
@@ -115,7 +115,8 @@ if (!(mergedConfig.encryption.ecPrivateKey.length === 64)) {
 
 if (!getCurves().includes(mergedConfig.encryption.ecCurve)) {
     console.error(
-        `The elliptical curve "${mergedConfig.encryption.ecCurve}" is not supported! Please use crypto.getCurves() to find a supported curve. Default is "${defaultConfig.encryption.ecCurve}"`)
+        `The elliptical curve "${mergedConfig.encryption.ecCurve}" is not supported! Please use crypto.getCurves() to find a supported curve. Default is "${defaultConfig.encryption.ecCurve}"`
+    )
     process.exit(exitCodes.configEncryptionCurve)
 }
 

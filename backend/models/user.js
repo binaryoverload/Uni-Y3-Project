@@ -4,7 +4,7 @@ const { hashPassword } = require("../utils/password")
 
 const USERS_TABLE_NAME = "users"
 
-async function createUser (data) {
+async function createUser(data) {
     const { username, password, first_name, last_name } = data
 
     const hashedPassword = await hashPassword(password)
@@ -14,7 +14,7 @@ async function createUser (data) {
             username,
             password: hashedPassword,
             first_name,
-            last_name
+            last_name,
         })
         .returning("id")
         .then(r => {
@@ -23,7 +23,7 @@ async function createUser (data) {
         .catch(handlePostgresError)
 }
 
-async function getUserByUsername (username) {
+async function getUserByUsername(username) {
     return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .where("username", username)
@@ -31,7 +31,7 @@ async function getUserByUsername (username) {
         .catch(handlePostgresError)
 }
 
-async function getUserById (id) {
+async function getUserById(id) {
     return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .where("id", id)
@@ -39,21 +39,17 @@ async function getUserById (id) {
         .catch(handlePostgresError)
 }
 
-async function getAllUsers () {
+async function getAllUsers() {
     return await knex(USERS_TABLE_NAME)
         .select(["id", "username", "password", "checksum", "first_name", "last_name", "updated_at"])
         .catch(handlePostgresError)
 }
 
-async function deleteUser (id) {
-    return await knex(USERS_TABLE_NAME)
-        .where("id", id)
-        .delete()
-        .returning("id")
-        .catch(handlePostgresError)
+async function deleteUser(id) {
+    return await knex(USERS_TABLE_NAME).where("id", id).delete().returning("id").catch(handlePostgresError)
 }
 
-async function updateUser (id, data) {
+async function updateUser(id, data) {
     const { username, first_name, last_name, password } = data
 
     const hashedPassword = await hashPassword(password)
@@ -64,7 +60,7 @@ async function updateUser (id, data) {
             username,
             password: hashedPassword,
             first_name,
-            last_name
+            last_name,
         })
         .returning("*")
 

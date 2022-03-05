@@ -3,7 +3,7 @@ const { handlePostgresError } = require("../utils/errorHandling")
 
 const ENROLMENT_TOKENS_TABLE_NAME = "enrolment_tokens"
 
-async function getEnrolmentToken (id) {
+async function getEnrolmentToken(id) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .where("id", id)
@@ -11,7 +11,7 @@ async function getEnrolmentToken (id) {
         .catch(handlePostgresError)
 }
 
-async function getEnrolmentTokenByToken (token) {
+async function getEnrolmentTokenByToken(token) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .where("token", token)
@@ -19,20 +19,17 @@ async function getEnrolmentTokenByToken (token) {
         .catch(handlePostgresError)
 }
 
-async function getAllEnrolmentTokens () {
+async function getAllEnrolmentTokens() {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .select(["id", "name", "token", "created_at", "expires_at", "usage_current", "usage_limit"])
         .catch(handlePostgresError)
 }
 
-async function deleteEnrolmentToken (id) {
-    return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .where("id", id)
-        .delete()
-        .catch(handlePostgresError)
+async function deleteEnrolmentToken(id) {
+    return await knex(ENROLMENT_TOKENS_TABLE_NAME).where("id", id).delete().catch(handlePostgresError)
 }
 
-async function createEnrolmentToken (name, token) {
+async function createEnrolmentToken(name, token) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .insert({ name, token })
         .returning(["id", "name", "token", "created_at", "usage_current"])
@@ -40,7 +37,7 @@ async function createEnrolmentToken (name, token) {
         .catch(handlePostgresError)
 }
 
-async function updateEnrolmentToken (id, data) {
+async function updateEnrolmentToken(id, data) {
     const { name, expires_at, usage_current, usage_limit } = data
 
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
@@ -56,5 +53,5 @@ module.exports = {
     getEnrolmentTokenByToken,
     deleteEnrolmentToken,
     createEnrolmentToken,
-    updateEnrolmentToken
+    updateEnrolmentToken,
 }

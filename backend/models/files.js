@@ -3,7 +3,7 @@ const { handlePostgresError } = require("../utils/errorHandling")
 
 const FILES_TABLE_NAME = "files"
 
-async function createFile (data) {
+async function createFile(data) {
     const { id, name, original_filename, hash, size } = data
 
     return await knex(FILES_TABLE_NAME)
@@ -12,7 +12,7 @@ async function createFile (data) {
             name,
             original_filename,
             hash,
-            size
+            size,
         })
         .returning("id")
         .then(r => {
@@ -21,37 +21,21 @@ async function createFile (data) {
         .catch(handlePostgresError)
 }
 
-async function deleteFile (id) {
-    return await knex(FILES_TABLE_NAME)
-        .where("id", id)
-        .delete()
-        .returning("id")
-        .catch(handlePostgresError)
+async function deleteFile(id) {
+    return await knex(FILES_TABLE_NAME).where("id", id).delete().returning("id").catch(handlePostgresError)
 }
 
-async function getFileById (id) {
+async function getFileById(id) {
     return await knex(FILES_TABLE_NAME)
-        .select([
-            "id",
-            "name",
-            "original_filename",
-            "hash",
-            "size",
-            "updated_at"])
+        .select(["id", "name", "original_filename", "hash", "size", "updated_at"])
         .where("id", id)
         .first()
         .catch(handlePostgresError)
 }
 
-async function getAllFiles (id) {
+async function getAllFiles(id) {
     return await knex(FILES_TABLE_NAME)
-        .select([
-            "id",
-            "name",
-            "original_filename",
-            "hash",
-            "size",
-            "updated_at"])
+        .select(["id", "name", "original_filename", "hash", "size", "updated_at"])
         .first()
         .catch(handlePostgresError)
 }
@@ -60,5 +44,5 @@ module.exports = {
     createFile,
     deleteFile,
     getFileById,
-    getAllFiles
+    getAllFiles,
 }

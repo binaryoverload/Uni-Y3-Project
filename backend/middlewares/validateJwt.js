@@ -21,7 +21,10 @@ const validateJwt = async (req, res, next) => {
     const decoded = jwt.verify(accessToken, config.jwt.secret)
 
     if (decoded?.token_type !== "access") {
-        throw new UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`, exceptionCodes.invalidTokenType)
+        throw new UnauthorizedError(
+            `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
+            exceptionCodes.invalidTokenType
+        )
     }
 
     const { username, checksum } = decoded

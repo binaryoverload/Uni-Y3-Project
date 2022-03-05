@@ -9,7 +9,6 @@ const { cli } = require("triple-beam/config")
 const ipaddr = require("ipaddr.js")
 
 class SessionHandler {
-
     #receivedHello = false
     #clientPublicKey = null
     #sharedSecret = null
@@ -17,27 +16,31 @@ class SessionHandler {
     #hostAddress = null
     #invalidPacketCount = 0
 
-    constructor (hostAddress) {
+    constructor(hostAddress) {
         this.#hostAddress = hostAddress
 
         logger.debug(`Started TCP session`, { label: "sess", host: hostAddress.full })
     }
 
-    async processOuterPacket (packet) {
+    async processOuterPacket(packet) {
         try {
             return await this.#processOuterPacket(packet)
         } catch (e) {
-            logger.error(`Error processing ${packet.constructor.name || "unknown"} packet: ${e.message}`,
-                { label: "sess", host: this.#hostAddress.full })
+            logger.error(`Error processing ${packet.constructor.name || "unknown"} packet: ${e.message}`, {
+                label: "sess",
+                host: this.#hostAddress.full,
+            })
         }
     }
 
     // Make a pass-through function to handle errors
-    async #processOuterPacket (packet) {
+    async #processOuterPacket(packet) {
         if (packet instanceof Hello) {
             if (this.#receivedHello) {
-                logger.error("Session has already been established with Hello!",
-                    { label: "sess", host: this.#hostAddress.full })
+                logger.error("Session has already been established with Hello!", {
+                    label: "sess",
+                    host: this.#hostAddress.full,
+                })
                 return new HelloNAck()
             }
             this.#invalidPacketCount = 0
@@ -45,7 +48,10 @@ class SessionHandler {
             this.#sharedSecret = computeSharedECHDSecret(packet.senderPublicKey)
             const jsonData = this.#decryptJsonData(packet.aesData)
             if (Object.keys(jsonData).length > 0) {
-                logger.error("Received non-empty data from client on Hello", { label: "sess", host: this.#hostAddress.full })
+                logger.error("Received non-empty data from client on Hello", {
+                    label: "sess",
+                    host: this.#hostAddress.full,
+                })
                 return new HelloNAck()
             }
 
@@ -53,7 +59,10 @@ class SessionHandler {
 
             if (client) {
                 this.#clientId = client.id
-                logger.debug("Known client connected. Id: " + client.id, { label: "sess", host: this.#hostAddress.full })
+                logger.debug("Known client connected. Id: " + client.id, {
+                    label: "sess",
+                    host: this.#hostAddress.full,
+                })
             } else {
                 logger.debug("Unknown client connected", { label: "sess", host: this.#hostAddress.full })
             }
@@ -73,21 +82,32 @@ class SessionHandler {
             if (!decodeFunction) {
                 logger.error(
                     `Decode function for op-code ${jsonData.op_code} does not exist. Op-code exists: ${Object.values(
-                        innerOpCodes).includes(jsonData.op_code)}`, { label: "sess", host: this.#hostAddress.full })
+                        innerOpCodes
+                    ).includes(jsonData.op_code)}`,
+                    { label: "sess", host: this.#hostAddress.full }
+                )
                 return new Data(
-                    encryptAes(this.#sharedSecret, encodeTCPError(`Op-code ${jsonData.op_code} is not valid`)))
+                    encryptAes(this.#sharedSecret, encodeTCPError(`Op-code ${jsonData.op_code} is not valid`))
+                )
             }
 
-            let result = null;
+            let result = null
             try {
-                result = await decodeFunction({
-                    hostAddress: this.#hostAddress,
-                    clientId: this.#clientId,
-                    clientPubKey: this.#clientPublicKey
-                }, jsonData)
+                result = await decodeFunction(
+                    {
+                        hostAddress: this.#hostAddress,
+                        clientId: this.#clientId,
+                        clientPubKey: this.#clientPublicKey,
+                    },
+                    jsonData
+                )
             } catch (e) {
                 result = encodeTCPError(`${e.name}: ${e.message}`)
-                logger.error(`Decoding failed. ${e.name}: ${e.message}`, { stack: e.stack, label: "sess", host:this.#hostAddress.full })
+                logger.error(`Decoding failed. ${e.name}: ${e.message}`, {
+                    stack: e.stack,
+                    label: "sess",
+                    host: this.#hostAddress.full,
+                })
             }
 
             if (result) {
@@ -101,25 +121,28 @@ class SessionHandler {
 
         this.#invalidPacketCount += 1
         if (this.#invalidPacketCount > maxAllowedInvalid) {
-            logger.error(`Received ${maxAllowedInvalid} invalid packets, closing connection`,
-                { label: "sess", host: this.#hostAddress.full })
+            logger.error(`Received ${maxAllowedInvalid} invalid packets, closing connection`, {
+                label: "sess",
+                host: this.#hostAddress.full,
+            })
             return new ErrorPacket()
         }
-        logger.warn(`Received invalid packet of type ${packet.constructor.name || "unknown"}. Ignoring...`,
-            { label: "sess", host: this.#hostAddress.full })
+        logger.warn(`Received invalid packet of type ${packet.constructor.name || "unknown"}. Ignoring...`, {
+            label: "sess",
+            host: this.#hostAddress.full,
+        })
     }
 
     #decryptJsonData(aesData) {
         const decryptedData = decryptAes(this.#sharedSecret, aesData)
         let jsonData = null
         try {
-            jsonData = {...JSON.parse(decryptedData)}
+            jsonData = { ...JSON.parse(decryptedData) }
         } catch (e) {
             throw new Error(`Could not parse JSON data: ${e.message}`)
         }
         return jsonData
     }
-
 }
 
 module.exports = SessionHandler

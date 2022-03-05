@@ -10,26 +10,28 @@ const { BadRequest } = require("../utils/httpExceptions")
 
 const router = Router()
 
-router.post("/upload", validateJwt,  executeQuery(async ({ req, res }) => {
+router.post(
+    "/upload",
+    validateJwt,
+    executeQuery(async ({ req }) => {
+        const id = uuid.v4()
 
-    const id = uuid.v4()
+        const { file } = req.files
 
-    const { file } = req.files
+        if (file) {
+            await file.mv(path.join(config.files.uploadDirectory, id))
 
-    if (file) {
-        await file.mv(path.join(config.files.uploadDirectory, id))
+            return await createFile({
+                id,
+                name: file.name,
+                original_filename: file.name,
+                hash: file.md5,
+                size: file.size,
+            })
+        }
 
-        return await createFile({
-            id,
-            name: file.name,
-            original_filename: file.name,
-            hash: file.md5,
-            size: file.size
-        })
-    }
-
-    throw new BadRequest()
-}))
-
+        throw new BadRequest()
+    })
+)
 
 module.exports = router

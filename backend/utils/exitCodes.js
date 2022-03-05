@@ -5,7 +5,7 @@ const exitCodes = {
     configInvalidPostgres: 22,
     configPasswordHashing: 23,
     configEncryptionPrivateKey: 24,
-    configEncryptionCurve: 25
+    configEncryptionCurve: 25,
 }
 
 module.exports = exitCodes

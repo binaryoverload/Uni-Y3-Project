@@ -19,28 +19,36 @@ const knex = require("knex")({
         port,
         user,
         password,
-        database: db
+        database: db,
     },
     pool: {
         min: 0,
         max: 10,
-        afterCreate (client, done) {
+        afterCreate(client, done) {
             logger.info(`Client connected to ${host}:${port} `, logLabel)
             done()
-        }
+        },
     },
     log: {
-        warn (message) { logger.warn(JSON.stringify(message), logLabel) },
-        debug (message) { logger.debug(JSON.stringify(message), logLabel) },
-        error (message) { logger.error(JSON.stringify(message), logLabel) },
-        deprecate (method, alternative) { logger.warn(`Knex Deprecated: ${method} -> ${alternative}`) }
-    }
+        warn(message) {
+            logger.warn(JSON.stringify(message), logLabel)
+        },
+        debug(message) {
+            logger.debug(JSON.stringify(message), logLabel)
+        },
+        error(message) {
+            logger.error(JSON.stringify(message), logLabel)
+        },
+        deprecate(method, alternative) {
+            logger.warn(`Knex Deprecated: ${method} -> ${alternative}`)
+        },
+    },
 })
 
-function verifyConnection () {
+function verifyConnection() {
     knex.raw("SELECT 1")
         .then(() => logger.info("Successfully verified connection", logLabel))
-        .catch((err) => {
+        .catch(err => {
             logger.error(`Error verifying connection: ${err.message}`, logLabel)
             process.exit(exitCodes.postgresError)
         })

@@ -33,9 +33,7 @@ const loggingFormat = combine(
 const logger = createLogger({
     level: config.loggingLevel,
     format: loggingFormat,
-    transports: [
-        new transports.Console()
-    ]
+    transports: [new transports.Console()],
 })
 
 const expressLogger = expressWinston.logger({
@@ -43,7 +41,7 @@ const expressLogger = expressWinston.logger({
     baseMeta: { label: "http" },
     msg: "{{req.method}} (Status {{res.statusCode}}, {{res.responseTime}}ms) {{req.url}}",
     expressFormat: false,
-    colorize: true
+    colorize: true,
 })
 
 module.exports = { logger, expressLogger }

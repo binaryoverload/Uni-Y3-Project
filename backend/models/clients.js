@@ -3,7 +3,7 @@ const { handlePostgresError } = require("../utils/errorHandling")
 
 const CLIENTS_TABLE_NAME = "clients"
 
-async function createClient (data) {
+async function createClient(data) {
     const { name, public_key, mac_address, os_information, last_known_ip, last_known_hostname } = data
 
     return await knex(CLIENTS_TABLE_NAME)
@@ -13,7 +13,7 @@ async function createClient (data) {
             mac_address,
             os_information,
             last_known_ip,
-            last_known_hostname
+            last_known_hostname,
         })
         .returning("id")
         .then(r => {
@@ -22,24 +22,12 @@ async function createClient (data) {
         .catch(handlePostgresError)
 }
 
-async function deleteClient (id) {
-    return await knex(CLIENTS_TABLE_NAME)
-        .where("id", id)
-        .delete()
-        .returning("id")
-        .catch(handlePostgresError)
+async function deleteClient(id) {
+    return await knex(CLIENTS_TABLE_NAME).where("id", id).delete().returning("id").catch(handlePostgresError)
 }
 
-async function updateClient (id, data) {
-    const {
-        name,
-        public_key,
-        last_activity,
-        mac_address,
-        last_known_ip,
-        last_known_hostname,
-        os_information
-    } = data
+async function updateClient(id, data) {
+    const { name, public_key, last_activity, mac_address, last_known_ip, last_known_hostname, os_information } = data
 
     return await knex(CLIENTS_TABLE_NAME)
         .update({
@@ -49,13 +37,13 @@ async function updateClient (id, data) {
             mac_address,
             last_known_ip,
             last_known_hostname,
-            os_information
+            os_information,
         })
         .where("id", id)
         .catch(handlePostgresError)
 }
 
-async function getClientById (id) {
+async function getClientById(id) {
     return await knex(CLIENTS_TABLE_NAME)
         .select([
             "id",
@@ -65,13 +53,14 @@ async function getClientById (id) {
             "mac_address",
             "last_known_ip",
             "last_known_hostname",
-            "os_information"])
+            "os_information",
+        ])
         .where("id", id)
         .first()
         .catch(handlePostgresError)
 }
 
-async function getClientByPublicKey (public_key) {
+async function getClientByPublicKey(public_key) {
     return await knex(CLIENTS_TABLE_NAME)
         .select([
             "id",
@@ -81,13 +70,14 @@ async function getClientByPublicKey (public_key) {
             "mac_address",
             "last_known_ip",
             "last_known_hostname",
-            "os_information"])
+            "os_information",
+        ])
         .where("public_key", public_key)
         .first()
         .catch(handlePostgresError)
 }
 
-async function getAllClients () {
+async function getAllClients() {
     return await knex(CLIENTS_TABLE_NAME)
         .select([
             "id",
@@ -97,7 +87,8 @@ async function getAllClients () {
             "mac_address",
             "last_known_ip",
             "last_known_hostname",
-            "os_information"])
+            "os_information",
+        ])
         .catch(handlePostgresError)
 }
 
@@ -107,5 +98,5 @@ module.exports = {
     updateClient,
     getClientById,
     getClientByPublicKey,
-    getAllClients
+    getAllClients,
 }
