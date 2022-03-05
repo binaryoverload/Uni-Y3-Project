@@ -5,6 +5,7 @@ import (
 	"client/packets"
 	"client/policies"
 	"client/server"
+	"client/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -18,13 +19,10 @@ var backoffUntil time.Time
 var PauseHeartbeat = abool.New()
 
 func getCurrentBackoff() time.Duration {
-	minIndex := len(getBackoffs()) - 1
-	if lastBackoff < minIndex {
-		lastBackoff++
-		minIndex = lastBackoff
-	}
+	index := utils.Min(lastBackoff+1, len(getBackoffs())-1)
+	lastBackoff = index
 
-	return getBackoffs()[minIndex]
+	return getBackoffs()[index]
 }
 
 func getBackoffs() []time.Duration {
