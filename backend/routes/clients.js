@@ -5,8 +5,9 @@ const { getSafeUser } = require("../services/user")
 const { getUserById, deleteUser, updateUser, getAllUsers, createUser } = require("../models/user")
 const { NotFoundError } = require("../utils/httpExceptions")
 const { Router } = require("express")
-const { clientGetId, clientDelete, clientPost, clientPatch } = require("../validation/clients")
+const { clientPost, clientPatch } = require("../validation/clients")
 const { getAllClients, getClientById, deleteClient, updateClient } = require("../models/clients")
+const { idParamValidator } = require("../validation/common")
 
 const router = Router()
 
@@ -14,11 +15,11 @@ router.get("/", validateJwt, executeQuery(async () => {
     return getAllClients()
 }))
 
-router.get("/:id", validateJwt, checkValidationErrors(clientGetId), executeQuery(async ({ params }) => {
+router.get("/:id", validateJwt, checkValidationErrors(idParamValidator), executeQuery(async ({ params }) => {
     return getClientById(params.id)
 }))
 
-router.delete("/:id", validateJwt, checkValidationErrors(clientDelete), executeQuery(async ({ params }) => {
+router.delete("/:id", validateJwt, checkValidationErrors(idParamValidator), executeQuery(async ({ params }) => {
     const deletedId = await deleteClient(params.id)
 
     if (!deletedId || deletedId.length === 0)

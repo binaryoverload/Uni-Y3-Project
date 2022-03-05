@@ -4,10 +4,11 @@ const { checkValidationErrors, respondFail, respondSuccess, executeQuery } = req
 const { createUser, getUserById, getAllUsers, deleteUser, updateUser } = require("../models/user")
 const { DuplicateEntityError, DatabaseError, HttpError, UnauthorizedError, NotFoundError } = require(
     "../utils/httpExceptions")
-const { userPost, userGetId, userDelete, userPatch } = require("../validation/user")
+const { userPost, userPatch } = require("../validation/user")
 const { validateJwt } = require("../middlewares/validateJwt")
 const { hashPassword } = require("../utils/password")
 const { getSafeUser } = require("../services/user")
+const { idParamValidator } = require("../validation/common")
 
 const router = Router()
 
@@ -15,11 +16,11 @@ router.get("/@me", validateJwt, executeQuery(({ user }) => {
     return getSafeUser(user)
 }))
 
-router.get("/:id", validateJwt, checkValidationErrors(userGetId), executeQuery(async ({ params }) => {
+router.get("/:id", validateJwt, checkValidationErrors(idParamValidator), executeQuery(async ({ params }) => {
     return getSafeUser(await getUserById(params.id))
 }))
 
-router.delete("/:id", validateJwt, checkValidationErrors(userDelete), executeQuery(async ({ params }) => {
+router.delete("/:id", validateJwt, checkValidationErrors(idParamValidator), executeQuery(async ({ params }) => {
     const deletedId = await deleteUser(params.id)
 
     if (!deletedId || deletedId.length === 0)

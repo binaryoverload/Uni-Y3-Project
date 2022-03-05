@@ -1,9 +1,5 @@
 const { body, param } = require("express-validator")
-
-const userIdValidator = param("id", "User ID is required")
-    .exists()
-    .isUUID(4)
-    .withMessage("User ID must be a UUID v4")
+const { idParamValidator } = require("./common")
 
 module.exports = {
     userPost: [
@@ -32,14 +28,8 @@ module.exports = {
             .isLength({ min: 1 })
             .withMessage("The last name must be at least 1 character long")
     ],
-    userGetId: [
-        userIdValidator
-    ],
-    userDelete: [
-        userIdValidator
-    ],
     userPatch: [
-        userIdValidator,
+        idParamValidator,
         body("username", "The username must be a string")
             .optional()
             .isString()
