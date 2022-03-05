@@ -116,6 +116,7 @@ export default {
         "faSignOutAlt",
         "faSearch",
         "faArrowRight",
+        "faArrowLeft",
         "faCheck",
         "faTimes",
         "faExclamation",
@@ -123,6 +124,8 @@ export default {
         "faCopy",
         "faDownload",
         "faKey",
+        "faSync",
+        "faAsterisk"
       ],
     },
   },

@@ -53,8 +53,9 @@ Vue.use(VueTailwind, {
         success:
           "text-white bg-green-500 border border-transparent rounded shadow-sm hover:bg-green-600",
         link: "text-blue-500 underline hover:text-blue-600",
+        neutral: "text-slate-600 bg-slate-200 rounded shadow-sm hover:bg-slate-300 focus:ring-slate-500 focus:border-slate-500",
         secondary:
-          "text-gray-800 bg-white border border-gray-300 shadow-sm focus:ring-indigo-500hover:text-gray-600",
+          "text-gray-800 bg-white border border-gray-300 shadow-sm focus:ring-indigo-500 hover:text-gray-600",
       },
     },
   },
