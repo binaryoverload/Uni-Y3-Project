@@ -11,7 +11,13 @@ const loggingFormatString = printf(({ level, message, timestamp, label, stack })
 })
 
 const addHostToMessage = format(log => {
-    log.message = log.host ? `[${log.host}]\t${log.message}` : log.message
+    if (log.host) {
+        if (log.stack) {
+            log.stack = `[${log.host}]\t${log.stack}`
+        } else {
+            log.message = `[${log.host}]\t${log.message}`
+        }
+    }
     return log
 })
 
