@@ -11,7 +11,13 @@ const loggingFormatString = printf(({ level, message, timestamp, label, stack })
 })
 
 const addHostToMessage = format(log => {
-    log.message = log.host ? `[${log.host}]\t${log.message}` : log.message
+    if (log.host) {
+        if (log.stack) {
+            log.stack = `[${log.host}]\t${log.stack}`
+        } else {
+            log.message = `[${log.host}]\t${log.message}`
+        }
+    }
     return log
 })
 
@@ -27,9 +33,7 @@ const loggingFormat = combine(
 const logger = createLogger({
     level: config.loggingLevel,
     format: loggingFormat,
-    transports: [
-        new transports.Console()
-    ]
+    transports: [new transports.Console()],
 })
 
 const expressLogger = expressWinston.logger({
@@ -37,7 +41,7 @@ const expressLogger = expressWinston.logger({
     baseMeta: { label: "http" },
     msg: "{{req.method}} (Status {{res.statusCode}}, {{res.responseTime}}ms) {{req.url}}",
     expressFormat: false,
-    colorize: true
+    colorize: true,
 })
 
 module.exports = { logger, expressLogger }

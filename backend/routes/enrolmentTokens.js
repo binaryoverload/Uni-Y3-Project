@@ -1,40 +1,69 @@
 const { Router } = require("express")
 const { checkValidationErrors, executeQuery } = require("../utils/http")
-const { getAllEnrolmentTokens, getEnrolmentToken, deleteEnrolmentToken, createEnrolmentToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
-const { tokenGet, tokenDelete, tokenUpdate, tokenCreate } = require("../validation/enrolmentTokens")
+const {
+    getAllEnrolmentTokens,
+    getEnrolmentToken,
+    deleteEnrolmentToken,
+    createEnrolmentToken,
+    updateEnrolmentToken,
+} = require("../models/enrolmentTokens")
+const { tokenUpdate, tokenCreate } = require("../validation/enrolmentTokens")
 const { NotFoundError } = require("../utils/httpExceptions")
-const { userPost } = require("../validation/user")
-const { createUser } = require("../models/user")
+
 const { validateJwt } = require("../middlewares/validateJwt")
 const { generateToken } = require("../services/enrolmentTokens")
+const { idParamValidator } = require("../validation/common")
 
 const router = Router()
 
-router.get("/", validateJwt, executeQuery(async () => {
-    return await getAllEnrolmentTokens()
-}))
+router.get(
+    "/",
+    validateJwt,
+    executeQuery(async () => {
+        return await getAllEnrolmentTokens()
+    })
+)
 
-router.get("/:id", validateJwt, checkValidationErrors(tokenGet), executeQuery(async ({ params }) => {
-    return await getEnrolmentToken(params.id)
-}))
+router.get(
+    "/:id",
+    validateJwt,
+    checkValidationErrors(idParamValidator),
+    executeQuery(async ({ params }) => {
+        return await getEnrolmentToken(params.id)
+    })
+)
 
-router.delete("/:id", validateJwt, checkValidationErrors(tokenDelete), executeQuery(async ({ params }) => {
-    const token = await deleteEnrolmentToken(params.id)
+router.delete(
+    "/:id",
+    validateJwt,
+    checkValidationErrors(idParamValidator),
+    executeQuery(async ({ params }) => {
+        const token = await deleteEnrolmentToken(params.id)
 
-    if (!token || token.length === 0)
-        throw new NotFoundError()
+        if (!token || token.length === 0) throw new NotFoundError()
 
-    return token
-}))
+        return token
+    })
+)
 
-router.post("/", validateJwt, checkValidationErrors(tokenCreate), executeQuery(async ({ body }) => {
-    const token = generateToken()
+router.post(
+    "/",
+    validateJwt,
+    checkValidationErrors(tokenCreate),
+    executeQuery(async ({ body }) => {
+        const token = generateToken()
 
-    return await createEnrolmentToken(body.name, token)
-}))
+        return await createEnrolmentToken(body.name, token)
+    })
+)
 
-router.patch("/:id", validateJwt, checkValidationErrors(tokenUpdate), executeQuery(async ({ params, body }) => {
-    return await updateEnrolmentToken(params.id, body)
-}))
+router.patch(
+    "/:id",
+    validateJwt,
+    checkValidationErrors(tokenUpdate),
+    executeQuery(async ({ params, body }) => {
+        return await updateEnrolmentToken(params.id, body)
+    })
+)
 
 module.exports = router

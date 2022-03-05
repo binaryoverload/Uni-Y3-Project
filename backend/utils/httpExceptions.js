@@ -7,11 +7,11 @@ const exceptionCodes = {
     jwtExpired: "jwt_expired",
     validation: "validation",
     badRequest: "bad_request",
-    foreignKeyViolation: "foreign_key_violation"
+    foreignKeyViolation: "foreign_key_violation",
 }
 
 class DatabaseDataError extends Error {
-    constructor (message, code) {
+    constructor(message, code) {
         super(message)
         this.name = "DatabaseDataError"
         this.code = code
@@ -19,21 +19,21 @@ class DatabaseDataError extends Error {
 }
 
 class DuplicateEntityError extends DatabaseDataError {
-    constructor (message) {
+    constructor(message) {
         super(message, exceptionCodes.duplicate)
         this.name = "DuplicateEntityError"
     }
 }
 
 class ForeignKeyError extends DatabaseDataError {
-    constructor (message) {
+    constructor(message) {
         super(message, exceptionCodes.foreignKeyViolation)
         this.name = "ForeignKeyError"
     }
 }
 
 class HttpError extends Error {
-    constructor (status, code, message) {
+    constructor(status, code, message) {
         super(`${status}: ${message}`)
         this.name = "HttpError"
 
@@ -43,25 +43,25 @@ class HttpError extends Error {
 }
 
 class UnauthorizedError extends HttpError {
-    constructor (message = "Not logged in", code = exceptionCodes.unauthorized) {
+    constructor(message = "Not logged in", code = exceptionCodes.unauthorized) {
         super(401, code, message)
     }
 }
 
 class NotFoundError extends HttpError {
-    constructor (message = "Not found") {
+    constructor(message = "Not found") {
         super(404, exceptionCodes.notfound, message)
     }
 }
 
 class BadRequest extends HttpError {
-    constructor (message = "Bad request") {
+    constructor(message = "Bad request") {
         super(400, exceptionCodes.badRequest, message)
     }
 }
 
 class DatabaseError extends Error {
-    constructor (code, errName, message) {
+    constructor(code, errName, message) {
         super(message)
         this.name = "DatabaseError"
 
@@ -79,5 +79,5 @@ module.exports = {
     UnauthorizedError,
     NotFoundError,
     BadRequest,
-    exceptionCodes
+    exceptionCodes,
 }

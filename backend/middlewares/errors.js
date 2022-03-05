@@ -14,8 +14,7 @@ const internalError = (err, req, res, next) => {
     }
 
     let label = null
-    if (err instanceof DatabaseError)
-        label = "postgres"
+    if (err instanceof DatabaseError) label = "postgres"
 
     logger.error(`Error 500: ${err.message}`, { label })
 

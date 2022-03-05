@@ -1,6 +1,6 @@
 const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
 const { cli } = require("triple-beam/config")
-const Cache = require('node-cache');
+const Cache = require("node-cache")
 
 const fs = require("fs")
 const fsPromise = require("fs/promises")
@@ -25,24 +25,24 @@ const opCodes = {
     reqFileChunk: 9,
     resFileChunk: 10,
     invalidClient: 99,
-    error: 100
+    error: 100,
 }
 
 const opCodeDecodeFunctions = {
     [opCodes.heartbeat]: decodeHeartbeat,
     [opCodes.registerClient]: decodeRegisterClient,
-    [opCodes.reqFileChunk]: decodeFileChunkRequest
+    [opCodes.reqFileChunk]: decodeFileChunkRequest,
 }
 
 const requiredKeys = {
-    [opCodes.registerClient]: ["enrolment_token"/*, "os_information", "mac_address"*/, "name", "public_key"],
-    [opCodes.registerClientAck]: ["client_id"]
+    [opCodes.registerClient]: ["enrolment_token" /*, "os_information", "mac_address"*/, "name", "public_key"],
+    [opCodes.registerClientAck]: ["client_id"],
 }
 
 function checkRequiredKeys(opCode, data) {
     const keys = Object.keys(data)
     for (let key of requiredKeys[opCode]) {
-        if (!(keys.includes(key))) {
+        if (!keys.includes(key)) {
             throw new Error(`Data missing key ${key}`)
         }
     }
@@ -51,27 +51,27 @@ function checkRequiredKeys(opCode, data) {
 function encodeTCPError(message) {
     return {
         op_code: opCodes.error,
-        message
+        message,
     }
 }
 
 function encodeRegisterClientAck(clientId) {
     return {
         op_code: opCodes.registerClientAck,
-        client_id: clientId
+        client_id: clientId,
     }
 }
 
 function encodeHeartbeatAck(policies) {
     return {
         op_code: opCodes.heartbeatAck,
-        policies
+        policies,
     }
 }
 
 function encodeInvalidClient() {
     return {
-        op_code: opCodes.invalidClient
+        op_code: opCodes.invalidClient,
     }
 }
 
@@ -107,20 +107,20 @@ async function decodeRegisterClient(ctx, data) {
     data = {
         ...data,
         last_known_ip: ip,
-        last_known_hostname: data.os_information?.Hostname
+        last_known_hostname: data.os_information?.Hostname,
     }
 
     client = await createClient(data)
 
     await updateEnrolmentToken(token.id, {
-        usage_current: token.usage_current + 1
+        usage_current: token.usage_current + 1,
     })
 
     return encodeRegisterClientAck(client.id)
 }
 
 const policyCache = new Cache({
-    stdTTL: 60 * 10
+    stdTTL: 60 * 10,
 })
 
 async function decodeHeartbeat(ctx, data) {
@@ -132,14 +132,12 @@ async function decodeHeartbeat(ctx, data) {
         return encodeInvalidClient()
     }
 
-    const { ip } = splitHostAddress(ctx.hostAddress)
-
     const updateData = {
-        last_known_ip: ip,
+        last_known_ip: ctx.hostAddress.ip,
         last_known_hostname: os_information?.Hostname,
         mac_address,
         os_information,
-        last_activity: new Date()
+        last_activity: new Date(),
     }
 
     await updateClient(client.id, updateData)

@@ -18,7 +18,6 @@ function encryptData(data) {
     return Buffer.concat([iv, aesCipher.getAuthTag(), encryptedData])
 }
 
-
 function sendHello(client, data) {
     const clientPublicKey = ecdh.getPublicKey(null, "compressed")
 
@@ -46,12 +45,11 @@ function sendData(client, data) {
     client.write(encryptedData)
 }
 
+var client = new net.Socket()
+client.connect(9000, "192.168.1.248", function () {
+    console.log("Connected")
 
-var client = new net.Socket();
-client.connect(9000, '192.168.1.248', function() {
-    console.log('Connected');
-
-    let sentHello = false;
+    let sentHello = false
 
     rl.on("line", () => {
         if (!sentHello) {
@@ -60,21 +58,20 @@ client.connect(9000, '192.168.1.248', function() {
             return
         }
 
-        sendData(client, JSON.stringify({rand: crypto.randomBytes(crypto.randomInt(1000)).toString('hex')}))
-
+        sendData(client, JSON.stringify({ rand: crypto.randomBytes(crypto.randomInt(1000)).toString("hex") }))
     })
-});
+})
 
-client.on('data', function(data) {
-    console.log('Received: ' + data.toString("hex"));
+client.on("data", function (data) {
+    console.log("Received: " + data.toString("hex"))
     client.end()
-});
+})
 
-client.on('close', function() {
-    console.log('Connection closed');
-});
+client.on("close", function () {
+    console.log("Connection closed")
+})
 
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 })

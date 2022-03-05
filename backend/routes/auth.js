@@ -13,40 +13,50 @@ const { UnauthorizedError, exceptionCodes } = require("../utils/httpExceptions")
 
 const router = Router()
 
-router.post("/login", checkValidationErrors(loginValidator), executeQuery(async ({ body }) => {
-    const { username, password } = body
+router.post(
+    "/login",
+    checkValidationErrors(loginValidator),
+    executeQuery(async ({ body }) => {
+        const { username, password } = body
 
-    const user = await getUserByUsername(username)
+        const user = await getUserByUsername(username)
 
-    if (user == null) {
-        throw new UnauthorizedError("Invalid username or password")
-    }
+        if (user == null) {
+            throw new UnauthorizedError("Invalid username or password")
+        }
 
-    if (!(await verifyPassword(user.password, password))) {
-        throw new UnauthorizedError("Invalid username or password")
-    }
+        if (!(await verifyPassword(user.password, password))) {
+            throw new UnauthorizedError("Invalid username or password")
+        }
 
-    const accessToken = signAccessJwt(username, user.checksum)
-    const refreshToken = signRefreshJwt(username, user.checksum)
+        const accessToken = signAccessJwt(username, user.checksum)
+        const refreshToken = signRefreshJwt(username, user.checksum)
 
-    return { access_token: accessToken, refresh_token: refreshToken }
-}))
+        return { access_token: accessToken, refresh_token: refreshToken }
+    })
+)
 
-router.post("/refresh", checkValidationErrors(refreshValidator), executeQuery(async ({ body }) => {
-    const { refresh_token: refreshToken } = body
+router.post(
+    "/refresh",
+    checkValidationErrors(refreshValidator),
+    executeQuery(async ({ body }) => {
+        const { refresh_token: refreshToken } = body
 
-    let decoded = jwt.verify(refreshToken, config.jwt.secret)
+        let decoded = jwt.verify(refreshToken, config.jwt.secret)
 
-    if (decoded?.token_type !== "refresh") {
-        throw new UnauthorizedError(`Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
-            exceptionCodes.invalidTokenType)
-    }
+        if (decoded?.token_type !== "refresh") {
+            throw new UnauthorizedError(
+                `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
+                exceptionCodes.invalidTokenType
+            )
+        }
 
-    const { username, checksum } = decoded
+        const { username, checksum } = decoded
 
-    const user = await authorizeUser(username, checksum)
+        const user = await authorizeUser(username, checksum)
 
-    return { access_token: signAccessJwt(user.username, user.checksum) }
-}))
+        return { access_token: signAccessJwt(user.username, user.checksum) }
+    })
+)
 
 module.exports = router

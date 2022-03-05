@@ -42,10 +42,9 @@ function decryptAes(secret, aesData) {
     return decryptedData
 }
 
-
 module.exports = {
     computeSharedECHDSecret,
     encryptAes,
     decryptAes,
-    ecPublicKey: ecdh.getPublicKey(null, "compressed")
+    ecPublicKey: ecdh.getPublicKey(null, "compressed"),
 }

@@ -23,15 +23,11 @@ async function createFile (data) {
         .catch(handlePostgresError)
 }
 
-async function deleteFile (id) {
-    return await knex(FILES_TABLE_NAME)
-        .where("id", id)
-        .delete()
-        .returning("id")
-        .catch(handlePostgresError)
+async function deleteFile(id) {
+    return await knex(FILES_TABLE_NAME).where("id", id).delete().returning("id").catch(handlePostgresError)
 }
 
-async function getFileById (id) {
+async function getFileById(id) {
     return await knex(FILES_TABLE_NAME)
         .select([
             "id",
@@ -45,15 +41,9 @@ async function getFileById (id) {
         .catch(handlePostgresError)
 }
 
-async function getAllFiles (id) {
+async function getAllFiles(id) {
     return await knex(FILES_TABLE_NAME)
-        .select([
-            "id",
-            "name",
-            "original_filename",
-            "hash",
-            "size",
-            "updated_at"])
+        .select(["id", "name", "original_filename", "hash", "size", "updated_at"])
         .first()
         .catch(handlePostgresError)
 }
@@ -62,5 +52,5 @@ module.exports = {
     createFile,
     deleteFile,
     getFileById,
-    getAllFiles
+    getAllFiles,
 }

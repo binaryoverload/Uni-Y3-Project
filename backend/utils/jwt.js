@@ -13,7 +13,7 @@ const signRefreshJwt = (username, checksum) => {
 const signJwt = (payload, validDuration) => {
     return jwt.sign(payload, config.jwt.secret, {
         algorithm: "HS256",
-        expiresIn: validDuration
+        expiresIn: validDuration,
     })
 }
 

@@ -9,7 +9,7 @@ const schema = [
   {
     display: "statusIcon",
     key: (row) => {
-      const timeSinceLastActivity = Date.now() - row.last_activity.getTime();
+      const timeSinceLastActivity = Date.now() - new Date(row.last_activity).getTime();
       if (isNaN(timeSinceLastActivity)) {
         return "unknown";
       } else if (timeSinceLastActivity < 60 * 10 * 1000) {
@@ -43,13 +43,15 @@ const schema = [
   {
     display: "text",
     content: (row) => {
-      return row.os_information && row.os_information.name;
+      return row.os_information && (row.os_information.OS + " " + row.os_information.Platform);
     },
     heading: "Operating System",
   },
   {
     display: "text",
-    key: "last_activity",
+    content: (row) => {
+      return new Date(row.last_activity)
+    },
     heading: "Last seen",
   },
 ];

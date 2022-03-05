@@ -7,16 +7,7 @@ const keyValidator = param("key", "Key must be a alpha-numeric slug")
     .withMessage("Key must be between 1 and 20 characters long")
 
 module.exports = {
-    propertyGet: [
-        keyValidator
-    ],
-    propertySet: [
-        keyValidator,
-        body("value", "Value must be a string")
-            .exists()
-            .isString()
-    ],
-    propertyDelete: [
-        keyValidator
-    ]
+    propertyGet: [keyValidator],
+    propertySet: [keyValidator, body("value", "Value must be a string").exists().isString()],
+    propertyDelete: [keyValidator],
 }
