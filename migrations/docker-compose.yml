@@ -4,6 +4,7 @@ services:
     image: flyway/flyway
     env_file:
       - flyway.env
+    network_mode: host
     environment:
       - FLYWAY_EDITION=community
       - FLYWAY_BASELINE_VERSION=0
