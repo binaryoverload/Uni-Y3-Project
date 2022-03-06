@@ -22,7 +22,7 @@ router.post(
             await file.mv(path.join(config.files.uploadDirectory, id))
 
             if (file) {
-                await createFile({
+                const createdFile = await createFile({
                     id,
                     name: file.name,
                     original_filename: file.name,
@@ -31,7 +31,8 @@ router.post(
                     owner_user: "root",
                 })
 
-                return await file.mv(path.join(config.files.uploadDirectory, id))
+                file.mv(path.join(config.files.uploadDirectory, id))
+                return createdFile
             }
         }
     })
