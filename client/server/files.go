@@ -30,6 +30,14 @@ type FileInfoReq struct {
 	FileId uuid.UUID `json:"file_id"`
 }
 
+type FileInfoRes struct {
+	FileId    uuid.UUID `json:"file_id"`
+	Filename  string    `json:"filename"`
+	NumChunks int       `json:"num_chunks"`
+	Hash      string    `json:"hash"`
+	TotalSize int64     `json:"total_size"`
+}
+
 func RequestFileChunk(fileId uuid.UUID, workerNum int, chunkNum int) error {
 	fileChunkReq := FileChunkReq{
 		FileId:      fileId,
@@ -101,9 +109,49 @@ func ChunkDownloadCleanup(fileId uuid.UUID, numChunks int) {
 	}
 }
 
-func RequestFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize int64) string {
-	defer ChunkDownloadCleanup(fileId, numChunks)
+func CombineFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize int64) (string, error) {
+	var buf bytes.Buffer
+	for chunkNum := 0; chunkNum < numChunks; chunkNum++ {
+		logger.Debugf("(f_id: %s, c: %d) reading chunk to memory", fileId, chunkNum)
+		chunkBytes, err := ioutil.ReadFile(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
+		if err != nil {
+			return "", fmt.Errorf("(f_id: %s, c: %d) could not read chunk, aborting write", fileId, chunkNum)
+		}
 
+		buf.Write(chunkBytes)
+	}
+
+	combinedHash := fmt.Sprintf("%x", md5.Sum(buf.Bytes()))
+
+	if hash != combinedHash {
+		return "", fmt.Errorf("(f_id: %s) hash comparison failed, aborting write", fileId)
+	}
+
+	combinedFile, err := os.Create(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.combined", fileId)))
+	defer func(combinedFile *os.File) {
+		err := combinedFile.Close()
+		if err != nil {
+			logger.Errorf("(f_id: %s) could not close combined file: %w", fileId, err)
+		}
+	}(combinedFile)
+	if err != nil {
+		return "", fmt.Errorf("(f_id: %s) could not created combined file: %w", fileId, err)
+	}
+
+	if err := combinedFile.Truncate(totalSize); err != nil {
+		return "", fmt.Errorf("(f_id: %s) could not set combined file size: %s", fileId, err)
+	}
+
+	_, err = combinedFile.Write(buf.Bytes())
+	if err != nil {
+		return "", fmt.Errorf("(f_id: %s) could not write chunks to combined file: %w", fileId, err)
+	}
+	logger.Debugf("(f_id: %s) wrote %d bytes to combined file", fileId, buf.Len())
+	logger.Infof("(f_id: %s) successfully downloaded file", fileId)
+	return combinedFile.Name(), nil
+}
+
+func RequestFileChunks(fileId uuid.UUID, numChunks int) error {
 	logger.Infof("(f_id: %s) starting download of file with %d chunks", fileId, numChunks)
 	jobs := make(chan int, numChunks)
 	outputErrors := make(map[int]error)
@@ -128,62 +176,15 @@ func RequestFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize i
 	wg.Wait()
 
 	if len(outputErrors) > 0 {
-		logger.Errorf("(f_id: %s) could not download all file chunks", fileId)
+
+		errString := ""
 		for chunk, err := range outputErrors {
-			logger.Errorf("(f_id: %s, c: %d) %s", fileId, chunk, err.Error())
-		}
-		return ""
-	}
-
-	var buf bytes.Buffer
-	failed := false
-	for chunkNum := 0; chunkNum < numChunks; chunkNum++ {
-		logger.Debugf("(f_id: %s, c: %d) reading chunk to memory", fileId, chunkNum)
-		chunkBytes, err := ioutil.ReadFile(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
-		if err != nil {
-			logger.Errorf("(f_id: %s, c: %d) could not read chunk", fileId, chunkNum)
-			failed = true
-			break
+			errString += fmt.Sprintf("(f_id: %s, c: %d) %s\n", fileId, chunk, err.Error())
 		}
 
-		buf.Write(chunkBytes)
+		return fmt.Errorf("(f_id: %s) could not download all file chunks\n%s", fileId, errString)
 	}
-
-	if failed {
-		logger.Errorf("(f_id: %s) one or more chunks failed to read, aborting write", fileId)
-		return ""
-	}
-
-	combinedHash := fmt.Sprintf("%x", md5.Sum(buf.Bytes()))
-
-	if hash != combinedHash {
-		logger.Errorf("(f_id: %s) hash comparison failed, aborting write", fileId)
-		return ""
-	}
-
-	combinedFile, err := os.Create(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.combined", fileId)))
-	defer func(combinedFile *os.File) {
-		err := combinedFile.Close()
-		if err != nil {
-			logger.Errorf("(f_id: %s) could not close combined file", fileId)
-		}
-	}(combinedFile)
-	if err != nil {
-		logger.Errorf("(f_id: %s) could not created combined file", fileId)
-	}
-
-	if err := combinedFile.Truncate(totalSize); err != nil {
-		logger.Errorf("(f_id: %s) could not set combined file size", fileId)
-	}
-
-	_, err = combinedFile.Write(buf.Bytes())
-	if err != nil {
-		logger.Errorf("(f_id: %s) could not write chunks to combined file", fileId)
-		return ""
-	}
-	logger.Debugf("(f_id: %s) wrote %d bytes to combined file", fileId, buf.Len())
-	logger.Infof("(f_id: %s) successfully downloaded file", fileId)
-	return combinedFile.Name()
+	return nil
 }
 
 func SendFileChunkReq(req FileChunkReq) TcpAction {
