@@ -16,6 +16,7 @@ type Config struct {
 	ServerPort       int                 `json:"server_port"`
 	EnrolmentToken   string              `json:"enrolment_token"`
 	DebugLogging     bool                `json:"debug_logging"`
+	TempDownloadPath string              `json:"temp_download_path"`
 }
 
 var instanceLock = &sync.Mutex{}
@@ -36,9 +37,10 @@ func GetConfigInstance() *Config {
 
 func loadConfig() Config {
 	config := Config{
-		ServerHost:   "localhost",
-		ServerPort:   9000,
-		DebugLogging: false,
+		ServerHost:       "localhost",
+		ServerPort:       9000,
+		DebugLogging:     false,
+		TempDownloadPath: "temp/",
 	}
 
 	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_RDONLY, 660)

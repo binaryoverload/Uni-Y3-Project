@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-var conf = config.GetConfigInstance()
-
 type TcpAction func(conn *net.Conn, prevData interface{}) (interface{}, error)
 
 func RunTcpActions(actions []TcpAction) (interface{}, error) {

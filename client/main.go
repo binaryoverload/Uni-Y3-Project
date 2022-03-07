@@ -44,8 +44,8 @@ func main() {
 
 	logger.Infof("ecdh client public key: %x", encryption.GetPublicKey())
 
-	u, _ := uuid.Parse("d44548a1-5d84-4ba2-85df-10554f9649d9")
-	server.RequestFileChunks(u, 2)
+	u, _ := uuid.Parse("1c24230e-7b56-453f-889b-e2c27899e1eb")
+	server.RequestFileChunks(u, "a7cde9184eae71e3830ccf276f16a0f7", 9, 90633872)
 
 	defer func() {
 		if r := recover(); r != nil {
