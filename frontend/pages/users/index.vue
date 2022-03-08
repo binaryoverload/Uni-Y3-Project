@@ -2,15 +2,17 @@
   <div>
     <div class="flex items-end mb-10">
       <p class="text-5xl font-bold leading-[3rem]">Users</p>
-      <div class="ml-auto">
-        <t-button to="/users/create" href="/users/create" tagName="a">Create new</t-button>
+      <div class="flex ml-auto space-x-2">
+        <refresh-button @click="$fetch()" />
+        <t-button to="/users/create" href="/users/create" tagName="a"
+          >Create new</t-button
+        >
       </div>
     </div>
     <div>
       <searchbar
         placeholder="Search by name"
-        v-model="searchFilter"
-      ></searchbar>
+        v-model="searchFilter"></searchbar>
       <users-table :rows="rows" :filter="searchFilter" />
     </div>
   </div>
@@ -21,13 +23,13 @@ export default {
   layout: "dashboard",
   middleware: "authed",
   async fetch() {
-    this.rows = (await this.$axios.$get("/users")).data;
+    this.rows = (await this.$axios.$get("/users")).data
   },
   data() {
     return {
       searchFilter: "",
       rows: [],
-    };
+    }
   },
-};
+}
 </script>

@@ -1,17 +1,22 @@
 <template>
   <div>
-    <div class="mb-10">
-      <p class="text-5xl font-bold leading-[3rem] mb-4">Clients</p>
-      <div class="space-y-1">
-        <p class="text-slate-600">
-          Clients are added through enrolment tokens.
-        </p>
-        <nuxt-link
-          to="/enrolment-tokens"
-          class="flex items-center text-indigo-600 hover:text-indigo-700 hover:underline"
-          ><font-awesome-icon icon="arrow-right" class="mr-2" />Create new
-          enrolment token</nuxt-link
-        >
+    <div class="flex items-end mb-10">
+      <div>
+        <p class="text-5xl font-bold leading-[3rem] mb-4">Clients</p>
+        <div class="space-y-1">
+          <p class="text-slate-600">
+            Clients are added through enrolment tokens.
+          </p>
+          <nuxt-link
+            to="/enrolment-tokens"
+            class="flex items-center text-indigo-600 hover:text-indigo-700 hover:underline"
+            ><font-awesome-icon icon="arrow-right" class="mr-2" />Create new
+            enrolment token</nuxt-link
+          >
+        </div>
+      </div>
+      <div class="ml-auto">
+        <refresh-button @click="$fetch()" />
       </div>
     </div>
     <div>
