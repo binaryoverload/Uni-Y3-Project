@@ -15,13 +15,13 @@ type TcpAction func(conn *net.Conn, prevData interface{}) (interface{}, error)
 
 func RunTcpActions(actions []TcpAction) (interface{}, error) {
 	conf := config.GetConfigInstance()
-	c, err := net.Dial("tcp", fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort))
+	c, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort), 10*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("connecting: %w", err)
 	}
 	var currentData interface{} = nil
 	for i := 0; i < len(actions); i++ {
-		err := c.SetDeadline(time.Now().Add(15 * time.Second))
+		err := c.SetDeadline(time.Now().Add(10 * time.Second))
 		if err != nil {
 			return nil, fmt.Errorf("setting tcp ttl: %w", err)
 		}

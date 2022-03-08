@@ -1,6 +1,9 @@
 package packets
 
-import "errors"
+import (
+	"errors"
+	"github.com/google/uuid"
+)
 
 type DataPacket struct {
 	AesData []byte
@@ -20,6 +23,23 @@ const (
 	OpCodeInvalidClient                            = 99
 	OpCodeError                                    = 100
 )
+
+type FileChunkReq struct {
+	FileId      uuid.UUID `json:"file_id"`
+	ChunkNumber int       `json:"chunk_number"`
+}
+
+type FileInfoReq struct {
+	FileId uuid.UUID `json:"file_id"`
+}
+
+type FileInfoRes struct {
+	FileId    uuid.UUID `json:"file_id"`
+	Filename  string    `json:"filename"`
+	NumChunks int       `json:"num_chunks"`
+	Hash      string    `json:"hash"`
+	TotalSize int64     `json:"total_size"`
+}
 
 func (packet DataPacket) Encode() []byte {
 	opCode := make([]byte, 1)
