@@ -1,59 +1,17 @@
 package policies
 
 import (
+	"client/packets"
+	"client/server"
 	"client/utils"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"os/exec"
-	"sort"
 	"strings"
 )
 
-var logger = utils.GetLogger()
-
-func (policy Policy) EvaluatePolicy() {
-	logger.Debugf("(p_id: %s): begin eval", policy.Id)
-
-	policyItems := make([]PolicyItem, len(policy.PolicyItems))
-	copy(policyItems, policy.PolicyItems)
-	sort.Slice(policyItems, func(i, j int) bool {
-		return policyItems[i].Order < policyItems[j].Order
-	})
-
-	for index, policyItem := range policyItems {
-		logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
-
-		function, ok := choosePolicyEvalFunction(policyItem)
-
-		if !ok {
-			logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
-			return
-		}
-
-		err := policyItem.ParseData()
-		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
-			return
-		}
-
-		err = function(policyItem)
-
-		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
-			if policyItem.StopOnError {
-				logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
-				return
-			}
-		} else {
-			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
-		}
-	}
-
-	polStore := GetPolicyStorage()
-	polStore.Policies[policy.Id.String()] = policy
-	SavePolicyStorage()
-}
-
-func choosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem) error, bool) {
+func ChoosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem) error, bool) {
 	switch policyItem.Type {
 	case "command":
 		return evalCommandPolicy, true
@@ -68,6 +26,48 @@ func choosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem
 }
 
 func evalFilePolicy(policyItem PolicyItem) error {
+	filePolicy, ok := policyItem.Data.(FilePolicy)
+	if !ok {
+		return errors.New("policy data was not expected package type")
+	}
+
+	if !utils.IsRoot() {
+		return errors.New("copying files requires the client should be running as root")
+	}
+
+	data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendFileInfoReq(packets.FileInfoReq{FileId: filePolicy.FileId}), server.RecieveData})
+
+	if err != nil {
+		return fmt.Errorf("(pi_id: %s, f: %s) failed to request file info: %w", policyItem.Id, filePolicy.FileId, err)
+	}
+
+	dataBytes, ok := data.([]byte)
+	if !ok {
+		return fmt.Errorf("(pi_id: %s, f: %s) data response is not byte array", policyItem.Id, filePolicy.FileId)
+	}
+
+	var dataResponse packets.FileInfoRes
+	err = json.Unmarshal(dataBytes, &dataResponse)
+	if err != nil {
+		return fmt.Errorf("(pi_id: %s, f: %s) could not convert response from json: %w", policyItem.Id, filePolicy.FileId, err)
+	}
+
+	err = server.RequestFileChunks(dataResponse.FileId, dataResponse.NumChunks)
+	if err != nil {
+		return err
+	}
+
+	err = server.CombineFileChunks(dataResponse.FileId, dataResponse.Hash, dataResponse.NumChunks, dataResponse.TotalSize)
+	if err != nil {
+		return err
+	}
+
+	err = server.MoveCombinedFile(dataResponse.FileId, dataResponse.TotalSize, filePolicy)
+	if err != nil {
+		return fmt.Errorf("(pi_id: %s, f: %s) error moving combined file: %w", policyItem.Id, dataResponse.FileId, err)
+	}
+
+	server.ChunkDownloadCleanup(dataResponse.FileId, dataResponse.NumChunks)
 
 	return nil
 }
