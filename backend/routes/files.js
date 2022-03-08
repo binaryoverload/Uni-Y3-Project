@@ -28,7 +28,6 @@ router.post(
                     original_filename: file.name,
                     hash: file.md5,
                     size: file.size,
-                    owner_user: "root",
                 })
 
                 file.mv(path.join(config.files.uploadDirectory, id))
