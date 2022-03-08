@@ -4,6 +4,7 @@ const enrolmentToken = require("./enrolmentTokens")
 const properties = require("./properties")
 const files = require("./files")
 const clients = require("./clients")
+const policies = require("./policies")
 
 module.exports = {
     setupRoutes(app) {
@@ -12,6 +13,7 @@ module.exports = {
         app.use("/enrolment-tokens", enrolmentToken)
         app.use("/properties", properties)
         app.use("/files", files)
+        app.use("/policies", policies)
         app.use("/clients", clients)
     },
 }
