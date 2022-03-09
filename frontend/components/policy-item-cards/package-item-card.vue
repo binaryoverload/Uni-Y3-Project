@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center px-4 py-2 space-x-4 border rounded border-slate-300">
+    class="flex items-center min-w-[200px] px-4 py-2 space-x-4 border rounded border-slate-300">
     <div
       class="flex items-center self-stretch pr-4 -my-2 text-xl border-r border-slate-300 text-slate-600">
       <span>#{{ item.policy_order }}</span>

@@ -64,7 +64,7 @@
           <p class="text-slate-600">The items that this policy will execute.</p>
           <hr class="my-2" />
         </div>
-        <div class="space-y-2">
+        <div class="flex flex-col gap-2 lg:flex-row">
           <base-item-card
             v-for="item in policiesData.policy_items"
             :key="item.id"
