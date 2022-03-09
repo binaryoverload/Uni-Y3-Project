@@ -34,8 +34,9 @@ async function deletePolicy(id) {
 async function getPolicyById(id) {
     return await knex(POLICIES_TABLE_NAME)
         .withRelations(knex(POLICY_ITEMS_TABLE_NAME), "id", "policy_id")
-        .where("id", id)
-        .first()
+        .then(objs => {
+            return objs.find(obj => obj.id === id)
+        })
         .catch(handlePostgresError)
 }
 
