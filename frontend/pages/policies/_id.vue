@@ -4,7 +4,8 @@
       <back-link>Back to policies</back-link>
       <div class="flex items-end">
         <p class="text-5xl font-bold leading-[3rem]">View Policy</p>
-        <div class="ml-auto">
+        <div class="flex ml-auto space-x-2">
+          <refresh-button @click="$fetch()" />
           <t-button
             :to="`/users/edit/${$route.params.id}`"
             :href="`/users/edit/${$route.params.id}`"
@@ -21,23 +22,37 @@
           <p class="text-slate-600">These are details about the policy.</p>
           <hr class="my-2" />
         </div>
+
         <div>
           <table class>
             <tbody>
               <tr>
-                <td class="py-2 pr-4 font-bold">Username</td>
+                <td class="pb-2 pr-20 font-bold">Id</td>
+                <td class="text-slate-600">{{ policiesData.id }}</td>
+              </tr>
+              <tr>
+                <td class="pb-2 font-bold">Name</td>
+                <td class="text-slate-600">{{ policiesData.name }}</td>
+              </tr>
+              <tr>
+                <td class="pb-2 font-bold">Created at</td>
                 <td class="text-slate-600">
-                  {{ policiesData }}
+                  {{ new Date(policiesData.created_at) }}
                 </td>
               </tr>
               <tr>
-                <td class="font-bold">Password</td>
-                <td class="flex items-center space-x-4">
-                  <t-button variant="neutral">
-                    <font-awesome-icon icon="sync" class="mr-1" />
-                    Regenerate
-                  </t-button>
+                <td class="pb-2 font-bold">Updated at</td>
+                <td class="text-slate-600">
+                  {{ new Date(policiesData.updated_at) }}
                 </td>
+              </tr>
+              <tr>
+                <td class="pb-2 font-bold">Name</td>
+                <td class="text-slate-600">{{ policiesData.name }}</td>
+              </tr>
+              <tr v-if="policiesData.description">
+                <td class="pb-2 font-bold">Description</td>
+                <td class="text-slate-600">{{ policiesData.description }}</td>
               </tr>
             </tbody>
           </table>
@@ -45,23 +60,15 @@
       </div>
       <div>
         <div>
-          <p class="font-bold">Personal Information</p>
-          <p class="text-slate-600">These are details about the user.</p>
+          <p class="font-bold">Policy Items</p>
+          <p class="text-slate-600">The items that this policy will execute.</p>
           <hr class="my-2" />
         </div>
-        <div>
-          <table class>
-            <tbody>
-              <tr>
-                <td class="py-2 pr-4 font-bold">First Name</td>
-                <td class="text-slate-600"></td>
-              </tr>
-              <tr>
-                <td class="font-bold">Last Name</td>
-                <td class="flex items-center space-x-4 text-slate-600"></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="space-y-2">
+          <base-item-card
+            v-for="item in policiesData.policy_items"
+            :key="item.id"
+            :item="item" />
         </div>
       </div>
     </div>
@@ -69,6 +76,12 @@
 </template>
 
 <script>
+String.prototype.toTitle = function () {
+  return this.replace(/(^|\s)\S/g, function (t) {
+    return t.toUpperCase()
+  })
+}
+
 export default {
   middleware: "authed",
   layout: "dashboard",
@@ -80,6 +93,9 @@ export default {
   async fetch() {
     const id = this.$route.params.id
     this.policiesData = (await this.$axios.$get("/policies/" + id)).data
+    this.policiesData.policy_items.sort(
+      (a, b) => a.policy_order - b.policy_order
+    )
   },
 }
 </script>

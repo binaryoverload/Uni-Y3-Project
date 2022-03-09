@@ -125,7 +125,11 @@ export default {
         "faDownload",
         "faKey",
         "faSync",
-        "faAsterisk"
+        "faAsterisk",
+        "faPlus",
+        "faMinus",
+        "faBoxOpen",
+        "faTerminal"
       ],
     },
   },
