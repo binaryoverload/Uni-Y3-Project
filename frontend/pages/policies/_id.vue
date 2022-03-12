@@ -7,8 +7,8 @@
         <div class="flex ml-auto space-x-2">
           <refresh-button @click="$fetch()" />
           <t-button
-            :to="`/users/edit/${$route.params.id}`"
-            :href="`/users/edit/${$route.params.id}`"
+            :to="`/policies/edit/${$route.params.id}`"
+            :href="`/policies/edit/${$route.params.id}`"
             tagName="a"
             >Edit Policy</t-button
           >
