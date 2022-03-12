@@ -50,11 +50,15 @@
             <tbody>
               <tr>
                 <td class="pb-2 pr-10 font-bold">MAC Address</td>
-                <td class="text-slate-600">{{ clientData.mac_address }}</td>
+                <td class="pb-2 uppercase text-slate-600">
+                  {{ clientData.mac_address }}
+                </td>
               </tr>
               <tr>
                 <td class="pb-2 pr-10 font-bold">IP Address</td>
-                <td class="text-slate-600">{{ clientData.last_known_ip }}</td>
+                <td class="pb-2 text-slate-600">
+                  {{ clientData.last_known_ip }}
+                </td>
               </tr>
             </tbody>
           </table>
