@@ -33,7 +33,9 @@ const schema = [
   },
   {
     display: "text",
-    key: "mac_address",
+    content: row => {
+      return row.mac_address?.toUpperCase()
+    },
     heading: "MAC address",
   },
   {
