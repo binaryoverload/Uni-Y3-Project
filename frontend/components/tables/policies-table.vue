@@ -3,18 +3,18 @@
 </template>
 
 <script>
-import table from "./table.vue";
+import table from "./table.vue"
 
 const schema = [
   {
     display: "link",
-    url: (row) => "/policies/" + row.id,
+    url: row => "/policies/" + row.id,
     key: "name",
     heading: "Name",
   },
   {
     display: "text",
-    key: "item_count",
+    content: row => row.policy_items.length,
     heading: "Item Count",
   },
   {
@@ -27,7 +27,7 @@ const schema = [
     key: "created_by",
     heading: "Created by",
   },
-];
+]
 
 export default {
   components: { CustomTable: table },
@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       schema,
-    };
+    }
   },
-};
+}
 </script>
