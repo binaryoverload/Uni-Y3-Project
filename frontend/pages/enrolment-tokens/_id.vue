@@ -27,16 +27,16 @@
         </div>
 
         <div>
-          <table class="[border-spacing:0.75rem]">
+          <table>
             <tbody>
               <tr>
-                <td class="pr-20 font-bold">Name</td>
-                <td class="text-slate-600">{{ tokenData.name }}</td>
+                <td class="pb-2 pr-20 font-bold">Name</td>
+                <td class="pb-2 text-slate-600">{{ tokenData.name }}</td>
               </tr>
 
               <tr>
-                <td class="font-bold">Token</td>
-                <td class="text-slate-600">
+                <td class="pb-2 font-bold">Token</td>
+                <td class="pb-2 text-slate-600">
                   <div class="flex items-center space-x-2">
                     <div>
                       <font-awesome-icon
@@ -45,7 +45,7 @@
                         icon="asterisk"
                         class="h-4 text-xs text-slate-600" />
                     </div>
-                    <t-button variant="neutral">
+                    <t-button variant="neutral" @click="copyToken">
                       <font-awesome-icon icon="key" class="mr-1" />
                       Copy Token
                     </t-button>
@@ -53,15 +53,19 @@
                 </td>
               </tr>
               <tr>
-                <td class="font-bold">Created at</td>
-                <td class="text-slate-600">
-                  {{ new Date(tokenData.created_at) }}
+                <td class="pb-2 font-bold">Created at</td>
+                <td class="pb-2 text-slate-600">
+                  {{ new Date(tokenData.created_at).toLocaleString() }}
                 </td>
               </tr>
               <tr>
-                <td class="font-bold">Expires at</td>
-                <td class="text-slate-600">
-                  {{ new Date(tokenData.expires_at) }}
+                <td class="pb-2 font-bold">Expires at</td>
+                <td class="pb-2 text-slate-600">
+                  {{
+                    tokenData.expires_at
+                      ? new Date(tokenData.expires_at).toLocaleString()
+                      : "&lt;unset&gt;"
+                  }}
                 </td>
               </tr>
             </tbody>
@@ -81,6 +85,18 @@ export default {
     return {
       tokenData: {},
     }
+  },
+  methods: {
+    copyToken() {
+      navigator.clipboard.writeText(this.tokenData.token).then(
+        function () {
+          alert("Copied enrolment token to clipboard!")
+        },
+        function (err) {
+          console.error("Could not copy enrolment token: ", err)
+        }
+      )
+    },
   },
   async fetch() {
     const id = this.$route.params.id

@@ -28,31 +28,33 @@
             <tbody>
               <tr>
                 <td class="pb-2 pr-20 font-bold">Id</td>
-                <td class="text-slate-600">{{ policiesData.id }}</td>
+                <td class="pb-2 text-slate-600">{{ policiesData.id }}</td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold">Name</td>
-                <td class="text-slate-600">{{ policiesData.name }}</td>
+                <td class="pb-2 text-slate-600">{{ policiesData.name }}</td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold">Created at</td>
-                <td class="text-slate-600">
-                  {{ new Date(policiesData.created_at) }}
+                <td class="pb-2 text-slate-600">
+                  {{ new Date(policiesData.created_at).toLocaleString() }}
                 </td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold">Updated at</td>
-                <td class="text-slate-600">
-                  {{ new Date(policiesData.updated_at) }}
+                <td class="pb-2 text-slate-600">
+                  {{ new Date(policiesData.updated_at).toLocaleString() }}
                 </td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold">Name</td>
-                <td class="text-slate-600">{{ policiesData.name }}</td>
+                <td class="pb-2 text-slate-600">{{ policiesData.name }}</td>
               </tr>
               <tr v-if="policiesData.description">
                 <td class="pb-2 font-bold">Description</td>
-                <td class="text-slate-600">{{ policiesData.description }}</td>
+                <td class="pb-2 text-slate-600">
+                  {{ policiesData.description }}
+                </td>
               </tr>
             </tbody>
           </table>
