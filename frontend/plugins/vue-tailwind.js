@@ -44,7 +44,7 @@ Vue.use(VueTailwind, {
     component: TButton,
     props: {
       fixedClasses:
-        "block px-4 py-1 transition duration-100 ease-in-out  focus:ring-2  focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed",
+        "block px-4 py-1 transition duration-100 ease-in-out whitespace-nowrap focus:ring-2  focus:outline-none focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed",
       classes:
         "text-white bg-indigo-700 border border-transparent shadow-sm rounded hover:bg-indigo-800 focus:ring-indigo-500 focus:border-indigo-500",
       variants: {
