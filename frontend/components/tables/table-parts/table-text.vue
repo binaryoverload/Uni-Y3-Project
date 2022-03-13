@@ -20,20 +20,33 @@ export default {
     text() {
       if (this.schema.content) {
         if (typeof this.schema.content === "function") {
-          return this.schema.content(this.row);
+          return this.schema.content(this.row)
         } else {
-          return this.schema.content;
+          return this.schema.content
         }
       } else {
-        const value = this.row[this.schema.key];
+        let value = this.row[this.schema.key]
 
-        if (value instanceof Date) {
-          return value.toLocaleString();
+        if (value == null) {
+          return this.schema.default
         }
 
-        return value;
+        if (value instanceof Date) {
+          if (this.schema.format === "date") {
+            return value.toLocaleDateString()
+          }
+          return value.toLocaleString()
+        }
+
+        if (this.schema.format === "datetime") {
+          return new Date(value).toLocaleString()
+        } else if (this.schema.format === "date") {
+          return new Date(value).toLocaleDateString()
+        }
+
+        return value
       }
     },
   },
-};
+}
 </script>

@@ -48,16 +48,15 @@ const schema = [
     content: row => {
       return (
         row.os_information &&
-        row.os_information.OS + " " + row.os_information.Platform
+        row.os_information.OS + " " + (row.os_information.Platform || "")
       )
     },
     heading: "Operating System",
   },
   {
     display: "text",
-    content: row => {
-      return new Date(row.last_activity)
-    },
+    key: "last_activity",
+    format: "datetime",
     heading: "Last seen",
   },
 ]

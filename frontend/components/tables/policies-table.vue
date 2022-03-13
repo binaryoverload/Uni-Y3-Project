@@ -20,6 +20,7 @@ const schema = [
   {
     display: "text",
     key: "updated_at",
+    format: "datetime",
     heading: "Updated at",
   },
   {

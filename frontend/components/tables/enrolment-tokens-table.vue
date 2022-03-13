@@ -56,13 +56,9 @@ const schema = [
   },
   {
     display: "text",
-    content: (row) => {
-      if (row.expires_at) {
-        return new Date(row.expires_at).toLocaleString();
-      } else {
-        return "No expiry";
-      }
-    },
+    key: "expires_at",
+    format: "datetime",
+    default: "No expiry",
     heading: "Last seen",
   },
   {
