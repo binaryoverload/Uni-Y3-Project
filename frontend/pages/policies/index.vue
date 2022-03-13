@@ -13,7 +13,11 @@
       <searchbar
         placeholder="Search by name"
         v-model="searchFilter"></searchbar>
-      <policies-table :rows="rows" :filter="searchFilter" />
+      <policies-table
+        v-if="rows.length > 0"
+        :rows="rows"
+        :filter="searchFilter" />
+      <items-not-found v-else entity="policies" link="/policies/create" />
     </div>
   </div>
 </template>

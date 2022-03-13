@@ -11,7 +11,14 @@
       <searchbar
         placeholder="Search by name"
         v-model="searchFilter"></searchbar>
-      <enrolment-tokens-table :rows="rows" :filter="searchFilter" />
+      <enrolment-tokens-table
+        v-if="rows.length > 0"
+        :rows="rows"
+        :filter="searchFilter" />
+      <items-not-found
+        v-else
+        entity="enrolment tokens"
+        link="/enrolment-tokens/create" />
     </div>
   </div>
 </template>

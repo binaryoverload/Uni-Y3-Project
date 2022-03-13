@@ -13,7 +13,8 @@
       <searchbar
         placeholder="Search by name"
         v-model="searchFilter"></searchbar>
-      <users-table :rows="rows" :filter="searchFilter" />
+      <users-table v-if="rows.length > 0" :rows="rows" :filter="searchFilter" />
+      <items-not-found v-else entity="users" link="/users/create" />
     </div>
   </div>
 </template>

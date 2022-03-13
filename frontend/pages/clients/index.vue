@@ -23,7 +23,11 @@
       <searchbar
         placeholder="Search by name"
         v-model="searchFilter"></searchbar>
-      <clients-table :rows="rows" :filter="searchFilter" />
+      <clients-table
+        v-if="rows.length > 0"
+        :rows="rows"
+        :filter="searchFilter" />
+      <items-not-found v-else entity="clients" no-link />
     </div>
   </div>
 </template>
