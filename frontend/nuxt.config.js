@@ -20,7 +20,7 @@ export default {
   css: ["@/assets/css/main.css"],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ["~plugins/vue-tailwind"],
+  plugins: [{ src: "~/plugins/vue-tailwind" }],
 
   publicRuntimeConfig: {
     apiUrl: process.env.API_URL || DEFAULT_API_URL,
@@ -119,6 +119,7 @@ export default {
         "faArrowLeft",
         "faCheck",
         "faTimes",
+        "faExclamationTriangle",
         "faExclamation",
         "faQuestion",
         "faCopy",
