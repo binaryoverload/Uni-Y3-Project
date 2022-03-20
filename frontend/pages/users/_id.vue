@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-10 -mt-8">
-      <back-link>Back to users</back-link>
+      <back-link to="/users">Back to users</back-link>
       <div class="flex items-end">
         <p class="text-5xl font-bold leading-[3rem]">View User</p>
         <div class="ml-auto">
