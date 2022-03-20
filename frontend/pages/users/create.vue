@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="mb-10 text-5xl font-bold leading-[3rem]">Create User</p>
-    <form>
+    <form @submit.prevent="submit">
       <div class="space-y-4">
         <section-header
           title="Account information"
@@ -26,16 +26,24 @@
           label="First name"
           placeholder="First name"
           v-model="first_name"
-          :error="errors.first_name" />
+          :error="errors.first_name"
+          required />
         <form-input
           label="Last name"
           placeholder="Last name"
           v-model="last_name"
-          :error="errors.last_name" />
+          :error="errors.last_name"
+          required />
       </div>
 
-      <button @click="modify()">Make error</button>
-      {{ errors }}
+      <t-alert
+        :show="!!errors.message"
+        variant="danger"
+        :dismissible="false"
+        class="mt-8"
+        >{{ errors.message }}</t-alert
+      >
+      <t-button class="mt-4"> Create </t-button>
     </form>
     <div></div>
   </div>
@@ -46,16 +54,39 @@ export default {
   layout: "dashboard",
   middleware: "authed",
   methods: {
-    modify() {
-      this.errors = { ...this.errors, username: "hi" }
+    async submit() {
+      try {
+        const response = await this.$axios.$post("/users", {
+          username: this.username,
+          password: this.password,
+          first_name: this.first_name,
+          last_name: this.last_name,
+        })
+        if (response.status === "success") {
+          this.$router.push(`/users/${response.data.id}`)
+          return
+        }
+      } catch (error) {
+        if (error.response) {
+          this.errors = error.response.data
+        } else if (error.request) {
+          this.errors = {
+            message: "Could not contact the server",
+          }
+        } else {
+          this.errors = {
+            message: error.message,
+          }
+        }
+      }
     },
   },
   data() {
     return {
       username: "",
       password: "",
-      first_name: "",
-      last_name: "",
+      first_name: null,
+      last_name: null,
       errors: {},
     }
   },
