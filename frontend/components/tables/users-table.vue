@@ -3,17 +3,17 @@
 </template>
 
 <script>
-import table from "./table.vue";
+import table from "./table.vue"
 
 const schema = [
   {
     display: "link",
-    url: (row) => "/users/" + row.id,
-    content: (row) => {
+    url: row => "/users/" + row.id,
+    content: row => {
       if (row.first_name && row.last_name) {
-        return row.first_name + " " + row.last_name;
+        return row.first_name + " " + row.last_name
       } else {
-        return row.username;
+        return row.username
       }
     },
     heading: "Name",
@@ -26,6 +26,7 @@ const schema = [
   {
     display: "text",
     key: "updated_at",
+    format: "datetime",
     heading: "Updated at",
   },
   {
@@ -35,15 +36,25 @@ const schema = [
       {
         icon: "key",
         onClick(row) {
-          alert("reset password for " + row.username);
+          alert("reset password for " + row.username)
         },
         showCondition(row) {
-          return row.username !== this.$auth.user.username;
+          return row.username !== this.$auth.user.username
+        },
+      },
+      {
+        icon: "trash",
+        variant: "danger",
+        onClick(row) {
+          alert("delete user " + row.username)
+        },
+        showCondition(row) {
+          return row.username !== this.$auth.user.username
         },
       },
     ],
   },
-];
+]
 
 export default {
   components: { CustomTable: table },
@@ -59,7 +70,7 @@ export default {
   data() {
     return {
       schema,
-    };
+    }
   },
-};
+}
 </script>

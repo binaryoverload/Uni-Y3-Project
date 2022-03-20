@@ -84,6 +84,16 @@ const schema = [
           alert("downloaded!!")
         },
       },
+      {
+        icon: "trash",
+        variant: "danger",
+        onClick(row) {
+          alert("delete token " + row.name)
+        },
+        showCondition(row) {
+          return row.username !== this.$auth.user.username
+        },
+      },
     ],
   },
 ]
