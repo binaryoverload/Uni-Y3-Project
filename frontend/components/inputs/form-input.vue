@@ -9,6 +9,7 @@
     </label>
     <input-box
       :value="value"
+      @input="$emit('input', $event)"
       :id="id"
       :placeholder="placeholder"
       :required="required"
@@ -25,7 +26,6 @@ export default {
   props: {
     value: {
       type: String,
-      required: true,
     },
     placeholder: {
       type: String,

@@ -24,8 +24,6 @@
 </template>
 
 <script>
-const fakeDate = new Date(2022, 6, 30)
-
 export default {
   layout: "dashboard",
   middleware: "authed",
