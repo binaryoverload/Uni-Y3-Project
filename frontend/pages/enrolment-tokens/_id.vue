@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-10 -mt-8">
-      <back-link>Back to enrolment tokens</back-link>
+      <back-link to="/enrolment-tokens">Back to enrolment tokens</back-link>
       <div class="flex items-end">
         <p class="text-5xl font-bold leading-[3rem]">View Enrolment Token</p>
         <div class="flex ml-auto space-x-2">
