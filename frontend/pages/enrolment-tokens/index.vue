@@ -4,7 +4,12 @@
       <p class="text-5xl font-bold leading-[3rem]">Enrolment Tokens</p>
       <div class="flex ml-auto space-x-2">
         <refresh-button @click="$fetch()" />
-        <t-button>Create new</t-button>
+        <t-button
+          to="/enrolment-tokens/create"
+          href="/enrolment-tokens/create"
+          tagName="a"
+          >Create new</t-button
+        >
       </div>
     </div>
     <div>
