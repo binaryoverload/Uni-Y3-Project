@@ -9,8 +9,7 @@
             'bg-green-500': percentage < 0.6,
           }"
           class="block rounded-full"
-          :style="{ width: percentage * 100 + '%' }"
-        ></span></span
+          :style="{ width: percentage * 100 + '%' }"></span></span
       ><span class="text-slate-900">{{ start }}</span
       ><span class="text-slate-400">&nbsp;/&nbsp;{{ end }}</span>
     </div>
@@ -34,14 +33,18 @@ export default {
   },
   computed: {
     start() {
-      return Number.parseInt(this.row[this.schema.startKey]) || 1;
+      return typeof this.row[this.schema.startKey] !== "undefined"
+        ? Number.parseInt(this.row[this.schema.startKey])
+        : 1
     },
     end() {
-      return Number.parseInt(this.row[this.schema.endKey]) || 1;
+      return typeof this.row[this.schema.endKey] !== "undefined"
+        ? Number.parseInt(this.row[this.schema.endKey])
+        : 1
     },
     percentage() {
-      return Math.min(this.start / this.end, 1);
+      return Math.min(this.start / this.end, 1)
     },
   },
-};
+}
 </script>
