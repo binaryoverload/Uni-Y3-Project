@@ -15,64 +15,77 @@
         </div>
       </div>
     </div>
-    {{ tokenData }}
     <div class="space-y-8">
       <div>
-        <div>
-          <p class="font-bold">Details</p>
-          <p class="text-slate-600">
-            These are details about the enrolment token.
-          </p>
-          <hr class="my-2" />
-        </div>
+        <section-header
+          title="Details"
+          subtitle="These are details about the enrolment token." />
 
-        <div>
-          <table>
-            <tbody>
-              <tr>
-                <td class="pb-2 pr-20 font-bold">Name</td>
-                <td class="pb-2 text-slate-600">{{ tokenData.name }}</td>
-              </tr>
+        <table>
+          <tbody>
+            <tr>
+              <td class="pb-2 pr-20 font-bold">Name</td>
+              <td class="pb-2 text-slate-600">{{ tokenData.name }}</td>
+            </tr>
 
-              <tr>
-                <td class="pb-2 font-bold">Token</td>
-                <td class="pb-2 text-slate-600">
-                  <div class="flex items-center space-x-2">
-                    <div>
-                      <font-awesome-icon
-                        v-for="i in 5"
-                        :key="i"
-                        icon="asterisk"
-                        class="h-4 text-xs text-slate-600" />
-                    </div>
-                    <t-button variant="neutral" @click="copyToken">
-                      <font-awesome-icon icon="key" class="mr-1" />
-                      Copy Token
-                    </t-button>
+            <tr>
+              <td class="pb-2 font-bold">Token</td>
+              <td class="pb-2 text-slate-600">
+                <div class="flex items-center space-x-2">
+                  <div>
+                    <font-awesome-icon
+                      v-for="i in 5"
+                      :key="i"
+                      icon="asterisk"
+                      class="h-4 text-xs text-slate-600" />
                   </div>
-                </td>
-              </tr>
-              <tr>
-                <td class="pb-2 font-bold">Created at</td>
-                <td class="pb-2 text-slate-600">
-                  {{ new Date(tokenData.created_at).toLocaleString() }}
-                </td>
-              </tr>
-              <tr>
-                <td class="pb-2 font-bold">Expires at</td>
-                <td class="pb-2 text-slate-600">
-                  {{
-                    tokenData.expires_at
-                      ? new Date(tokenData.expires_at).toLocaleString()
-                      : "&lt;unset&gt;"
-                  }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  <t-button variant="neutral" @click="copyToken">
+                    <font-awesome-icon icon="key" class="mr-1" />
+                    Copy Token
+                  </t-button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-2 font-bold">Created at</td>
+              <td class="pb-2 text-slate-600">
+                {{ new Date(tokenData.created_at).toLocaleString() }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div></div>
+      <div>
+        <section-header
+          title="Limit Info"
+          subtitle="Information about the security limits on tokens." />
+        <table>
+          <tbody>
+            <tr>
+              <td class="pb-2 pr-20 font-bold">Expires at</td>
+              <td class="pb-2 text-slate-600">
+                {{
+                  tokenData.expires_at
+                    ? new Date(tokenData.expires_at).toLocaleString()
+                    : "&lt;unset&gt;"
+                }}
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-2 font-bold">Usage limit</td>
+              <td class="pb-2 text-slate-600">
+                {{ tokenData.usage_limit || "&lt;unset&gt;" }}
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-2 font-bold">Current usage</td>
+              <td class="pb-2 text-slate-600">
+                {{ tokenData.usage_current }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
