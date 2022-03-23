@@ -3,8 +3,8 @@ package server
 import (
 	"bytes"
 	"client/config"
+	"client/data"
 	"client/packets"
-	"client/policies"
 	"client/utils"
 	"crypto/md5"
 	"errors"
@@ -136,7 +136,7 @@ func CombineFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize i
 	return nil
 }
 
-func MoveCombinedFile(fileId uuid.UUID, totalSize int64, policy policies.FilePolicy) error {
+func MoveCombinedFile(fileId uuid.UUID, totalSize int64, policy data.FilePolicy) error {
 	srcFile := filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.combined", fileId))
 
 	sourceFileStat, err := os.Stat(srcFile)

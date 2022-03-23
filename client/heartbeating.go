@@ -2,6 +2,7 @@ package main
 
 import (
 	"client/config"
+	"client/data"
 	"client/packets"
 	"client/policies"
 	"client/server"
@@ -36,7 +37,7 @@ func getBackoffs() []time.Duration {
 
 type HeartbeatAck struct {
 	OpCode   packets.InnerMessageOpCode `json:"op_code"`
-	Policies []policies.Policy          `json:"policies"`
+	Policies []data.Policy              `json:"policies"`
 	Message  string                     `json:"message"`
 }
 
@@ -60,7 +61,7 @@ func heartbeat(ctx context.Context) {
 		backoffUntil = time.Time{}
 	}
 
-	data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendHeartbeat, server.RecieveData})
+	tcpData, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendHeartbeat, server.RecieveData})
 
 	if err != nil {
 		logger.Error("error in attempting to send heartbeat:", err.Error())
@@ -79,7 +80,7 @@ func heartbeat(ctx context.Context) {
 
 	var heartbeatAck HeartbeatAck
 
-	byteData, ok := data.([]byte)
+	byteData, ok := tcpData.([]byte)
 
 	if !ok {
 		logger.Error("did not receive response from heartbeat")
@@ -109,7 +110,7 @@ func heartbeat(ctx context.Context) {
 		if heartbeatAck.Policies != nil {
 			logger.Debugf("received %d policies", len(heartbeatAck.Policies))
 
-			polStore := policies.GetPolicyStorage()
+			polStore := data.GetPolicyStorage()
 
 			for _, policy := range heartbeatAck.Policies {
 				if storedPolicy, ok := polStore.Policies[policy.Id.String()]; ok {
@@ -122,7 +123,7 @@ func heartbeat(ctx context.Context) {
 					}
 				}
 
-				policy.EvaluatePolicy()
+				policies.EvaluatePolicy(policy)
 			}
 		}
 

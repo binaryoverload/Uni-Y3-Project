@@ -1,4 +1,4 @@
-package policies
+package data
 
 import (
 	"client/utils"
@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"sort"
 	"strings"
 )
 
@@ -136,47 +135,4 @@ func (policyItem *PolicyItem) ParseData() error {
 	}
 
 	return fmt.Errorf("could not find policy item type %s", policyItem.Type)
-}
-
-func (policy Policy) EvaluatePolicy() {
-	logger.Debugf("(p_id: %s): begin eval", policy.Id)
-
-	policyItems := make([]PolicyItem, len(policy.PolicyItems))
-	copy(policyItems, policy.PolicyItems)
-	sort.Slice(policyItems, func(i, j int) bool {
-		return policyItems[i].Order < policyItems[j].Order
-	})
-
-	for index, policyItem := range policyItems {
-		logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
-
-		function, ok := ChoosePolicyEvalFunction(policyItem)
-
-		if !ok {
-			logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
-			return
-		}
-
-		err := policyItem.ParseData()
-		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
-			return
-		}
-
-		err = function(policyItem)
-
-		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
-			if policyItem.StopOnError {
-				logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
-				return
-			}
-		} else {
-			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
-		}
-	}
-
-	polStore := GetPolicyStorage()
-	polStore.Policies[policy.Id.String()] = policy
-	SavePolicyStorage()
 }

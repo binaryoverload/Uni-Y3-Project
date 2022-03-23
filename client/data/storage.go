@@ -1,4 +1,4 @@
-package policies
+package data
 
 import (
 	"client/utils"

@@ -1,6 +1,7 @@
 package policies
 
 import (
+	"client/data"
 	"client/packets"
 	"client/server"
 	"client/utils"
@@ -8,10 +9,56 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"sort"
 	"strings"
 )
 
-func ChoosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem) error, bool) {
+var logger = utils.GetLogger()
+
+func EvaluatePolicy(policy data.Policy) {
+	logger.Debugf("(p_id: %s): begin eval", policy.Id)
+
+	policyItems := make([]data.PolicyItem, len(policy.PolicyItems))
+	copy(policyItems, policy.PolicyItems)
+	sort.Slice(policyItems, func(i, j int) bool {
+		return policyItems[i].Order < policyItems[j].Order
+	})
+
+	for index, policyItem := range policyItems {
+		logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
+
+		function, ok := ChoosePolicyEvalFunction(policyItem)
+
+		if !ok {
+			logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
+			return
+		}
+
+		err := policyItem.ParseData()
+		if err != nil {
+			logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
+			return
+		}
+
+		err = function(policyItem)
+
+		if err != nil {
+			logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
+			if policyItem.StopOnError {
+				logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
+				return
+			}
+		} else {
+			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
+		}
+	}
+
+	polStore := data.GetPolicyStorage()
+	polStore.Policies[policy.Id.String()] = policy
+	data.SavePolicyStorage()
+}
+
+func ChoosePolicyEvalFunction(policyItem data.PolicyItem) (func(policyItem data.PolicyItem) error, bool) {
 	switch policyItem.Type {
 	case "command":
 		return evalCommandPolicy, true
@@ -25,8 +72,8 @@ func ChoosePolicyEvalFunction(policyItem PolicyItem) (func(policyItem PolicyItem
 	}
 }
 
-func evalFilePolicy(policyItem PolicyItem) error {
-	filePolicy, ok := policyItem.Data.(FilePolicy)
+func evalFilePolicy(policyItem data.PolicyItem) error {
+	filePolicy, ok := policyItem.Data.(data.FilePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
@@ -35,13 +82,13 @@ func evalFilePolicy(policyItem PolicyItem) error {
 		return errors.New("copying files requires the client should be running as root")
 	}
 
-	data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendFileInfoReq(packets.FileInfoReq{FileId: filePolicy.FileId}), server.RecieveData})
+	tcpData, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendFileInfoReq(packets.FileInfoReq{FileId: filePolicy.FileId}), server.RecieveData})
 
 	if err != nil {
 		return fmt.Errorf("(pi_id: %s, f: %s) failed to request file info: %w", policyItem.Id, filePolicy.FileId, err)
 	}
 
-	dataBytes, ok := data.([]byte)
+	dataBytes, ok := tcpData.([]byte)
 	if !ok {
 		return fmt.Errorf("(pi_id: %s, f: %s) data response is not byte array", policyItem.Id, filePolicy.FileId)
 	}
@@ -72,8 +119,8 @@ func evalFilePolicy(policyItem PolicyItem) error {
 	return nil
 }
 
-func evalPackagePolicy(policyItem PolicyItem) error {
-	packagePolicy, ok := policyItem.Data.(PackagePolicy)
+func evalPackagePolicy(policyItem data.PolicyItem) error {
+	packagePolicy, ok := policyItem.Data.(data.PackagePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
@@ -103,8 +150,8 @@ func evalPackagePolicy(policyItem PolicyItem) error {
 	return nil
 }
 
-func evalCommandPolicy(policyItem PolicyItem) error {
-	commandPolicy, ok := policyItem.Data.(CommandPolicy)
+func evalCommandPolicy(policyItem data.PolicyItem) error {
+	commandPolicy, ok := policyItem.Data.(data.CommandPolicy)
 	if !ok {
 		return errors.New("policy data was not expected command type")
 	}
