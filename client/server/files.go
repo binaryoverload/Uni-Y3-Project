@@ -29,13 +29,13 @@ func RequestFileChunk(fileId uuid.UUID, workerNum int, chunkNum int) error {
 		ChunkNumber: chunkNum,
 	}
 
-	data, err := RunTcpActions([]TcpAction{SendHello, RecieveHelloAck, SendFileChunkReq(fileChunkReq), RecieveData})
+	tcpData, err := RunTcpActions([]TcpAction{SendHello, RecieveHelloAck, SendFileChunkReq(fileChunkReq), RecieveData})
 
 	if err != nil {
 		return err
 	}
 
-	dataBytes, ok := data.([]byte)
+	dataBytes, ok := tcpData.([]byte)
 
 	if !ok {
 		return errors.New("data returned is not []byte")
@@ -69,7 +69,7 @@ func FileRequestWorker(wg *sync.WaitGroup, workerNum int, jobs <-chan int, outpu
 			logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) starting chunk download", fileId, workerNum, retry, chunkNum)
 			err = RequestFileChunk(fileId, workerNum, chunkNum)
 			if err != nil {
-				logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) error with chunk download: %w", fileId, workerNum, retry, chunkNum, err)
+				logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) error with chunk download: %s", fileId, workerNum, retry, chunkNum, err)
 			} else {
 				break
 			}
@@ -168,6 +168,17 @@ func MoveCombinedFile(fileId uuid.UUID, totalSize int64, policy data.FilePolicy)
 	if nBytes != totalSize {
 		return fmt.Errorf("num bytes written (%d) != total file size (%d)", nBytes, totalSize)
 	}
+
+	if err != nil {
+		return fmt.Errorf("could not copy file: %w", err)
+	}
+
+	err = os.Chmod(policy.Destination, os.FileMode(policy.Permissions))
+
+	if err != nil {
+		return fmt.Errorf("could not chmod file: %w", err)
+	}
+	logger.Debugf("(f_id: %s) successfully chmod file at %s with permissions %o", fileId, policy.Destination, policy.Permissions)
 
 	return nil
 }
