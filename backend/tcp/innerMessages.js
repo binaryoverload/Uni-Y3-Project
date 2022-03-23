@@ -30,6 +30,7 @@ const opCodes = {
 const opCodeDecodeFunctions = {
     [opCodes.heartbeat]: decodeHeartbeat,
     [opCodes.registerClient]: decodeRegisterClient,
+    [opCodes.reqFileInfo]: decodeFileInfoRequest,
     [opCodes.reqFileChunk]: decodeFileChunkRequest,
 }
 
@@ -158,6 +159,10 @@ async function decodeFileChunkRequest(ctx, data) {
 
     const file = await getFileById(fileId)
 
+    if (!file) {
+        return encodeTCPError("fileId does not exist")
+    }
+
     const fileChunks = Math.ceil(file.size / config.files.chunkSize)
 
     if (chunkNumber >= fileChunks) {
@@ -187,6 +192,33 @@ async function decodeFileChunkRequest(ctx, data) {
     } catch (e) {
         return encodeTCPError("Error sending file: " + e.message)
     }
+}
+
+function encodeFileInfoRes(data) {
+    return {
+        op_code: opCodes.resFileInfo,
+        ...data,
+    }
+}
+
+async function decodeFileInfoRequest(ctx, data) {
+    const { file_id } = data
+
+    const file = await getFileById(file_id)
+
+    if (!file) {
+        return encodeTCPError("could not find file with that id")
+    }
+
+    const fileChunks = Math.ceil(file.size / config.files.chunkSize)
+
+    return encodeFileInfoRes({
+        file_id: file.id,
+        filename: file.original_filename,
+        num_chunks: fileChunks,
+        hash: file.hash,
+        total_size: file.size,
+    })
 }
 
 module.exports = { opCodes, encodeTCPError, opCodeDecodeFunctions }
