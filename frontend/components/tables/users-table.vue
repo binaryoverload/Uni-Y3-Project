@@ -45,8 +45,31 @@ const schema = [
       {
         icon: "trash",
         variant: "danger",
-        onClick(row) {
-          alert("delete user " + row.username)
+        async onClick(row) {
+          try {
+            const response = await this.$axios.$delete(`/users/${row.id}`)
+            if (response.status === "success") {
+              setTimeout(
+                function () {
+                  this.$fetch()
+                }.bind(this),
+                200
+              )
+              return
+            }
+          } catch (error) {
+            if (error.response) {
+              this.errors = error.response.data
+            } else if (error.request) {
+              this.errors = {
+                message: "Could not contact the server",
+              }
+            } else {
+              this.errors = {
+                message: error.message,
+              }
+            }
+          }
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username
