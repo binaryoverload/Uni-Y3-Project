@@ -4,6 +4,7 @@
 
 <script>
 import table from "./table.vue"
+import { deleteEntity } from "~/utils/actions"
 
 const schema = [
   {
@@ -46,30 +47,9 @@ const schema = [
         icon: "trash",
         variant: "danger",
         async onClick(row) {
-          try {
-            const response = await this.$axios.$delete(`/users/${row.id}`)
-            if (response.status === "success") {
-              setTimeout(
-                function () {
-                  this.$fetch()
-                }.bind(this),
-                200
-              )
-              return
-            }
-          } catch (error) {
-            if (error.response) {
-              this.errors = error.response.data
-            } else if (error.request) {
-              this.errors = {
-                message: "Could not contact the server",
-              }
-            } else {
-              this.errors = {
-                message: error.message,
-              }
-            }
-          }
+          deleteEntity.call(this, `/users/${row.id}`, function () {
+            alert(`User ${row.username} has been deleted`)
+          })
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username
