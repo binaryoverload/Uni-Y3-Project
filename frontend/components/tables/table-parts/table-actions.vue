@@ -3,7 +3,7 @@
     <div
       v-for="(action, index) in actions"
       :key="index"
-      @click="action.onClick(row)"
+      @click="onClick(action)"
       class="px-2 py-1 rounded cursor-pointer"
       tabindex="0"
       :class="variantClasses(action)">
@@ -43,6 +43,9 @@ export default {
         }
       }
       return "bg-slate-200 hover:bg-slate-300 text-slate-500 hover:text-slate-600 focus:ring-slate-400 focus:border-slate-500 focus:ring-2  focus:outline-none focus:ring-opacity-50"
+    },
+    onClick(action) {
+      action.onClick.call(this, this.row)
     },
   },
 }
