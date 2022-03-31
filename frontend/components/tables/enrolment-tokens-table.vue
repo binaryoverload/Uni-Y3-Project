@@ -4,6 +4,7 @@
 
 <script>
 import table from "./table.vue"
+import { deleteEntity } from "~/utils/actions"
 
 const schema = [
   {
@@ -80,15 +81,17 @@ const schema = [
       },
       {
         icon: "download",
-        onClick: row => {
+        onClick: _ => {
           alert("downloaded!!")
         },
       },
       {
         icon: "trash",
         variant: "danger",
-        onClick(row) {
-          alert("delete token " + row.name)
+        async onClick(row) {
+          deleteEntity.call(this, `/enrolment-tokens/${row.id}`, function () {
+            alert(`Token ${row.name} has been deleted`)
+          })
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username
