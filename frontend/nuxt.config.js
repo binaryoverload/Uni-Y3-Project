@@ -131,7 +131,8 @@ export default {
         "faMinus",
         "faBoxOpen",
         "faTerminal",
-        "faTrash"
+        "faTrash",
+        "faFile"
       ],
     },
   },
