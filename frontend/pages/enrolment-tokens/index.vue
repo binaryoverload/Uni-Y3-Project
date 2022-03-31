@@ -23,7 +23,8 @@
       <items-not-found
         v-else
         entity="enrolment tokens"
-        link="/enrolment-tokens/create" />
+        link="/enrolment-tokens/create"
+        class="mt-8" />
     </div>
   </div>
 </template>

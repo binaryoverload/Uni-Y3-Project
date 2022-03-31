@@ -17,7 +17,11 @@
         v-if="rows.length > 0"
         :rows="rows"
         :filter="searchFilter" />
-      <items-not-found v-else entity="policies" link="/policies/create" />
+      <items-not-found
+        v-else
+        entity="policies"
+        link="/policies/create"
+        class="mt-8" />
     </div>
   </div>
 </template>

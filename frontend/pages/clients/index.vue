@@ -27,7 +27,7 @@
         v-if="rows.length > 0"
         :rows="rows"
         :filter="searchFilter" />
-      <items-not-found v-else entity="clients" no-link />
+      <items-not-found v-else entity="clients" class="mt-8" />
     </div>
   </div>
 </template>

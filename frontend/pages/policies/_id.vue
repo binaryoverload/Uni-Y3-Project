@@ -66,12 +66,18 @@
           <p class="text-slate-600">The items that this policy will execute.</p>
           <hr class="my-2" />
         </div>
-        <div class="flex flex-col gap-2 lg:flex-row">
+
+        <div
+          v-if="
+            policiesData.policy_items && policiesData.policy_items.length > 0
+          "
+          class="flex flex-col gap-2 lg:flex-row">
           <base-item-card
             v-for="item in policiesData.policy_items"
             :key="item.id"
             :item="item" />
         </div>
+        <items-not-found v-else entity="policy items" />
       </div>
     </div>
   </div>
