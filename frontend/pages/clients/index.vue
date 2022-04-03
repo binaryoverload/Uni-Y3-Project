@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="ml-auto">
-        <refresh-button @click="$fetch()" />
+        <refresh-button @click="$nuxt.refresh()" />
       </div>
     </div>
     <div>

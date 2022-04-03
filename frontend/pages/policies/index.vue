@@ -3,7 +3,7 @@
     <div class="flex items-end mb-10">
       <p class="text-5xl font-bold leading-[3rem]">Policies</p>
       <div class="flex ml-auto space-x-2">
-        <refresh-button @click="$fetch()" />
+        <refresh-button @click="$nuxt.refresh()" />
         <t-button to="/policies/create" href="/policies/create" tagName="a"
           >Create new</t-button
         >

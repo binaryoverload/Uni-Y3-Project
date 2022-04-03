@@ -5,7 +5,7 @@
       <div class="flex items-end">
         <p class="text-5xl font-bold leading-[3rem]">View Policy</p>
         <div class="flex ml-auto space-x-2">
-          <refresh-button @click="$fetch()" />
+          <refresh-button @click="$nuxt.refresh()" />
           <t-button
             :to="`/policies/edit/${$route.params.id}`"
             :href="`/policies/edit/${$route.params.id}`"

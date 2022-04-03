@@ -3,7 +3,7 @@
     <div class="flex items-end mb-10">
       <p class="text-5xl font-bold leading-[3rem]">Enrolment Tokens</p>
       <div class="flex ml-auto space-x-2">
-        <refresh-button @click="$fetch()" />
+        <refresh-button @click="$nuxt.refresh()" />
         <t-button
           to="/enrolment-tokens/create"
           href="/enrolment-tokens/create"
