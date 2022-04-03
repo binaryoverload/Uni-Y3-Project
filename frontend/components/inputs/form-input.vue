@@ -7,7 +7,8 @@
       <span>{{ label }}</span>
       <span v-if="required" class="text-red-500">*</span>
     </label>
-    <input-box
+    <component
+      :is="large ? 'large-input-box' : 'input-box'"
       :value="value"
       @input="$emit('input', $event)"
       :id="id"
@@ -39,6 +40,7 @@ export default {
       type: String,
     },
     required: Boolean,
+    large: Boolean,
   },
   methods: {},
   data() {
