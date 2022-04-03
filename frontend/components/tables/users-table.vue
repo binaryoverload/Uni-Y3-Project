@@ -37,7 +37,7 @@ const schema = [
       {
         icon: "key",
         onClick(row) {
-          alert("reset password for " + row.username)
+          this.$swal("reset password for " + row.username)
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username
@@ -47,9 +47,30 @@ const schema = [
         icon: "trash",
         variant: "danger",
         async onClick(row) {
-          deleteEntity.call(this, `/users/${row.id}`, function () {
-            alert(`User ${row.username} has been deleted`)
+          const result = await this.$swal({
+            icon: "warning",
+            title: "Are you sure?",
+            html: `Are you sure you want to delete the user <span class="text-indigo-700">${row.username}</span>? This action is irreversible.`,
+            confirmButtonText: "Delete",
+            showCancelButton: true,
+            focusConfirm: false,
+            focusCancel: true,
           })
+          if (!result.isConfirmed) {
+            return
+          }
+          deleteEntity.call(
+            this,
+            `/users/${row.id}`,
+            function () {
+              this.$swal({
+                icon: "success",
+                title: "Deleted user!",
+                html: `Successfully delete the user <span class="text-indigo-700">${row.username}</span>.`,
+              })
+              this.$nuxt.refresh()
+            }.bind(this)
+          )
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username

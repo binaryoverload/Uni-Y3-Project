@@ -21,6 +21,7 @@
         "lodash.uniqueid": "^4.0.1",
         "nuxt": "^2.15.7",
         "nuxt-rfg-icon": "^0.6.4",
+        "vue-sweetalert2": "^5.0.2",
         "vue-tailwind": "^2.4.2"
     },
     "devDependencies": {

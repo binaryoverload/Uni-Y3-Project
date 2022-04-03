@@ -89,9 +89,30 @@ const schema = [
         icon: "trash",
         variant: "danger",
         async onClick(row) {
-          deleteEntity.call(this, `/enrolment-tokens/${row.id}`, function () {
-            alert(`Token ${row.name} has been deleted`)
+          const result = await this.$swal({
+            icon: "warning",
+            title: "Are you sure?",
+            html: `Are you sure you want to delete the token <span class="text-indigo-700">${row.name}</span>? This action is irreversible.`,
+            confirmButtonText: "Delete",
+            showCancelButton: true,
+            focusConfirm: false,
+            focusCancel: true,
           })
+          if (!result.isConfirmed) {
+            return
+          }
+          deleteEntity.call(
+            this,
+            `/enrolment-tokens/${row.id}`,
+            function () {
+              this.$swal({
+                icon: "success",
+                title: "Deleted token!",
+                html: `Successfully delete the token <span class="text-indigo-700">${row.name}</span>.`,
+              })
+              this.$nuxt.refresh()
+            }.bind(this)
+          )
         },
         showCondition(row) {
           return row.username !== this.$auth.user.username

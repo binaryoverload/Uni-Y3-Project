@@ -47,6 +47,7 @@ export default {
     "@nuxtjs/auth-next",
     ["nuxt-rfg-icon", { masterPicture: "static/favicon.png" }],
     "@nuxtjs/manifest",
+    "vue-sweetalert2/nuxt"
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -104,6 +105,10 @@ export default {
         autoprefixer: {},
       },
     },
+  },
+
+  sweetalert: {
+    heightAuto: false
   },
 
   fontawesome: {
