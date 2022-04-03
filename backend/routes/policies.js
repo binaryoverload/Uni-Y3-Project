@@ -4,8 +4,9 @@ const { executeQuery, checkValidationErrors } = require("../utils/http")
 const { clientPatch } = require("../validation/clients")
 const { NotFoundError } = require("../utils/httpExceptions")
 const { Router } = require("express")
-const { getAllPolicies, getPolicyById, deletePolicy, updatePolicy } = require("../models/policies")
+const { getAllPolicies, getPolicyById, deletePolicy, updatePolicy, createPolicy } = require("../models/policies")
 const { idParamValidator } = require("../validation/common")
+const { policyCreate } = require("../validation/policies")
 
 const router = Router()
 
@@ -14,6 +15,16 @@ router.get(
     validateJwt,
     executeQuery(async () => {
         return getAllPolicies()
+    })
+)
+
+router.post(
+    "/",
+    validateJwt,
+    checkValidationErrors(policyCreate),
+    executeQuery(async ({ body }) => {
+        const { name, description, created_by } = body
+        return await createPolicy({ name, description, created_by })
     })
 )
 
