@@ -1,15 +1,35 @@
 <template>
   <div>
     <p class="mb-10 text-5xl font-bold leading-[3rem]">Create Policies</p>
-    <section-header
-      title="Account information"
-      subtitle="For logging in and such." />
-    <input-box placeholder="Test" />
+    <form @submit.prevent="submit">
+      <div class="space-y-4">
+        <section-header
+          title="Account information"
+          subtitle="For logging in and such." />
+        <form-input
+          label="Name"
+          placeholder="Name"
+          v-model="name"
+          required
+          :error="errors.name" />
 
-    <section-header
-      title="Personal information"
-      subtitle="Information about the user." />
-    <div></div>
+        <form-input
+          label="Description"
+          placeholder="Description"
+          v-model="description"
+          large
+          :error="errors.description" />
+      </div>
+
+      <t-alert
+        :show="!!errors.message"
+        variant="danger"
+        :dismissible="false"
+        class="mt-8"
+        >{{ errors.message }}</t-alert
+      >
+      <t-button class="mt-4"> Create </t-button>
+    </form>
   </div>
 </template>
 
@@ -17,5 +37,39 @@
 export default {
   layout: "dashboard",
   middleware: "authed",
+  methods: {
+    async submit() {
+      try {
+        const response = await this.$axios.$post("/policies", {
+          name: this.name,
+          description: this.description,
+          created_by: this.$auth.user.id,
+        })
+        if (response.status === "success") {
+          this.$router.push(`/policies/${response.data.id}`)
+          return
+        }
+      } catch (error) {
+        if (error.response) {
+          this.errors = error.response.data
+        } else if (error.request) {
+          this.errors = {
+            message: "Could not contact the server",
+          }
+        } else {
+          this.errors = {
+            message: error.message,
+          }
+        }
+      }
+    },
+  },
+  data() {
+    return {
+      name: "",
+      description: null,
+      errors: {},
+    }
+  },
 }
 </script>
