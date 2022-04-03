@@ -108,7 +108,9 @@ export default {
   },
 
   sweetalert: {
-    heightAuto: false
+    heightAuto: false,
+    confirmButtonColor: "#6d28d9",
+    cancelButtonColor: "#94a3b8"
   },
 
   fontawesome: {
