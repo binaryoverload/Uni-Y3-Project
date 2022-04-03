@@ -68,15 +68,20 @@ const schema = [
     actions: [
       {
         icon: "copy",
-        onClick: row => {
-          navigator.clipboard.writeText(row.token).then(
-            function () {
-              alert("Copied enrolment token to clipboard!")
-            },
-            function (err) {
-              console.error("Could not copy enrolment token: ", err)
-            }
-          )
+        async onClick(row) {
+          try {
+            await navigator.clipboard.writeText(row.token)
+            this.$swal({
+              icon: "success",
+              timerProgressBar: true,
+              showConfirmButton: false,
+              title: "Copied token!",
+              text: `Successfully copied the token to your clipboard`,
+              timer: 1500,
+            })
+          } catch (err) {
+            console.error("Could not copy enrolment token: ", err)
+          }
         },
       },
       {
