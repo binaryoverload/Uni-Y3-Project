@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col items-center justify-center w-full h-40 bg-slate-100">
+    class="flex flex-col items-center justify-center w-full h-40 rounded bg-slate-100">
     <p class="font-medium">No {{ entity }} found</p>
     <p class="text-slate-500" v-if="link">
       Click
