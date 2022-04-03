@@ -49,7 +49,7 @@
             <tr>
               <td class="pb-2 font-bold">Created at</td>
               <td class="pb-2 text-slate-600">
-                {{ new Date(tokenData.created_at).toLocaleString() }}
+                {{ new Date(tokenData.created_at).toLocaleString("en-GB") }}
               </td>
             </tr>
           </tbody>
@@ -66,7 +66,7 @@
               <td class="pb-2 text-slate-600">
                 {{
                   tokenData.expires_at
-                    ? new Date(tokenData.expires_at).toLocaleString()
+                    ? new Date(tokenData.expires_at).toLocaleString("en-GB")
                     : "&lt;unset&gt;"
                 }}
               </td>

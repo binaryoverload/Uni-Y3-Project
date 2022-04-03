@@ -34,26 +34,26 @@
                 <td class="pb-2 font-bold">Name</td>
                 <td class="pb-2 text-slate-600">{{ policiesData.name }}</td>
               </tr>
+              <tr v-if="policiesData.description">
+                <td class="pb-2 font-bold">Description</td>
+                <td class="pb-2 text-slate-600">
+                  {{ policiesData.description }}
+                </td>
+              </tr>
               <tr>
                 <td class="pb-2 font-bold">Created at</td>
                 <td class="pb-2 text-slate-600">
-                  {{ new Date(policiesData.created_at).toLocaleString() }}
+                  {{
+                    new Date(policiesData.created_at).toLocaleString("en-GB")
+                  }}
                 </td>
               </tr>
               <tr>
                 <td class="pb-2 font-bold">Updated at</td>
                 <td class="pb-2 text-slate-600">
-                  {{ new Date(policiesData.updated_at).toLocaleString() }}
-                </td>
-              </tr>
-              <tr>
-                <td class="pb-2 font-bold">Name</td>
-                <td class="pb-2 text-slate-600">{{ policiesData.name }}</td>
-              </tr>
-              <tr v-if="policiesData.description">
-                <td class="pb-2 font-bold">Description</td>
-                <td class="pb-2 text-slate-600">
-                  {{ policiesData.description }}
+                  {{
+                    new Date(policiesData.updated_at).toLocaleString("en-GB")
+                  }}
                 </td>
               </tr>
             </tbody>

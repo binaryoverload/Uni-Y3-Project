@@ -33,15 +33,15 @@ export default {
 
         if (value instanceof Date) {
           if (this.schema.format === "date") {
-            return value.toLocaleDateString()
+            return value.toLocaleDateString("en-GB")
           }
-          return value.toLocaleString()
+          return value.toLocaleString("en-GB")
         }
 
         if (this.schema.format === "datetime") {
-          return new Date(value).toLocaleString()
+          return new Date(value).toLocaleString("en-GB")
         } else if (this.schema.format === "date") {
-          return new Date(value).toLocaleDateString()
+          return new Date(value).toLocaleDateString("en-GB")
         }
 
         return value

@@ -32,7 +32,9 @@
               <tr>
                 <td class="pb-2 pr-10 font-bold">Last Activity</td>
                 <td class="text-slate-600">
-                  {{ new Date(clientData.last_activity).toLocaleString() }}
+                  {{
+                    new Date(clientData.last_activity).toLocaleString("en-GB")
+                  }}
                 </td>
               </tr>
             </tbody>
