@@ -62,7 +62,7 @@ export default {
         }
       } catch (error) {
         if (error.response) {
-          this.errors = error.response.data
+          this.errors = error.response.data.data
         } else if (error.request) {
           this.errors = {
             message: "Could not contact the server",
