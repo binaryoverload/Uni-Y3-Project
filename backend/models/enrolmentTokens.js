@@ -29,9 +29,11 @@ async function deleteEnrolmentToken(id) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME).where("id", id).delete().catch(handlePostgresError)
 }
 
-async function createEnrolmentToken(name, token) {
+async function createEnrolmentToken(data) {
+    const { name, token, expires_at, usage_limit } = data
+
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
-        .insert({ name, token })
+        .insert({ name, token, expires_at, usage_limit })
         .returning(["id", "name", "token", "created_at", "usage_current"])
         .then(r => r[0])
         .catch(handlePostgresError)

@@ -51,9 +51,16 @@ router.post(
     validateJwt,
     checkValidationErrors(tokenCreate),
     executeQuery(async ({ body }) => {
+        const { name, expires_at, usage_limit } = body
+
         const token = generateToken()
 
-        return await createEnrolmentToken(body.name, token)
+        return await createEnrolmentToken({
+            name,
+            usage_limit,
+            expires_at,
+            token,
+        })
     })
 )
 
