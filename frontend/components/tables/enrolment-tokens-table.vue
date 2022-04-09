@@ -6,6 +6,13 @@
 import table from "./table.vue"
 import { deleteEntity } from "~/utils/actions"
 
+const Status = {
+  unhealthy: 0,
+  warning: 1,
+  healthy: 2,
+  unknown: 3,
+}
+
 const schema = [
   {
     display: "link",
@@ -15,31 +22,44 @@ const schema = [
   },
   {
     display: "statusIcon",
-    key: row => {
-      if (!row.expires_at && !row.usage_limit) return "online"
+    content: row => {
+      let expiresAtScore = Status.healthy // Green by default
+      let usageScore = Status.healthy
 
-      const usageRatio = row.usage_current / row.usage_limit
+      if (row.usage_limit) {
+        const usageRatio = row.usage_current / row.usage_limit
 
-      if (usageRatio >= 0.8) {
-        return "offline"
-      } else if (usageRatio < 0.8 && usageRatio >= 0.6) {
-        return "warning"
+        if (usageRatio >= 0.8) {
+          usageScore = Status.unhealthy
+        } else if (usageRatio < 0.8 && usageRatio >= 0.6) {
+          usageScore = Status.warning
+        }
+
+        if (row.usage_current >= row.usage_limit) {
+          usageScore = Status.unhealthy
+        }
       }
 
-      if (row.usage_current >= row.usage_limit) return "offline"
-
-      const timeUntilExpiry = Date.now() - row.expires_at.getTime()
-      if (isNaN(timeUntilExpiry)) {
-        return "unknown"
-      } else if (timeUntilExpiry < 60 * 10 * 1000) {
-        // < 10 Minutes is considered healthy
-        return "online"
-      } else if (timeUntilExpiry < 60 * 60 * 1000) {
-        // < 1 Hour
-        return "warning"
-      } else {
-        return "offline"
+      if (row.expires_at) {
+        console.log(row)
+        const timeUntilExpiry = Date.now() - Date.parse(row.expires_at)
+        if (isNaN(timeUntilExpiry)) {
+          expiresAtScore = Status.unknown
+        } else if (timeUntilExpiry < 60 * 10 * 1000) {
+          // < 10 Minutes is considered healthy
+          expiresAtScore = Status.healthy
+        } else if (timeUntilExpiry < 60 * 60 * 1000) {
+          // < 1 Hour
+          expiresAtScore = Status.warning
+        } else {
+          expiresAtScore = Status.unhealthy
+        }
       }
+
+      // The min score is the worst score
+      const minScore = Math.min(expiresAtScore, usageScore)
+
+      return Object.keys(Status).find(key => Status[key] === minScore)
     },
     heading: "Status",
     text: {

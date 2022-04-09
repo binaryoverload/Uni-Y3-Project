@@ -8,19 +8,19 @@ import table from "../../components/tables/table.vue"
 const schema = [
   {
     display: "statusIcon",
-    key: row => {
+    content: row => {
       const timeSinceLastActivity =
         Date.now() - new Date(row.last_activity).getTime()
       if (isNaN(timeSinceLastActivity)) {
         return "unknown"
       } else if (timeSinceLastActivity < 60 * 10 * 1000) {
         // < 10 Minutes is considered healthy
-        return "online"
+        return "healthy"
       } else if (timeSinceLastActivity < 60 * 60 * 1000) {
         // < 1 Hour
         return "warning"
       } else {
-        return "offline"
+        return "unhealthy"
       }
     },
     width: "0",
