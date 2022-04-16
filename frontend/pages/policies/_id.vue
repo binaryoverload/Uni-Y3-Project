@@ -27,11 +27,7 @@
           <table class>
             <tbody>
               <tr>
-                <td class="pb-2 pr-20 font-bold">Id</td>
-                <td class="pb-2 text-slate-600">{{ policiesData.id }}</td>
-              </tr>
-              <tr>
-                <td class="pb-2 font-bold">Name</td>
+                <td class="pb-2 pr-20 font-bold">Name</td>
                 <td class="pb-2 text-slate-600">{{ policiesData.name }}</td>
               </tr>
               <tr v-if="policiesData.description">
@@ -61,12 +57,11 @@
         </div>
       </div>
       <div>
-        <div>
-          <p class="font-bold">Policy Items</p>
-          <p class="text-slate-600">The items that this policy will execute.</p>
-          <hr class="my-2" />
-        </div>
-
+        <section-header
+          title="Policy Item"
+          subtitle="The items that this policy will execute.">
+          <t-button>New Item</t-button>
+        </section-header>
         <div
           v-if="
             policiesData.policy_items && policiesData.policy_items.length > 0
