@@ -8,13 +8,14 @@
       <span v-if="required" class="text-red-500">*</span>
     </label>
     <component
-      :is="large ? 'large-input-box' : 'input-box'"
+      :is="(component && components[component]) || 'input-box'"
       :value="value"
       @input="$emit('input', $event)"
       :id="id"
       :placeholder="placeholder"
       :required="required"
-      :class="inputClasses" />
+      :class="inputClasses"
+      v-bind="$attrs" />
     <p v-if="error" class="mt-1 space-x-2 text-sm font-bold text-red-500">
       <font-awesome-icon icon="exclamation-triangle" /><span>{{ error }}</span>
     </p>
@@ -23,14 +24,20 @@
 
 <script>
 const uniqueId = require("lodash.uniqueid")
+
+const components = {
+  large: "large-input-box",
+  fancyRadio: "fancy-radio",
+}
+
 export default {
+  inheritAttrs: false,
   props: {
     value: {
       type: String,
     },
     placeholder: {
       type: String,
-      required: true,
     },
     label: {
       type: String,
@@ -40,12 +47,13 @@ export default {
       type: String,
     },
     required: Boolean,
-    large: Boolean,
+    component: String,
   },
   methods: {},
   data() {
     return {
       id: uniqueId("form-"),
+      components,
     }
   },
   computed: {

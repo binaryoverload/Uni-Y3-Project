@@ -17,7 +17,7 @@
           label="Description"
           placeholder="Description"
           v-model="description"
-          large
+          component="large"
           :error="errors.description" />
       </div>
 

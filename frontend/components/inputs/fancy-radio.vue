@@ -15,6 +15,7 @@
           :key="option.key"
           class="cursor-pointer text-slate-300 checked:text-indigo-600 focus:ring-indigo-600 focus:ring-2 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0"
           :checked="value === option.key"
+          :required="required"
           @input="$emit('input', option.key)" />
       </div>
       <div class="space-y-0.5">
@@ -36,6 +37,7 @@ export default {
     value: {
       type: String,
     },
+    required: Boolean,
   },
   data() {
     return {
