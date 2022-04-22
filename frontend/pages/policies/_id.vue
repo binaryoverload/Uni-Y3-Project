@@ -60,7 +60,12 @@
         <section-header
           title="Policy Item"
           subtitle="The items that this policy will execute.">
-          <t-button>New Item</t-button>
+          <t-button
+            to="/policy-items/create"
+            href="/policy-items/create"
+            tagName="a"
+            >New Item</t-button
+          >
         </section-header>
         <div
           v-if="
