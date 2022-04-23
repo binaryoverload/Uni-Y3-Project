@@ -3,7 +3,7 @@
     <label
       v-for="option in options"
       :key="option.key"
-      class="flex items-center flex-1 max-w-sm py-4 pl-3 pr-6 border-2 rounded cursor-pointer"
+      class="flex items-center flex-1 max-w-sm py-4 pl-3 pr-6 transition-colors border-2 rounded cursor-pointer"
       :class="{
         'border-slate-300': value !== option.key,
         'border-indigo-600': value === option.key,
@@ -13,7 +13,7 @@
           type="radio"
           :name="name"
           :key="option.key"
-          class="cursor-pointer text-slate-300 checked:text-indigo-600 focus:ring-indigo-600 focus:ring-2 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0"
+          class="transition-colors cursor-pointer text-slate-300 checked:text-indigo-600 focus:ring-indigo-600 focus:ring-2 focus:outline-none focus:ring-opacity-50 focus:ring-offset-0"
           :checked="value === option.key"
           :required="required"
           @input="$emit('input', option.key)" />

@@ -6,39 +6,48 @@
         label="Item Type"
         :options="[
           {
-            key: 'file',
-            title: 'File',
-            description: 'Transfers a file to the client',
+            key: 'command',
+            title: 'Command',
+            description: 'Executes a command on the client',
           },
           {
             key: 'package',
             title: 'Package',
             description: 'Installs or removes a package from the client',
           },
-
           {
-            key: 'command',
-            title: 'Command',
-            description: 'Executes a command on the client',
+            key: 'file',
+            title: 'File',
+            description: 'Transfers a file to the client',
           },
         ]"
         component="fancyRadio"
         v-model="type"
         required />
+      <component v-if="type" :is="`${type}-type-form`" v-model="data" />
     </form>
   </div>
 </template>
 
 <script>
+// Keep a cache of form data so switching types doesn't lose data
+const dataCache = {}
+
 export default {
   layout: "dashboard",
   middleware: "authed",
   data() {
     return {
-      type: "",
+      type: "command",
       data: {},
       errors: {},
     }
+  },
+  watch: {
+    type(newType, oldType) {
+      dataCache[newType] = this.data
+      this.data = dataCache[oldType] || {}
+    },
   },
 }
 </script>
