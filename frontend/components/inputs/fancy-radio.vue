@@ -20,7 +20,9 @@
       </div>
       <div class="space-y-0.5">
         <p class="text-xl">{{ option.title }}</p>
-        <p class="text-slate-600">{{ option.description }}</p>
+        <p class="text-slate-600" v-if="option.description">
+          {{ option.description }}
+        </p>
       </div>
     </label>
   </div>
