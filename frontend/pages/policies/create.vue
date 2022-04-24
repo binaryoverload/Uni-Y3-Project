@@ -28,7 +28,7 @@
         class="mt-8"
         >{{ errors.message }}</t-alert
       >
-      <t-button class="mt-4"> Create </t-button>
+      <t-button class="mt-4">Create</t-button>
     </form>
   </div>
 </template>

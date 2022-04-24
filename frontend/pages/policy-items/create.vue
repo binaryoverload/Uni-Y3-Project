@@ -1,7 +1,7 @@
 <template>
   <div>
-    <p class="mb-10 text-5xl font-bold leading-[3rem]">Create Policy Items</p>
-    <form @submit.prevent="submit">
+    <p class="mb-10 text-5xl font-bold leading-[3rem]">Create Policy Item</p>
+    <form @submit.prevent="submit" class="space-y-4">
       <form-input
         label="Item Type"
         :options="[
@@ -25,13 +25,21 @@
         v-model="type"
         required />
       <component v-if="type" :is="`${type}-type-form`" v-model="data" />
+      <t-button class="mt-4">Create</t-button>
     </form>
   </div>
 </template>
 
 <script>
 // Keep a cache of form data so switching types doesn't lose data
-const dataCache = {}
+const dataCache = {
+  command: {},
+  package: {
+    action: "install",
+    packages: [],
+  },
+  file: {},
+}
 
 export default {
   layout: "dashboard",
@@ -39,14 +47,41 @@ export default {
   data() {
     return {
       type: "command",
-      data: {},
+      data: dataCache["command"],
       errors: {},
     }
   },
+  methods: {
+    async submit() {
+      try {
+        const response = await this.$axios.$post("/policy-items", {
+          type: this.type,
+          data: this.data,
+          policy_id: this.$auth.user.id,
+        })
+        if (response.status === "success") {
+          this.$router.push(`/policies/${response.data.id}`)
+          return
+        }
+      } catch (error) {
+        if (error.response) {
+          this.errors = error.response.data.data
+        } else if (error.request) {
+          this.errors = {
+            message: "Could not contact the server",
+          }
+        } else {
+          this.errors = {
+            message: error.message,
+          }
+        }
+      }
+    },
+  },
   watch: {
     type(newType, oldType) {
-      dataCache[newType] = this.data
-      this.data = dataCache[oldType] || {}
+      dataCache[oldType] = this.data
+      this.data = dataCache[newType] || {}
     },
   },
 }
