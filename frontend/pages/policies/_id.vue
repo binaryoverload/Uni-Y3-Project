@@ -61,8 +61,8 @@
           title="Policy Item"
           subtitle="The items that this policy will execute.">
           <t-button
-            to="/policy-items/create"
-            href="/policy-items/create"
+            :to="`/policy-items/create/${policiesData.id}`"
+            :href="`/policy-items/create/${policiesData.id}`"
             tagName="a"
             >New Item</t-button
           >

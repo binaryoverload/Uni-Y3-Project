@@ -54,13 +54,14 @@ export default {
   methods: {
     async submit() {
       try {
+        const policyId = this.$route.params.policyId
         const response = await this.$axios.$post("/policy-items", {
           type: this.type,
           data: this.data,
-          policy_id: this.$auth.user.id,
+          policy_id: policyId,
         })
         if (response.status === "success") {
-          this.$router.push(`/policies/${response.data.id}`)
+          this.$router.push(`/policies/${policyId}`)
           return
         }
       } catch (error) {
