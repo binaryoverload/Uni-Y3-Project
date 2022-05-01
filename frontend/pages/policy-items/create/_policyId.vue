@@ -24,7 +24,11 @@
         component="fancyRadio"
         v-model="type"
         required />
-      <component v-if="type" :is="`${type}-type-form`" v-model="data" />
+      <component
+        v-if="type"
+        :is="`${type}-type-form`"
+        v-model="data"
+        :errors="dataErrors" />
       <t-button class="mt-4">Create</t-button>
     </form>
   </div>
@@ -33,7 +37,9 @@
 <script>
 // Keep a cache of form data so switching types doesn't lose data
 const dataCache = {
-  command: {},
+  command: {
+    args: "test",
+  },
   package: {
     action: "install",
     packages: [],
@@ -51,13 +57,31 @@ export default {
       errors: {},
     }
   },
+  computed: {
+    dataErrors() {
+      const dataErrors = {}
+      if (this.errors) {
+        for (let [key, value] of Object.entries(this.errors)) {
+          if (key.startsWith("data.")) {
+            dataErrors[key.substring(5)] = value
+          }
+        }
+      }
+      return dataErrors
+    },
+  },
   methods: {
     async submit() {
       try {
+        const modifiedData =
+          this.data.args != null
+            ? { ...this.data, args: this.data.args.split(" ") }
+            : this.data
+
         const policyId = this.$route.params.policyId
         const response = await this.$axios.$post("/policy-items", {
           type: this.type,
-          data: this.data,
+          data: modifiedData,
           policy_id: policyId,
         })
         if (response.status === "success") {

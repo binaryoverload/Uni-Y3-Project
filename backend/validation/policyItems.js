@@ -15,10 +15,13 @@ const packageType = [
     body("type", "The policy type is required")
         .exists()
         .trim()
-        .equals("command")
+        .equals("package")
         .withMessage("The policy ID must be package"),
     body("data.action", "Package action is required").exists().trim().isIn(["install", "uninstall"]),
-    body("data.packages", "Packages are required").exists().isArray({ min: 1 }),
+    body("data.packages", "Packages are required")
+        .exists()
+        .isArray({ min: 1 })
+        .withMessage("Must contain at least 1 package"),
 ]
 
 const commandType = [

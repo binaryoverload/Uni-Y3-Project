@@ -33,6 +33,13 @@ const validationErrorsToJsend = errors => {
     const finalObject = {}
 
     for (let error of errors) {
+        if (error.nestedErrors) {
+            for (let nestedError of error.nestedErrors) {
+                if (!(nestedError.param && nestedError.msg)) continue
+                finalObject[nestedError.param] = nestedError.msg
+            }
+            continue
+        }
         if (!(error.param && error.msg)) continue
         finalObject[error.param] = error.msg
     }

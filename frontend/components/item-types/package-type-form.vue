@@ -13,11 +13,16 @@
         },
       ]"
       component="fancyRadio"
+      :error="errors.action"
       :value="value.action || 'install'"
       @input="$emit('input', { ...value, action: $event })"
       required />
     <div class="space-y-2">
-      <p class="text-sm font-bold">Packages</p>
+      <p
+        class="text-sm font-bold"
+        :class="errors.packages ? 'text-red-500' : ''">
+        Packages
+      </p>
       <div>
         <p v-for="pack in value.packages" :key="pack" class="flex items-center">
           <span class="font-mono">{{ pack }}</span>
@@ -31,6 +36,13 @@
         <input-box placeholder="Package" required v-model="packInput" />
         <t-button class="ml-1">Add</t-button>
       </form>
+      <p
+        v-if="errors.packages"
+        class="mt-1 space-x-2 text-sm font-bold text-red-500">
+        <font-awesome-icon icon="exclamation-triangle" /><span>{{
+          errors.packages
+        }}</span>
+      </p>
     </div>
   </div>
 </template>
@@ -39,6 +51,12 @@
 export default {
   props: {
     value: Object,
+    errors: {
+      type: Object,
+      default: () => {
+        return {}
+      },
+    },
   },
   data() {
     return {

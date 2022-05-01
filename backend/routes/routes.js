@@ -5,6 +5,7 @@ const properties = require("./properties")
 const files = require("./files")
 const clients = require("./clients")
 const policies = require("./policies")
+const policyItems = require("./policyItems")
 
 module.exports = {
     setupRoutes(app) {
@@ -14,6 +15,7 @@ module.exports = {
         app.use("/properties", properties)
         app.use("/files", files)
         app.use("/policies", policies)
+        app.use("/policy-items", policyItems)
         app.use("/clients", clients)
     },
 }

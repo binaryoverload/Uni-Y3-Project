@@ -15,7 +15,7 @@
       <p class="text-sm text-slate-600">
         <span class="font-mono">{{ item.data.command }}</span>
         &middot;
-        <span>{{ item.data.args.split(" ").length }} args</span>
+        <span>{{ item.data.args.length }} args</span>
       </p>
     </div>
   </nuxt-link>
