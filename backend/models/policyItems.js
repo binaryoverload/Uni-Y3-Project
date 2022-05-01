@@ -54,14 +54,12 @@ async function getPolicyItemsForPolicy(policy_id) {
     return await knex(POLICY_ITEMS_TABLE_NAME)
         .select(["id", "policy_id", "policy_order", "policy_item_type", "stop_on_error", "data"])
         .where("policy_id", policy_id)
-        .first()
         .catch(handlePostgresError)
 }
 
 async function getAllPolicyItems() {
     return await knex(POLICY_ITEMS_TABLE_NAME)
         .select(["id", "policy_id", "policy_order", "policy_item_type", "stop_on_error", "data"])
-        .first()
         .catch(handlePostgresError)
 }
 
