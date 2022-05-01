@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"strings"
 )
 
 var logger = utils.GetLogger()
@@ -17,22 +16,9 @@ type FilePolicy struct {
 	Permissions uint32    `json:"permissions"`
 }
 
-type CommandArgs []string
-
-func (args CommandArgs) MarshalJSON() ([]byte, error) {
-	joinedString := strings.Join(args, " ")
-	return json.Marshal(joinedString)
-}
-
-func (args *CommandArgs) UnmarshalJSON(data []byte) (err error) {
-	convertedString := string(data)
-	*args = strings.Split(convertedString, " ")
-	return nil
-}
-
 type CommandPolicy struct {
 	Command          string            `json:"command"`
-	Args             CommandArgs       `json:"args"`
+	Args             []string          `json:"args"`
 	WorkingDirectory string            `json:"working_directory"`
 	Env              map[string]string `json:"env"`
 }
