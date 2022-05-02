@@ -49,7 +49,7 @@ Vue.use(VueTailwind, {
         "text-white bg-indigo-700 border border-transparent shadow-sm rounded hover:bg-indigo-800 focus:ring-indigo-500 focus:border-indigo-500",
       variants: {
         error:
-          "text-white bg-red-500 border border-transparent rounded shadow-sm hover:bg-red-600",
+          "text-white bg-red-500 border border-transparent rounded shadow-sm hover:bg-red-600 focus:ring-red-500 focus:border-red-500",
         success:
           "text-white bg-green-500 border border-transparent rounded shadow-sm hover:bg-green-600",
         link: "text-blue-500 underline hover:text-blue-600",

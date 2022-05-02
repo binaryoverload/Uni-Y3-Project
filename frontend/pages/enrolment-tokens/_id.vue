@@ -6,6 +6,10 @@
         <p class="text-5xl font-bold leading-[3rem]">View Enrolment Token</p>
         <div class="flex ml-auto space-x-2">
           <refresh-button @click="$nuxt.refresh()" />
+          <t-button @click="deleteTokens" variant="error" class="space-x-2">
+            <font-awesome-icon icon="trash" />
+            <span>Delete Token</span>
+          </t-button>
           <t-button
             :to="`/users/edit/${$route.params.id}`"
             :href="`/users/edit/${$route.params.id}`"
@@ -91,7 +95,7 @@
 </template>
 
 <script>
-import { copyToken } from "~/utils/actions"
+import { copyToken, deleteEntity } from "~/utils/actions"
 
 export default {
   middleware: "authed",
@@ -104,6 +108,32 @@ export default {
   methods: {
     async copyToken() {
       copyToken.call(this, this.tokenData.token)
+    },
+    async deleteTokens() {
+      const result = await this.$swal({
+        icon: "warning",
+        title: "Are you sure?",
+        html: `Are you sure you want to delete the enrolment token <span class="text-indigo-700">${this.tokenData.name}</span>? This action is irreversible.`,
+        confirmButtonText: "Delete",
+        showCancelButton: true,
+        focusConfirm: false,
+        focusCancel: true,
+      })
+      if (!result.isConfirmed) {
+        return
+      }
+      deleteEntity.call(
+        this,
+        `/enrolment-tokens/${this.tokenData.id}`,
+        function () {
+          this.$swal({
+            icon: "success",
+            title: "Deleted token!",
+            html: `Successfully delete the token <span class="text-indigo-700">${this.tokenData.name}</span>.`,
+          })
+          this.$router.push(`/enrolment-tokens`)
+        }.bind(this)
+      )
     },
   },
   async fetch() {

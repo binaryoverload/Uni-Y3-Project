@@ -6,12 +6,10 @@
         <p class="text-5xl font-bold leading-[3rem]">View Client</p>
         <div class="flex ml-auto space-x-2">
           <refresh-button @click="$nuxt.refresh()" />
-          <t-button
-            :to="`/clients/edit/${$route.params.id}`"
-            :href="`/clients/edit/${$route.params.id}`"
-            tagName="a"
-            >Edit Client</t-button
-          >
+          <t-button @click="deleteClient" variant="error" class="space-x-2">
+            <font-awesome-icon icon="trash" />
+            <span>Delete Client</span>
+          </t-button>
         </div>
       </div>
     </div>
@@ -90,6 +88,8 @@
 </template>
 
 <script>
+import { deleteEntity } from "~/utils/actions"
+
 export default {
   middleware: "authed",
   layout: "dashboard",
@@ -97,6 +97,34 @@ export default {
     return {
       clientData: {},
     }
+  },
+  methods: {
+    async deleteClient() {
+      const result = await this.$swal({
+        icon: "warning",
+        title: "Are you sure?",
+        html: `Are you sure you want to delete the client <span class="text-indigo-700">${this.clientData.name}</span>? This action is irreversible.`,
+        confirmButtonText: "Delete",
+        showCancelButton: true,
+        focusConfirm: false,
+        focusCancel: true,
+      })
+      if (!result.isConfirmed) {
+        return
+      }
+      deleteEntity.call(
+        this,
+        `/clients/${this.clientData.id}`,
+        function () {
+          this.$swal({
+            icon: "success",
+            title: "Deleted client!",
+            html: `Successfully delete the client <span class="text-indigo-700">${this.clientData.name}</span>.`,
+          })
+          this.$router.push(`/clients`)
+        }.bind(this)
+      )
+    },
   },
   async fetch() {
     const id = this.$route.params.id

@@ -6,6 +6,10 @@
         <p class="text-5xl font-bold leading-[3rem]">View Policy</p>
         <div class="flex ml-auto space-x-2">
           <refresh-button @click="$nuxt.refresh()" />
+          <t-button @click="deletePolicy" variant="error" class="space-x-2">
+            <font-awesome-icon icon="trash" />
+            <span>Delete Policy</span>
+          </t-button>
           <t-button
             :to="`/policies/edit/${$route.params.id}`"
             :href="`/policies/edit/${$route.params.id}`"
@@ -84,6 +88,8 @@
 </template>
 
 <script>
+import { deleteEntity } from "~/utils/actions"
+
 String.prototype.toTitle = function () {
   return this.replace(/(^|\s)\S/g, function (t) {
     return t.toUpperCase()
@@ -97,6 +103,34 @@ export default {
     return {
       policiesData: {},
     }
+  },
+  methods: {
+    async deletePolicy() {
+      const result = await this.$swal({
+        icon: "warning",
+        title: "Are you sure?",
+        html: `Are you sure you want to delete the policy <span class="text-indigo-700">${this.policiesData.name}</span>? This action is irreversible.`,
+        confirmButtonText: "Delete",
+        showCancelButton: true,
+        focusConfirm: false,
+        focusCancel: true,
+      })
+      if (!result.isConfirmed) {
+        return
+      }
+      deleteEntity.call(
+        this,
+        `/policies/${this.policiesData.id}`,
+        function () {
+          this.$swal({
+            icon: "success",
+            title: "Deleted policy!",
+            html: `Successfully delete the policy <span class="text-indigo-700">${this.policiesData.name}</span>.`,
+          })
+          this.$router.push(`/policies`)
+        }.bind(this)
+      )
+    },
   },
   async fetch() {
     const id = this.$route.params.id

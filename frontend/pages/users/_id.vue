@@ -4,7 +4,15 @@
       <back-link to="/users">Back to users</back-link>
       <div class="flex items-end">
         <p class="text-5xl font-bold leading-[3rem]">View User</p>
-        <div class="ml-auto">
+        <div class="flex ml-auto space-x-2">
+          <t-button
+            @click="deleteUser"
+            variant="error"
+            class="space-x-2"
+            v-if="$route.params.id !== $auth.user.id">
+            <font-awesome-icon icon="trash" />
+            <span>Delete User</span>
+          </t-button>
           <t-button
             :to="`/users/edit/${$route.params.id}`"
             :href="`/users/edit/${$route.params.id}`"
@@ -82,7 +90,7 @@
 </template>
 
 <script>
-import { resetUserPassword } from "~/utils/actions"
+import { resetUserPassword, deleteEntity } from "~/utils/actions"
 
 export default {
   middleware: "authed",
@@ -95,6 +103,32 @@ export default {
   methods: {
     async regenPassword() {
       resetUserPassword.call(this, this.userData)
+    },
+    async deleteUser() {
+      const result = await this.$swal({
+        icon: "warning",
+        title: "Are you sure?",
+        html: `Are you sure you want to delete the user <span class="text-indigo-700">${this.userData.username}</span>? This action is irreversible.`,
+        confirmButtonText: "Delete",
+        showCancelButton: true,
+        focusConfirm: false,
+        focusCancel: true,
+      })
+      if (!result.isConfirmed) {
+        return
+      }
+      deleteEntity.call(
+        this,
+        `/users/${this.userData.id}`,
+        function () {
+          this.$swal({
+            icon: "success",
+            title: "Deleted user!",
+            html: `Successfully delete the user <span class="text-indigo-700">${this.userData.username}</span>.`,
+          })
+          this.$router.push(`/users`)
+        }.bind(this)
+      )
     },
   },
   async fetch() {
