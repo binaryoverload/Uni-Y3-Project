@@ -61,7 +61,7 @@ async function updateUser(id, data) {
             password: hashedPassword,
             first_name,
             last_name,
-            updated_at: Date.now(),
+            updated_at: new Date(),
         })
         .returning("*")
 
