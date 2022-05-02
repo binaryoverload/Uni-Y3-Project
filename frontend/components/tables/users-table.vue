@@ -5,6 +5,7 @@
 <script>
 import table from "./table.vue"
 import { deleteEntity } from "~/utils/actions"
+import { resetUserPassword } from "~/utils/actions"
 
 const schema = [
   {
@@ -37,10 +38,7 @@ const schema = [
       {
         icon: "key",
         onClick(row) {
-          this.$swal("reset password for " + row.username)
-        },
-        showCondition(row) {
-          return row.username !== this.$auth.user.username
+          resetUserPassword.call(this, row)
         },
       },
       {

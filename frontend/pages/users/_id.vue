@@ -42,7 +42,7 @@
                       icon="asterisk"
                       class="h-4 text-xs text-slate-600" />
                   </div>
-                  <t-button variant="neutral">
+                  <t-button variant="neutral" @click="regenPassword">
                     <font-awesome-icon icon="sync" class="mr-1" />
                     Regenerate
                   </t-button>
@@ -82,6 +82,8 @@
 </template>
 
 <script>
+import { resetUserPassword } from "~/utils/actions"
+
 export default {
   middleware: "authed",
   layout: "dashboard",
@@ -89,6 +91,11 @@ export default {
     return {
       userData: {},
     }
+  },
+  methods: {
+    async regenPassword() {
+      resetUserPassword.call(this, this.userData)
+    },
   },
   async fetch() {
     const id = this.$route.params.id

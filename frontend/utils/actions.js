@@ -48,7 +48,76 @@ async function deletePolicyItem() {
   )
 }
 
+async function resetUserPassword(userData) {
+  const result = await this.$swal({
+    icon: "question",
+    title: "Are you sure?",
+    html: `Are you sure you want to reset the password for <span class="text-indigo-700">${userData.username}</span>? This action is irreversible.`,
+    confirmButtonText: "Reset Password",
+    showCancelButton: true,
+    focusConfirm: false,
+    focusCancel: true,
+  })
+  if (!result.isConfirmed) {
+    return
+  }
+
+  if (userData.username === this.$auth.user.username) {
+    const result = await this.$swal({
+      icon: "warning",
+      title: "Are you sure?",
+      text: "Are you sure you want to reset your password? This action will log you out!",
+      confirmButtonText: "I'm sure",
+      showCancelButton: true,
+      focusConfirm: false,
+      focusCancel: true,
+    })
+    if (!result.isConfirmed) {
+      return
+    }
+  }
+
+  try {
+    const result = await fetch("https://www.dinopass.com/password/simple", {
+      method: "get",
+    })
+    if (!result.ok) {
+      throw Error()
+    }
+    const password = await result.text()
+    const response = await this.$axios.$patch(
+      `/users/${userData.id}`,
+      {
+        username: userData.username,
+        password: password,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+      }
+    )
+    if (response.status === "success") {
+      this.$swal({
+        icon: "success",
+        title: "Password regenerated!",
+        html: `Password for user <span class="text-indigo-700">${userData.username}</span> has been reset to: <input value="${password}" class="inline-block py-1 font-mono text-center" spellcheck="false"/>`,
+      })
+    }
+  } catch (error) {
+    let message = "Something went wrong"
+    if (error.request) {
+      message = "Could not contact the server"
+    } else {
+      message = error.message
+    }
+    this.$swal({
+      icon: "error",
+      title: "Could not regenerate password",
+      text: message,
+    })
+  }
+}
+
 module.exports = {
   deleteEntity,
-  deletePolicyItem
+  deletePolicyItem,
+  resetUserPassword
 }
