@@ -120,7 +120,7 @@ async function decodeRegisterClient(ctx, data) {
 }
 
 const policyCache = new Cache({
-    stdTTL: 60 * 10,
+    stdTTL: 60,
 })
 
 async function decodeHeartbeat(ctx, data) {
