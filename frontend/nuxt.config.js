@@ -23,7 +23,10 @@ export default {
   plugins: [{ src: "~/plugins/vue-tailwind" }],
 
   publicRuntimeConfig: {
-    apiUrl: process.env.API_URL || DEFAULT_API_URL,
+    axios: {
+      browserBaseURL: process.env.PUBLIC_API_URL || DEFAULT_API_URL,
+      baseURL: process.env.API_URL || DEFAULT_API_URL,
+    }
   },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -51,9 +54,7 @@ export default {
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {
-    baseURL: process.env.API_URL || DEFAULT_API_URL,
-  },
+  axios: {},
 
   auth: {
     strategies: {
