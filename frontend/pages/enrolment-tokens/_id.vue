@@ -91,6 +91,8 @@
 </template>
 
 <script>
+import { copyToken } from "~/utils/actions"
+
 export default {
   middleware: "authed",
   layout: "dashboard",
@@ -100,15 +102,8 @@ export default {
     }
   },
   methods: {
-    copyToken() {
-      navigator.clipboard.writeText(this.tokenData.token).then(
-        function () {
-          alert("Copied enrolment token to clipboard!")
-        },
-        function (err) {
-          console.error("Could not copy enrolment token: ", err)
-        }
-      )
+    async copyToken() {
+      copyToken.call(this, this.tokenData.token)
     },
   },
   async fetch() {

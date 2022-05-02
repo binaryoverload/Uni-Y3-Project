@@ -4,7 +4,7 @@
 
 <script>
 import table from "./table.vue"
-import { deleteEntity } from "~/utils/actions"
+import { deleteEntity, copyToken } from "~/utils/actions"
 
 const Status = {
   unhealthy: 0,
@@ -89,24 +89,12 @@ const schema = [
       {
         icon: "copy",
         async onClick(row) {
-          try {
-            await navigator.clipboard.writeText(row.token)
-            this.$swal({
-              icon: "success",
-              timerProgressBar: true,
-              showConfirmButton: false,
-              title: "Copied token!",
-              text: `Successfully copied the token to your clipboard`,
-              timer: 1500,
-            })
-          } catch (err) {
-            console.error("Could not copy enrolment token: ", err)
-          }
+          copyToken.call(this, row.token)
         },
       },
       {
         icon: "download",
-        onClick: _ => {
+        onClick: () => {
           alert("downloaded!!")
         },
       },
