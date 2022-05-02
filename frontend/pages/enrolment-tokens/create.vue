@@ -23,6 +23,7 @@
           label="Expires at"
           placeholder="Expires at"
           v-model="expires_at"
+          type="datetime-local"
           :error="errors.expires_at" />
         <form-input
           label="Usage limit"
