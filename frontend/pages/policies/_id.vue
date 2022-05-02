@@ -71,7 +71,7 @@
           v-if="
             policiesData.policy_items && policiesData.policy_items.length > 0
           "
-          class="flex flex-col gap-2 lg:flex-row">
+          class="flex flex-col flex-wrap gap-2 lg:flex-row">
           <base-item-card
             v-for="item in policiesData.policy_items"
             :key="item.id"

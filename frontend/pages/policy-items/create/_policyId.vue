@@ -36,16 +36,6 @@
 
 <script>
 // Keep a cache of form data so switching types doesn't lose data
-const dataCache = {
-  command: {
-    args: "test",
-  },
-  package: {
-    action: "install",
-    packages: [],
-  },
-  file: {},
-}
 
 export default {
   layout: "dashboard",
@@ -53,9 +43,22 @@ export default {
   data() {
     return {
       type: "command",
-      data: dataCache["command"],
+      dataCache: {
+        command: {
+          args: "",
+        },
+        package: {
+          action: "install",
+          packages: [],
+        },
+        file: {},
+      },
+      data: {},
       errors: {},
     }
+  },
+  mounted() {
+    this.data = this.dataCache["command"]
   },
   computed: {
     dataErrors() {
@@ -75,7 +78,10 @@ export default {
       try {
         const modifiedData =
           this.data.args != null
-            ? { ...this.data, args: this.data.args.split(" ") }
+            ? {
+                ...this.data,
+                args: this.data.args === "" ? [] : this.data.args.split(" "),
+              }
             : this.data
 
         const policyId = this.$route.params.policyId
@@ -105,8 +111,8 @@ export default {
   },
   watch: {
     type(newType, oldType) {
-      dataCache[oldType] = this.data
-      this.data = dataCache[newType] || {}
+      this.dataCache[oldType] = this.data
+      this.data = this.dataCache[newType] || {}
     },
   },
 }
