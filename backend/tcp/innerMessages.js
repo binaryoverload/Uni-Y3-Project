@@ -102,7 +102,7 @@ async function decodeRegisterClient(ctx, data) {
         return encodeTCPError("Client already registered")
     }
 
-    const { ip } = splitHostAddress(ctx.hostAddress)
+    const { ip } = ctx.hostAddress
 
     data = {
         ...data,
