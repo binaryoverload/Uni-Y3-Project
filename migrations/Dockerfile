@@ -1,0 +1,7 @@
+FROM flyway/flyway
+
+COPY ./sql/* /flyway/sql
+
+ENV FLYWAY_EDITION=community
+ENV FLYWAY_BASELINE_VERSION=0
+ENV FLYWAY_VALIDATE_MIGRATION_NAMING=true
