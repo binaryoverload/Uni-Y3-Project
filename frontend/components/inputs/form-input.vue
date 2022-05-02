@@ -28,6 +28,7 @@ const uniqueId = require("lodash.uniqueid")
 const components = {
   large: "large-input-box",
   fancyRadio: "fancy-radio",
+  select: "select-box",
 }
 
 export default {
