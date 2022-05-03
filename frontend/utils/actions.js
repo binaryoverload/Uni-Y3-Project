@@ -126,6 +126,8 @@ async function copyToken(token) {
       title: "Copied token!",
       text: `Successfully copied the token to your clipboard`,
       timer: 1500,
+      toast: true,
+      position: "top-end"
     })
   } catch (e) {
     await this.$swal({
