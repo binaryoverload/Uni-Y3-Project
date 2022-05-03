@@ -53,6 +53,7 @@ export default {
         },
         file: {},
       },
+      errorCache: {},
       data: {},
       errors: {},
     }
@@ -113,6 +114,9 @@ export default {
     type(newType, oldType) {
       this.dataCache[oldType] = this.data
       this.data = this.dataCache[newType] || {}
+
+      this.errorCache[oldType] = this.errors
+      this.errors = this.errorCache[newType] || {}
     },
   },
 }
