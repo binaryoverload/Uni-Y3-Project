@@ -66,9 +66,18 @@ export default {
   methods: {
     addPackage() {
       const packages = this.value.packages || []
-      if (packages.indexOf(this.packInput) === -1) {
-        packages.push(this.packInput)
+
+      const inputPackages = this.packInput
+        .trim()
+        .split(/[ ;,|]/)
+        .filter(s => s.length > 0)
+
+      for (let pack of inputPackages) {
+        if (packages.indexOf(pack) === -1) {
+          packages.push(pack)
+        }
       }
+
       this.$emit("input", { ...this.value, packages })
       this.packInput = ""
     },
