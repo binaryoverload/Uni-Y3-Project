@@ -57,6 +57,7 @@ export default {
   axios: {},
 
   auth: {
+    plugins: ["~/plugins/axios-error-interceptor"],
     strategies: {
       local: {
         scheme: "refresh",
