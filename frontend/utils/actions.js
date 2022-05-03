@@ -136,12 +136,34 @@ async function copyToken(token) {
       text: e.message
     })
   }
+}
 
+async function copyPassword(password) {
+  try {
+    await navigator.clipboard.writeText(password)
+    await this.$swal({
+      icon: "success",
+      timerProgressBar: true,
+      showConfirmButton: false,
+      title: "Copied password!",
+      text: `Successfully copied the password to your clipboard`,
+      timer: 1500,
+      toast: true,
+      position: "top-end"
+    })
+  } catch (e) {
+    await this.$swal({
+      icon: "error",
+      title: "Could not copy password",
+      text: e.message
+    })
+  }
 }
 
 module.exports = {
   deleteEntity,
   deletePolicyItem,
   resetUserPassword,
-  copyToken
+  copyToken,
+  copyPassword
 }

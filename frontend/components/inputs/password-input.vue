@@ -11,8 +11,9 @@
         :required="required"
         @input="$emit('input', $event)"
         placeholder="Press 'Generate'"
+        autocomplete="new-password"
+        name="password"
         class="flex-1"
-        disabled
         input-classes="font-mono" />
       <t-button
         type="button"
@@ -34,6 +35,8 @@
 
 <script>
 const uniqueId = require("lodash.uniqueid")
+import { copyPassword } from "~/utils/actions"
+
 export default {
   props: {
     value: {
@@ -57,14 +60,7 @@ export default {
       }
     },
     copyPassword() {
-      navigator.clipboard.writeText(this.value).then(
-        function () {
-          alert("Copied password to clipboard!")
-        },
-        function (err) {
-          console.error("Could not copy password: ", err)
-        }
-      )
+      copyPassword.call(this, this.value)
     },
   },
   data() {
