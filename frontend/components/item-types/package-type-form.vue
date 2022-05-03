@@ -20,7 +20,7 @@
     <div class="space-y-2">
       <p
         class="text-sm font-bold"
-        :class="errors.packages ? 'text-red-500' : ''">
+        :class="firstPackageError ? 'text-red-500' : ''">
         Packages
       </p>
       <div>
@@ -33,14 +33,18 @@
         </p>
       </div>
       <form @submit.prevent="addPackage" class="flex gap-1">
-        <input-box placeholder="Package" required v-model="packInput" />
+        <input-box
+          placeholder="Package"
+          required
+          v-model="packInput"
+          max-length="50" />
         <t-button class="ml-1">Add</t-button>
       </form>
       <p
-        v-if="errors.packages"
+        v-if="firstPackageError"
         class="mt-1 space-x-2 text-sm font-bold text-red-500">
         <font-awesome-icon icon="exclamation-triangle" /><span>{{
-          errors.packages
+          firstPackageError
         }}</span>
       </p>
     </div>
@@ -62,6 +66,19 @@ export default {
     return {
       packInput: "",
     }
+  },
+  computed: {
+    firstPackageError() {
+      if (this.errors) {
+        const packagesError = Object.keys(this.errors).find(s =>
+          s.startsWith("packages")
+        )
+        if (!this.errors.packages && packagesError) {
+          return this.errors[packagesError]
+        }
+      }
+      return null
+    },
   },
   methods: {
     addPackage() {

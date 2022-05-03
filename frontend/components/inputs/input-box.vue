@@ -10,7 +10,8 @@
       :disabled="disabled"
       :id="id"
       :required="required"
-      :placeholder="placeholder" />
+      :placeholder="placeholder"
+      :maxlength="maxLength" />
   </div>
 </template>
 
@@ -22,6 +23,7 @@ export default {
     id: String,
     disabled: Boolean,
     required: Boolean,
+    maxLength: String,
     "input-classes": String,
     type: {
       type: String,
