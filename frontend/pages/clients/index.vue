@@ -38,17 +38,7 @@ export default {
   middleware: "authed",
   data() {
     return {
-      rows: [
-        {
-          name: "JVS's PC",
-          last_activity: new Date(),
-          mac_address: "54:af:78:22:54:38",
-          last_known_ip: "10.28.160.0",
-          os_information: {
-            name: "Windows 10",
-          },
-        },
-      ],
+      rows: [],
       searchFilter: "",
     }
   },
