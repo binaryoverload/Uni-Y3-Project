@@ -5,13 +5,14 @@
       :type="type"
       v-bind:value="value"
       v-on:input="$emit('input', $event.target.value)"
-      class="w-full bg-transparent border-0 text-slate-600 placeholder-slate-300 focus:outline-0 focus:ring-0 disabled:cursor-text"
+      class="w-full bg-transparent border-0 text-slate-600 placeholder-slate-300 focus:outline-0 focus:ring-0"
       :class="$props['input-classes']"
       :disabled="disabled"
       :id="id"
       :required="required"
       :placeholder="placeholder"
-      :maxlength="maxLength" />
+      :maxlength="maxLength"
+      v-bind="$attrs" />
   </div>
 </template>
 
