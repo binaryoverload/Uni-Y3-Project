@@ -70,6 +70,7 @@ export default {
         packages.push(this.packInput)
       }
       this.$emit("input", { ...this.value, packages })
+      this.packInput = ""
     },
     removePackage(pack) {
       const packages = this.value.packages || []
