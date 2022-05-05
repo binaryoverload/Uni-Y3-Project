@@ -68,17 +68,19 @@
             <tr>
               <td class="pb-2 pr-20 font-bold">Expires at</td>
               <td class="pb-2 text-slate-600">
-                {{
-                  tokenData.expires_at
-                    ? new Date(tokenData.expires_at).toLocaleString("en-GB")
-                    : "&lt;unset&gt;"
-                }}
+                <unset
+                  :condition="tokenData.expires_at"
+                  :data="
+                    new Date(tokenData.expires_at).toLocaleString(`en-GB`)
+                  " />
               </td>
             </tr>
             <tr>
               <td class="pb-2 font-bold">Usage limit</td>
               <td class="pb-2 text-slate-600">
-                {{ tokenData.usage_limit || "&lt;unset&gt;" }}
+                <unset
+                  :condition="tokenData.usage_limit"
+                  :data="tokenData.usage_limit" />
               </td>
             </tr>
             <tr>
@@ -96,8 +98,10 @@
 
 <script>
 import { copyToken, deleteEntity } from "~/utils/actions"
+import unset from "../../components/utils/unset.vue"
 
 export default {
+  components: { unset },
   middleware: "authed",
   layout: "dashboard",
   data() {
@@ -139,7 +143,7 @@ export default {
   async fetch() {
     const id = this.$route.params.id
     try {
-    this.tokenData = (await this.$axios.$get("/enrolment-tokens/" + id)).data
+      this.tokenData = (await this.$axios.$get("/enrolment-tokens/" + id)).data
     } catch (e) {
       this.$nuxt.context.error({
         status: e.response.status,

@@ -72,13 +72,17 @@
               <tr>
                 <td class="py-2 pr-4 font-bold">First Name</td>
                 <td class="text-slate-600">
-                  {{ userData.first_name || "&lt;unset&gt;" }}
+                  <unset
+                    :condition="userData.first_name"
+                    :data="userData.first_name" />
                 </td>
               </tr>
               <tr>
                 <td class="font-bold">Last Name</td>
                 <td class="flex items-center space-x-4 text-slate-600">
-                  {{ userData.last_name || "&lt;unset&gt;" }}
+                  <unset
+                    :condition="userData.last_name"
+                    :data="userData.last_name" />
                 </td>
               </tr>
             </tbody>
