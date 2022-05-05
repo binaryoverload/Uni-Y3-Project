@@ -134,7 +134,17 @@ export default {
   },
   async fetch() {
     const id = this.$route.params.id
+    try {
     this.policiesData = (await this.$axios.$get("/policies/" + id)).data
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "Policy could not be found"
+            : e.response.statusText,
+      })
+    }
     this.policiesData.policy_items.sort(
       (a, b) => a.policy_order - b.policy_order
     )

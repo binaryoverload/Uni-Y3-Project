@@ -86,10 +86,20 @@ export default {
   },
   async fetch() {
     const id = this.$route.params.id
-    const userData = (await this.$axios.$get("/users/" + id)).data
-    this.username = userData.username
-    this.first_name = userData.first_name
-    this.last_name = userData.last_name
+    try {
+      const userData = (await this.$axios.$get("/users/" + id)).data
+      this.username = userData.username
+      this.first_name = userData.first_name
+      this.last_name = userData.last_name
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "User could not be found"
+            : e.response.statusText,
+      })
+    }
   },
   data() {
     return {

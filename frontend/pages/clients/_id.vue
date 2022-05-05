@@ -128,7 +128,17 @@ export default {
   },
   async fetch() {
     const id = this.$route.params.id
-    this.clientData = (await this.$axios.$get("/clients/" + id)).data
+    try {
+      this.clientData = (await this.$axios.$get("/clients/" + id)).data
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "Client could not be found"
+            : e.response.statusText,
+      })
+    }
   },
 }
 </script>

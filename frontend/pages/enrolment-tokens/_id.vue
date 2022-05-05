@@ -138,7 +138,17 @@ export default {
   },
   async fetch() {
     const id = this.$route.params.id
+    try {
     this.tokenData = (await this.$axios.$get("/enrolment-tokens/" + id)).data
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "Enrolment token could not be found"
+            : e.response.statusText,
+      })
+    }
   },
 }
 </script>

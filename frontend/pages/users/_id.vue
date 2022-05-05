@@ -133,7 +133,17 @@ export default {
   },
   async fetch() {
     const id = this.$route.params.id
-    this.userData = (await this.$axios.$get("/users/" + id)).data
+    try {
+      this.userData = (await this.$axios.$get("/users/" + id)).data
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "User could not be found"
+            : e.response.statusText,
+      })
+    }
   },
 }
 </script>
