@@ -8,6 +8,7 @@
         </p>
         <p v-if="error.message">{{ error.message }}</p>
       </div>
+      <back-link>Back</back-link>
     </div>
   </div>
 </template>
