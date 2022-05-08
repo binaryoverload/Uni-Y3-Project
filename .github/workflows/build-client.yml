@@ -1,0 +1,26 @@
+name: Build client application
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-push-client:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go 1.16
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.16"
+          check-latest: true
+      - name: Build Client
+        run: |
+          cd client
+          go build
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client
+          path: client/client
