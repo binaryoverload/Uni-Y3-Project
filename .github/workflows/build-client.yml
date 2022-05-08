@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "client/**"
+      - ".github/**"
 
 jobs:
   build-and-push-client:
