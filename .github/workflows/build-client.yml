@@ -35,13 +35,13 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: latest
+          tag: latest
           name: Latest ${{ steps.date.outputs.date }}
-          fail_on_unmatched_files: true
-          draft: false
-          prerelease: false
-          files: client/client
+          commit: ${{ env.GITHUB_REF }}
+          replacesArtifacts: true
+          artifacts: client/client
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          token: ${{ secrets.GITHUB_TOKEN }}
