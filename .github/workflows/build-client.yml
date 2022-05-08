@@ -45,7 +45,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: client-latest
+          tag: latest-client
           name: Client Latest - ${{ steps.date.outputs.date }}
           replacesArtifacts: true
           artifacts: client/client
