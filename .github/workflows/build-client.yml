@@ -3,6 +3,8 @@ name: Build client application
 on:
   push:
     branches: ["main"]
+    paths:
+      - "client/**"
 
 jobs:
   build-and-push-client:

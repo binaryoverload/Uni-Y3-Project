@@ -3,6 +3,9 @@ name: Build docker containers
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "client/**"
+      - "documentation/**"
 
 jobs:
   build-and-push-image:
