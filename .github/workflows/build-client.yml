@@ -52,7 +52,7 @@ jobs:
           tag: latest-client
           name: Client Latest - ${{ steps.date.outputs.date }}
           replacesArtifacts: true
-          artifacts: client/client,client/installer.zip
+          artifacts: client/client,client/installation/installer.zip
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
