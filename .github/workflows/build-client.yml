@@ -38,7 +38,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       - name: Build installer bundle
         run: |
-          cd installer
+          cd client/installation
           bash create_bundle.sh
       - uses: rickstaa/action-create-tag@v1
         with:
