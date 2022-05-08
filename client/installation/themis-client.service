@@ -1,0 +1,11 @@
+[Unit]
+Description=Themis Client
+
+[Service]
+ExecStart=/usr/local/bin/themis-client -config /etc/themis/settings.json -policy-store /etc/themis/policy_storage.json
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
