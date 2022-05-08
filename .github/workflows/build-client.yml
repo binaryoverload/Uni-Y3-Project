@@ -38,15 +38,15 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       - uses: rickstaa/action-create-tag@v1
         with:
-          tag: "latest"
-          message: "Latest release"
+          tag: "latest-client"
+          message: "Latest client release"
           force_push_tag: true
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: latest
-          name: Latest ${{ steps.date.outputs.date }}
+          tag: client-latest
+          name: Client Latest - ${{ steps.date.outputs.date }}
           replacesArtifacts: true
           artifacts: client/client
           allowUpdates: true
