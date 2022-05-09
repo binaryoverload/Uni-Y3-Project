@@ -31,14 +31,14 @@ chmod 755 "$config_dir"
 
 # Copy executable
 log_info "Copying client exe to local bin directory"
-cp "themis-client" "/usr/local/bin/themis-client"
+cp "client" "/usr/local/bin/themis-client"
 
 # Create and copy config files
 log_info "Creating ${config_dir}/policy_storage.json"
 touch "${config_dir}/policy_storage.json"
 
 log_info "Copying client_settings.json to ${config_dir}"
-cp "client_settings.json" "${config_dir}/client_settings.json"
+cp "client_settings.json" "${config_dir}/settings.json"
 
 # Copy and link service file
 log_info "Copying service file to /etc/systemd/system/themis-client.service"

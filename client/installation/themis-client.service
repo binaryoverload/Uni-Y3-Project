@@ -2,7 +2,7 @@
 Description=Themis Client
 
 [Service]
-ExecStart=/usr/local/bin/themis-client -config /etc/themis/settings.json -policy-store /etc/themis/policy_storage.json
+ExecStart=/usr/local/bin/themis-client -config /etc/themis-client/settings.json -policy-storage /etc/themis-client/policy_storage.json
 User=root
 Restart=on-failure
 RestartSec=5
