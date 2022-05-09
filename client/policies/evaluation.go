@@ -1,6 +1,7 @@
 package policies
 
 import (
+	"client/config"
 	"client/data"
 	"client/packets"
 	"client/server"
@@ -13,10 +14,8 @@ import (
 	"strings"
 )
 
-var logger = utils.GetLogger()
-
-func EvaluatePolicy(policy data.Policy) {
-	logger.Debugf("(p_id: %s): begin eval", policy.Id)
+func EvaluatePolicy(env *config.Environment, policy data.Policy) {
+	env.Logger.Debugf("(p_id: %s): begin eval", policy.Id)
 
 	policyItems := make([]data.PolicyItem, len(policy.PolicyItems))
 	copy(policyItems, policy.PolicyItems)
@@ -25,40 +24,40 @@ func EvaluatePolicy(policy data.Policy) {
 	})
 
 	for index, policyItem := range policyItems {
-		logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
+		env.Logger.Debugf("(p_id: %s, pi_id: %s, #: %d): begin eval ", policy.Id, policyItem.Id, index)
 
-		function, ok := ChoosePolicyEvalFunction(policyItem)
+		function, ok := ChoosePolicyEvalFunction(env, policyItem)
 
 		if !ok {
-			logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
+			env.Logger.Errorf("could not determine policy type to evaluate. got: %s", policyItem.Type)
 			return
 		}
 
 		err := policyItem.ParseData()
 		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
+			env.Logger.Errorf("(pi_id: %s, #: %d): policy item decode failed: %s", policyItem.Id, index, err)
 			return
 		}
 
-		err = function(policyItem)
+		err = function(env, policyItem)
 
 		if err != nil {
-			logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
+			env.Logger.Errorf("(pi_id: %s, #: %d): policy item eval failed: %s", policyItem.Id, index, err)
 			if policyItem.StopOnError {
-				logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
+				env.Logger.Errorf("(pi_id: %s, #: %d): policy item has stop on failed, stopping", policyItem.Id, index)
 				return
 			}
 		} else {
-			logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
+			env.Logger.Infof("(pi_id: %s, #: %d): policy item eval successed ", policyItem.Id, index)
 		}
 	}
 
-	polStore := data.GetPolicyStorage()
+	polStore := data.GetPolicyStorage(env)
 	polStore.Policies[policy.Id.String()] = policy
-	data.SavePolicyStorage()
+	data.SavePolicyStorage(env)
 }
 
-func ChoosePolicyEvalFunction(policyItem data.PolicyItem) (func(policyItem data.PolicyItem) error, bool) {
+func ChoosePolicyEvalFunction(env *config.Environment, policyItem data.PolicyItem) (func(env *config.Environment, policyItem data.PolicyItem) error, bool) {
 	switch policyItem.Type {
 	case "command":
 		return evalCommandPolicy, true
@@ -67,22 +66,22 @@ func ChoosePolicyEvalFunction(policyItem data.PolicyItem) (func(policyItem data.
 	case "file":
 		return evalFilePolicy, true
 	default:
-		logger.Errorf("could not find policy item type %s", policyItem.Type)
+		env.Logger.Errorf("could not find policy item type %s", policyItem.Type)
 		return nil, false
 	}
 }
 
-func evalFilePolicy(policyItem data.PolicyItem) error {
+func evalFilePolicy(env *config.Environment, policyItem data.PolicyItem) error {
 	filePolicy, ok := policyItem.Data.(data.FilePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
 
-	if !utils.IsRoot() {
+	if !utils.IsRoot(env.Logger) {
 		return errors.New("copying files requires the client should be running as root")
 	}
 
-	tcpData, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendFileInfoReq(packets.FileInfoReq{FileId: filePolicy.FileId}), server.RecieveData})
+	tcpData, err := server.RunTcpActions(env, []server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendFileInfoReq(env, packets.FileInfoReq{FileId: filePolicy.FileId}), server.RecieveData})
 
 	if err != nil {
 		return fmt.Errorf("(pi_id: %s, f: %s) failed to request file info: %w", policyItem.Id, filePolicy.FileId, err)
@@ -99,33 +98,33 @@ func evalFilePolicy(policyItem data.PolicyItem) error {
 		return fmt.Errorf("(pi_id: %s, f: %s) could not convert response from json: %w", policyItem.Id, filePolicy.FileId, err)
 	}
 
-	err = server.RequestFileChunks(dataResponse.FileId, dataResponse.NumChunks)
+	err = server.RequestFileChunks(env, dataResponse.FileId, dataResponse.NumChunks)
 	if err != nil {
 		return err
 	}
 
-	err = server.CombineFileChunks(dataResponse.FileId, dataResponse.Hash, dataResponse.NumChunks, dataResponse.TotalSize)
+	err = server.CombineFileChunks(env, dataResponse.FileId, dataResponse.Hash, dataResponse.NumChunks, dataResponse.TotalSize)
 	if err != nil {
 		return err
 	}
 
-	err = server.MoveCombinedFile(dataResponse.FileId, dataResponse.TotalSize, filePolicy)
+	err = server.MoveCombinedFile(env, dataResponse.FileId, dataResponse.TotalSize, filePolicy)
 	if err != nil {
 		return fmt.Errorf("(pi_id: %s, f: %s) error moving combined file: %w", policyItem.Id, dataResponse.FileId, err)
 	}
 
-	server.ChunkDownloadCleanup(dataResponse.FileId, dataResponse.NumChunks)
+	server.ChunkDownloadCleanup(env, dataResponse.FileId, dataResponse.NumChunks)
 
 	return nil
 }
 
-func evalPackagePolicy(policyItem data.PolicyItem) error {
+func evalPackagePolicy(env *config.Environment, policyItem data.PolicyItem) error {
 	packagePolicy, ok := policyItem.Data.(data.PackagePolicy)
 	if !ok {
 		return errors.New("policy data was not expected package type")
 	}
 
-	if !utils.IsRoot() {
+	if !utils.IsRoot(env.Logger) {
 		return errors.New("package management requires the client should be running as root")
 	}
 
@@ -140,17 +139,17 @@ func evalPackagePolicy(policyItem data.PolicyItem) error {
 	if err != nil {
 		exitError, isExitError := err.(*exec.ExitError)
 		if isExitError {
-			logger.Errorf("(pi_id: %s): command \"%s\" failed with exit code %d: %s", policyItem.Id, fullCommand, exitError.ExitCode(), exitError.Error())
+			env.Logger.Errorf("(pi_id: %s): command \"%s\" failed with exit code %d: %s", policyItem.Id, fullCommand, exitError.ExitCode(), exitError.Error())
 			return nil
 		}
 		return err
 	}
 
-	logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, fullCommand)
+	env.Logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, fullCommand)
 	return nil
 }
 
-func evalCommandPolicy(policyItem data.PolicyItem) error {
+func evalCommandPolicy(env *config.Environment, policyItem data.PolicyItem) error {
 	commandPolicy, ok := policyItem.Data.(data.CommandPolicy)
 	if !ok {
 		return errors.New("policy data was not expected command type")
@@ -165,12 +164,12 @@ func evalCommandPolicy(policyItem data.PolicyItem) error {
 	if err != nil {
 		exitError, isExitError := err.(*exec.ExitError)
 		if isExitError {
-			logger.Errorf("(pi_id: %s): command \"%s\"  failed with exit code %d: %s", policyItem.Id, commandPolicy.Command, exitError.ExitCode(), exitError.Error())
+			env.Logger.Errorf("(pi_id: %s): command \"%s\"  failed with exit code %d: %s", policyItem.Id, commandPolicy.Command, exitError.ExitCode(), exitError.Error())
 			return nil
 		}
 		return err
 	}
 
-	logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, commandPolicy.Command)
+	env.Logger.Debugf("(pi_id: %s): command \"%s\" completed with exit code 0", policyItem.Id, commandPolicy.Command)
 	return nil
 }

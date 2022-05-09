@@ -41,36 +41,36 @@ type HeartbeatAck struct {
 	Message  string                     `json:"message"`
 }
 
-func heartbeat(ctx context.Context) {
+func heartbeat(ctx context.Context, env *config.Environment) {
 	if PauseHeartbeat.IsSet() {
-		logger.Debug("heartbeat paused. not sending")
+		env.Logger.Debug("heartbeat paused. not sending")
 		return
 	}
 
-	logger.Info("sending heartbeat...")
+	env.Logger.Info("sending heartbeat...")
 	PauseHeartbeat.Set()
 	defer func() { PauseHeartbeat.UnSet() }()
 
 	if !backoffUntil.IsZero() {
 
 		if !(time.Until(backoffUntil) <= 0) {
-			logger.Info(fmt.Sprintf("heartback backoff active for %s", time.Until(backoffUntil).Round(time.Second)))
+			env.Logger.Info(fmt.Sprintf("heartback backoff active for %s", time.Until(backoffUntil).Round(time.Second)))
 			return
 		}
 
 		backoffUntil = time.Time{}
 	}
 
-	tcpData, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendHeartbeat, server.RecieveData})
+	tcpData, err := server.RunTcpActions(env, []server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendHeartbeat, server.RecieveData})
 
 	if err != nil {
-		logger.Error("error in attempting to send heartbeat:", err.Error())
+		env.Logger.Error("error in attempting to send heartbeat:", err.Error())
 		numberErrors++
 
 		if numberErrors >= 3 {
 			backoffDuration := getCurrentBackoff()
 			backoffUntil = time.Now().Add(backoffDuration)
-			logger.Info(fmt.Sprintf("heartbeat failed 3 times. backing off for %s", backoffDuration))
+			env.Logger.Info(fmt.Sprintf("heartbeat failed 3 times. backing off for %s", backoffDuration))
 		}
 
 		return
@@ -83,52 +83,52 @@ func heartbeat(ctx context.Context) {
 	byteData, ok := tcpData.([]byte)
 
 	if !ok {
-		logger.Error("did not receive response from heartbeat")
+		env.Logger.Error("did not receive response from heartbeat")
 		return
 	}
 
 	err = json.Unmarshal(byteData, &heartbeatAck)
 	if err != nil {
-		logger.Error("error unmarshalling heartbeat: %s", err)
+		env.Logger.Error("error unmarshalling heartbeat: %s", err)
 		return
 	}
 
 	if heartbeatAck.OpCode == packets.OpCodeError {
-		logger.Error("could not heartbeat. error:", heartbeatAck.Message)
+		env.Logger.Error("could not heartbeat. error:", heartbeatAck.Message)
 		return
 	}
 
 	if heartbeatAck.OpCode == packets.OpCodeInvalidClient {
-		logger.Warn("client marked as invalid. attempting to register...")
-		registerClient(config.GetConfigInstance())
+		env.Logger.Warn("client marked as invalid. attempting to register...")
+		registerClient(env)
 		return
 	}
 
 	if heartbeatAck.OpCode == packets.OpCodeHeartbeatAck {
-		logger.Info("heartbeat acknowledged")
+		env.Logger.Info("heartbeat acknowledged")
 
 		if heartbeatAck.Policies != nil {
-			logger.Debugf("received %d policies", len(heartbeatAck.Policies))
+			env.Logger.Debugf("received %d policies", len(heartbeatAck.Policies))
 
-			polStore := data.GetPolicyStorage()
+			polStore := data.GetPolicyStorage(env)
 
 			for _, policy := range heartbeatAck.Policies {
 				if storedPolicy, ok := polStore.Policies[policy.Id.String()]; ok {
-					logger.Debugf("(p_id: %s): Stored policy found", policy.Id)
+					env.Logger.Debugf("(p_id: %s): Stored policy found", policy.Id)
 					if policy.LastUpdated.After(storedPolicy.LastUpdated) {
-						logger.Debugf("(p_id: %s): Stored policy is out of date, evaluating...", policy.Id)
+						env.Logger.Debugf("(p_id: %s): Stored policy is out of date, evaluating...", policy.Id)
 					} else {
-						logger.Debugf("(p_id: %s): Stored policy is latest version, skipping policy", policy.Id)
+						env.Logger.Debugf("(p_id: %s): Stored policy is latest version, skipping policy", policy.Id)
 						continue
 					}
 				}
 
-				policies.EvaluatePolicy(policy)
+				policies.EvaluatePolicy(env, policy)
 			}
 		}
 
 	} else {
-		logger.Error("unexpected response from heartbeat. opcode:", heartbeatAck.OpCode)
+		env.Logger.Error("unexpected response from heartbeat. opcode:", heartbeatAck.OpCode)
 	}
 
 }

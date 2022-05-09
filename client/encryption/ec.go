@@ -15,20 +15,20 @@ var curve = elliptic.P256()
 
 var ecdhInstance = ecdh.Generic(curve)
 
-var conf = config.GetConfigInstance()
+type PublicKey []byte
 
-func GetPublicKey() []byte {
-	var privateKey = []byte(config.GetConfigInstance().ClientPrivateKey)
+func GetPublicKey(env *config.Environment) PublicKey {
+	var privateKey = []byte(env.ClientPrivateKey)
 	var publicKey = ecdhInstance.PublicKey(privateKey).(ecdh.Point)
 	return elliptic.MarshalCompressed(curve, publicKey.X, publicKey.Y)
 }
 
-func GetPublicKeyHex() string {
-	return hex.EncodeToString(GetPublicKey())
+func (p PublicKey) Hex() string {
+	return hex.EncodeToString(p)
 }
 
-func CalculateSharedSecret(publicKey []byte) []byte {
-	var privateKey = []byte(config.GetConfigInstance().ClientPrivateKey)
+func CalculateSharedSecret(env *config.Environment, publicKey []byte) []byte {
+	var privateKey = []byte(env.ClientPrivateKey)
 	var x, y = elliptic.UnmarshalCompressed(curve, publicKey)
 	var point = ecdh.Point{X: x, Y: y}
 	return ecdhInstance.ComputeSecret(privateKey, point)
@@ -73,10 +73,10 @@ func decryptAes(secret []byte, data []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
-func EncryptAes(data []byte) ([]byte, error) {
-	return encryptAes(CalculateSharedSecret(conf.ServerPublicKey), data)
+func EncryptAes(env *config.Environment, data []byte) ([]byte, error) {
+	return encryptAes(CalculateSharedSecret(env, env.ServerPublicKey), data)
 }
 
-func DecryptAes(data []byte) ([]byte, error) {
-	return decryptAes(CalculateSharedSecret(conf.ServerPublicKey), data)
+func DecryptAes(env *config.Environment, data []byte) ([]byte, error) {
+	return decryptAes(CalculateSharedSecret(env, env.ServerPublicKey), data)
 }

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"client/config"
 	"client/utils"
 	"encoding/json"
 	"github.com/google/uuid"
@@ -31,36 +32,32 @@ type PolicyStorage struct {
 var storageLock = &sync.Mutex{}
 var policyStorage *PolicyStorage
 
-const policyStorageFilename = "policy_storage.json"
-
-func GetPolicyStorage() *PolicyStorage {
+func GetPolicyStorage(env *config.Environment) *PolicyStorage {
 	storageLock.Lock()
 	defer storageLock.Unlock()
 
 	if policyStorage == nil {
-		loadedStorage, existing := loadPolicyStorage()
+		loadedStorage, existing := loadPolicyStorage(env)
 		policyStorage = &loadedStorage
 		if !existing {
-			SavePolicyStorage()
+			SavePolicyStorage(env)
 		}
 	}
 
 	return policyStorage
 }
 
-func loadPolicyStorage() (PolicyStorage, bool) {
+func loadPolicyStorage(env *config.Environment) (PolicyStorage, bool) {
 	policies := make(map[string]Policy)
 
-	logger := utils.GetLogger()
-
-	file, err := os.OpenFile(policyStorageFilename, os.O_CREATE|os.O_RDONLY, 660)
+	file, err := os.OpenFile(env.PolicyStorageFilePath, os.O_CREATE|os.O_RDONLY, 660)
 	if err != nil {
-		logger.Fatal("Could not open settings file to load!", err)
+		env.Logger.Fatal("Could not open settings file to load!", err)
 	}
 
 	fileInfo, err := file.Stat()
 	if err != nil {
-		logger.Fatal("Could not stat settings file", err)
+		env.Logger.Fatal("Could not stat settings file", err)
 	}
 
 	if fileInfo.Size() == 0 {
@@ -72,7 +69,7 @@ func loadPolicyStorage() (PolicyStorage, bool) {
 	jsonDecoder := json.NewDecoder(file)
 	err = jsonDecoder.Decode(&policies)
 	if err != nil {
-		logger.Fatal("Could not decode JSON!", err)
+		env.Logger.Fatal("Could not decode JSON!", err)
 	}
 
 	return PolicyStorage{
@@ -80,9 +77,9 @@ func loadPolicyStorage() (PolicyStorage, bool) {
 	}, true
 }
 
-func SavePolicyStorage() {
-	logger := utils.GetLogger()
-	file, err := os.OpenFile(policyStorageFilename, os.O_CREATE|os.O_WRONLY, 660)
+func SavePolicyStorage(env *config.Environment) {
+	logger := utils.GetLogger(env.DebugLogging)
+	file, err := os.OpenFile(env.PolicyStorageFilePath, os.O_CREATE|os.O_WRONLY, 660)
 	if err != nil {
 		logger.Error("Could not open settings file to save!", err)
 	}

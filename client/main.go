@@ -5,7 +5,7 @@ import (
 	"client/encryption"
 	"client/packets"
 	"client/server"
-	"client/utils"
+	"context"
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/json"
@@ -19,14 +19,13 @@ import (
 	"time"
 )
 
-var logger = utils.GetLogger()
+var environment = config.CreateEnvironment()
 var taskScheduler = chrono.NewDefaultTaskScheduler()
 
 var Finished = make(chan bool)
 
 func main() {
 	defer func() { <-taskScheduler.Shutdown() }()
-	conf := config.GetConfigInstance()
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
@@ -36,13 +35,13 @@ func main() {
 		Finished <- true
 	}()
 
-	configInitValidation(conf)
+	configInitValidation(&environment)
 
-	if !conf.ClientId.Valid {
-		registerClient(conf)
+	if !environment.ClientId.Valid {
+		registerClient(&environment)
 	}
 
-	logger.Infof("ecdh client public key: %x", encryption.GetPublicKey())
+	environment.Logger.Infof("ecdh client public key: %x", encryption.GetPublicKey(&environment))
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -50,34 +49,36 @@ func main() {
 		}
 	}()
 
-	_, err := taskScheduler.ScheduleAtFixedRate(heartbeat, 30*time.Second)
+	_, err := taskScheduler.ScheduleAtFixedRate(func(ctx context.Context) {
+		heartbeat(ctx, &environment)
+	}, 30*time.Second)
 	if err != nil {
-		logger.Fatal("failed to setup heartbeat scheduler. error")
+		environment.Logger.Fatal("failed to setup heartbeat scheduler. error")
 	}
 
 	<-Finished
 }
 
-func registerClient(conf *config.Config) {
-	data, err := server.RunTcpActions([]server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendClientRegistration, server.RecieveData})
+func registerClient(env *config.Environment) {
+	data, err := server.RunTcpActions(env, []server.TcpAction{server.SendHello, server.RecieveHelloAck, server.SendClientRegistration, server.RecieveData})
 	if err != nil {
-		logger.Fatal("error in attempting to register client:", err.Error())
+		env.Logger.Fatal("error in attempting to register client:", err.Error())
 	}
 
 	dataBytes, ok := data.([]byte)
 	if !ok {
-		logger.Fatal("did not receive response from client registration")
+		env.Logger.Fatal("did not receive response from client registration")
 	}
 
 	var jsonData map[string]interface{}
 
 	err = json.Unmarshal(dataBytes, &jsonData)
 	if err != nil {
-		logger.Fatal("did not parse response from client registration")
+		env.Logger.Fatal("did not parse response from client registration")
 	}
 
 	if jsonData["op_code"].(float64) == packets.OpCodeError {
-		logger.Fatal("could not register client. error:", jsonData["message"])
+		env.Logger.Fatal("could not register client. error:", jsonData["message"])
 	}
 
 	if jsonData["op_code"].(float64) == packets.OpCodeClientRegistrationAck {
@@ -85,36 +86,36 @@ func registerClient(conf *config.Config) {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		conf.ClientId = uuid.NullUUID{
+		env.ClientId = uuid.NullUUID{
 			UUID:  clientId,
 			Valid: true,
 		}
-		conf.SaveConfig()
-		logger.Info("registered client! id:", jsonData["client_id"])
+		env.SaveConfig()
+		env.Logger.Info("registered client! id:", jsonData["client_id"])
 	} else {
-		logger.Fatal("unexpected response from registering client. opcode:", jsonData["op_code"])
+		env.Logger.Fatal("unexpected response from registering client. opcode:", jsonData["op_code"])
 	}
 }
 
-func configInitValidation(conf *config.Config) {
-	if len(conf.ClientPrivateKey) == 0 {
+func configInitValidation(env *config.Environment) {
+	if len(env.ClientPrivateKey) == 0 {
 		privateKey, _, _, err := elliptic.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			return
 		}
-		conf.ClientPrivateKey = privateKey
-		conf.SaveConfig()
+		env.ClientPrivateKey = privateKey
+		env.SaveConfig()
 	}
 
-	if len(conf.ServerPublicKey) != 33 {
-		logger.Fatal("Server Public Key is invalid! Please consult your administrator.")
+	if len(env.ServerPublicKey) != 33 {
+		env.Logger.Fatal("Server Public Key is invalid! Please consult your administrator.")
 	}
 
-	if len(conf.ServerHost) == 0 {
-		logger.Fatal("Server address is invalid! Please consult your administrator.")
+	if len(env.ServerHost) == 0 {
+		env.Logger.Fatal("Server address is invalid! Please consult your administrator.")
 	}
 
-	if len(conf.EnrolmentToken) == 0 {
-		logger.Fatal("Enrolment token is invalid! Please consult your administrator.")
+	if len(env.EnrolmentToken) == 0 {
+		env.Logger.Fatal("Enrolment token is invalid! Please consult your administrator.")
 	}
 }

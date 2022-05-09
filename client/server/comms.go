@@ -1,6 +1,7 @@
 package server
 
 import (
+	"client/config"
 	"client/encryption"
 	"client/packets"
 	"client/utils"
@@ -13,7 +14,7 @@ import (
 	"net"
 )
 
-func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) {
+func SendClientRegistration(conn *net.Conn, env *config.Environment, _ interface{}) (interface{}, error) {
 	type ClientRegistration struct {
 		OpCode         int                 `json:"op_code"`
 		EnrolmentToken string              `json:"enrolment_token"`
@@ -27,15 +28,15 @@ func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) 
 
 	inputData := ClientRegistration{
 		OpCode:         packets.OpCodeClientRegistration,
-		EnrolmentToken: conf.EnrolmentToken,
-		PublicKey:      encryption.GetPublicKeyHex(),
+		EnrolmentToken: env.EnrolmentToken,
+		PublicKey:      encryption.GetPublicKey(env).Hex(),
 		Name:           osInfo.Hostname,
 		OSInformation:  osInfo,
 		MACAddress:     utils.GetMACAddress(),
 	}
 
 	jsonData, _ := json.Marshal(inputData)
-	data, err := encryption.EncryptAes(jsonData)
+	data, err := encryption.EncryptAes(env, jsonData)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,7 @@ func SendClientRegistration(conn *net.Conn, _ interface{}) (interface{}, error) 
 	return nil, WriteWithLength(conn, packet)
 }
 
-func SendHeartbeat(conn *net.Conn, _ interface{}) (interface{}, error) {
+func SendHeartbeat(conn *net.Conn, env *config.Environment, _ interface{}) (interface{}, error) {
 	type Heartbeat struct {
 		OpCode        packets.InnerMessageOpCode `json:"op_code"`
 		OSInformation goInfo.GoInfoObject        `json:"os_information"`
@@ -63,7 +64,7 @@ func SendHeartbeat(conn *net.Conn, _ interface{}) (interface{}, error) {
 	}
 
 	jsonData, _ := json.Marshal(inputData)
-	data, err := encryption.EncryptAes(jsonData)
+	data, err := encryption.EncryptAes(env, jsonData)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func SendHeartbeat(conn *net.Conn, _ interface{}) (interface{}, error) {
 	return nil, WriteWithLength(conn, packet)
 }
 
-func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
+func RecieveData(conn *net.Conn, env *config.Environment, _ interface{}) (interface{}, error) {
 	length := make([]byte, 4)
 	_, err := io.ReadFull(*conn, length)
 	if err != nil {
@@ -99,7 +100,7 @@ func RecieveData(conn *net.Conn, _ interface{}) (interface{}, error) {
 		return nil, errors.New("expected packet was not a datapacket")
 	}
 
-	decryptedData, err := encryption.DecryptAes(dataPacket.AesData)
+	decryptedData, err := encryption.DecryptAes(env, dataPacket.AesData)
 	if err != nil {
 		return nil, fmt.Errorf("err while decrypting data: %w", err)
 	}

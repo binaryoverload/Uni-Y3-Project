@@ -5,7 +5,6 @@ import (
 	"client/config"
 	"client/data"
 	"client/packets"
-	"client/utils"
 	"crypto/md5"
 	"errors"
 	"fmt"
@@ -20,16 +19,13 @@ import (
 const fileRequestRetries = 3
 const numWorkers = 3
 
-var logger = utils.GetLogger()
-var conf = config.GetConfigInstance()
-
-func RequestFileChunk(fileId uuid.UUID, workerNum int, chunkNum int) error {
+func RequestFileChunk(env *config.Environment, fileId uuid.UUID, workerNum int, chunkNum int) error {
 	fileChunkReq := packets.FileChunkReq{
 		FileId:      fileId,
 		ChunkNumber: chunkNum,
 	}
 
-	tcpData, err := RunTcpActions([]TcpAction{SendHello, RecieveHelloAck, SendFileChunkReq(fileChunkReq), RecieveData})
+	tcpData, err := RunTcpActions(env, []TcpAction{SendHello, RecieveHelloAck, SendFileChunkReq(env, fileChunkReq), RecieveData})
 
 	if err != nil {
 		return err
@@ -47,7 +43,7 @@ func RequestFileChunk(fileId uuid.UUID, workerNum int, chunkNum int) error {
 
 	dataBytes = dataBytes[1:]
 
-	file, err := os.Create(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
+	file, err := os.Create(filepath.Join(env.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
 	if err != nil {
 		return err
 	}
@@ -57,19 +53,19 @@ func RequestFileChunk(fileId uuid.UUID, workerNum int, chunkNum int) error {
 		return err
 	}
 
-	logger.Debugf("(f_id: %s, w: %d, c: %d) written %d bytes to files", fileId, workerNum, chunkNum, numBytes)
+	env.Logger.Debugf("(f_id: %s, w: %d, c: %d) written %d bytes to files", fileId, workerNum, chunkNum, numBytes)
 	return nil
 }
 
-func FileRequestWorker(wg *sync.WaitGroup, workerNum int, jobs <-chan int, outputErrors *map[int]error, fileId uuid.UUID) {
+func FileRequestWorker(env *config.Environment, wg *sync.WaitGroup, workerNum int, jobs <-chan int, outputErrors *map[int]error, fileId uuid.UUID) {
 	for chunkNum := range jobs {
 		var err error
 
 		for retry := 1; retry <= fileRequestRetries; retry++ {
-			logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) starting chunk download", fileId, workerNum, retry, chunkNum)
-			err = RequestFileChunk(fileId, workerNum, chunkNum)
+			env.Logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) starting chunk download", fileId, workerNum, retry, chunkNum)
+			err = RequestFileChunk(env, fileId, workerNum, chunkNum)
 			if err != nil {
-				logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) error with chunk download: %s", fileId, workerNum, retry, chunkNum, err)
+				env.Logger.Debugf("(f_id: %s, w: %d, r: %d, c: %d) error with chunk download: %s", fileId, workerNum, retry, chunkNum, err)
 			} else {
 				break
 			}
@@ -82,23 +78,23 @@ func FileRequestWorker(wg *sync.WaitGroup, workerNum int, jobs <-chan int, outpu
 	}
 }
 
-func ChunkDownloadCleanup(fileId uuid.UUID, numChunks int) {
-	logger.Infof("(f_id: %s) starting cleanup of temp files with %d chunks", fileId, numChunks)
+func ChunkDownloadCleanup(env *config.Environment, fileId uuid.UUID, numChunks int) {
+	env.Logger.Infof("(f_id: %s) starting cleanup of temp files with %d chunks", fileId, numChunks)
 	for chunkNum := 0; chunkNum < numChunks; chunkNum++ {
-		err := os.Remove(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
+		err := os.Remove(filepath.Join(env.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
 		if err == nil {
-			logger.Debugf("(f_id: %s, c: %d) successfully deleted chunk file", fileId, chunkNum)
+			env.Logger.Debugf("(f_id: %s, c: %d) successfully deleted chunk file", fileId, chunkNum)
 		} else {
-			logger.Debugf("(f_id: %s, c: %d) error deleting chunk file: %s", fileId, chunkNum, err.Error())
+			env.Logger.Debugf("(f_id: %s, c: %d) error deleting chunk file: %s", fileId, chunkNum, err.Error())
 		}
 	}
 }
 
-func CombineFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize int64) error {
+func CombineFileChunks(env *config.Environment, fileId uuid.UUID, hash string, numChunks int, totalSize int64) error {
 	var buf bytes.Buffer
 	for chunkNum := 0; chunkNum < numChunks; chunkNum++ {
-		logger.Debugf("(f_id: %s, c: %d) reading chunk to memory", fileId, chunkNum)
-		chunkBytes, err := ioutil.ReadFile(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
+		env.Logger.Debugf("(f_id: %s, c: %d) reading chunk to memory", fileId, chunkNum)
+		chunkBytes, err := ioutil.ReadFile(filepath.Join(env.TempDownloadPath, fmt.Sprintf("%s.%d.chunk", fileId, chunkNum)))
 		if err != nil {
 			return fmt.Errorf("(f_id: %s, c: %d) could not read chunk, aborting write", fileId, chunkNum)
 		}
@@ -112,11 +108,11 @@ func CombineFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize i
 		return fmt.Errorf("(f_id: %s) hash comparison failed, aborting write", fileId)
 	}
 
-	combinedFile, err := os.Create(filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.combined", fileId)))
+	combinedFile, err := os.Create(filepath.Join(env.TempDownloadPath, fmt.Sprintf("%s.combined", fileId)))
 	defer func(combinedFile *os.File) {
 		err := combinedFile.Close()
 		if err != nil {
-			logger.Errorf("(f_id: %s) could not close combined file: %w", fileId, err)
+			env.Logger.Errorf("(f_id: %s) could not close combined file: %w", fileId, err)
 		}
 	}(combinedFile)
 	if err != nil {
@@ -131,13 +127,13 @@ func CombineFileChunks(fileId uuid.UUID, hash string, numChunks int, totalSize i
 	if err != nil {
 		return fmt.Errorf("(f_id: %s) could not write chunks to combined file: %w", fileId, err)
 	}
-	logger.Debugf("(f_id: %s) wrote %d bytes to combined file", fileId, buf.Len())
-	logger.Infof("(f_id: %s) successfully downloaded file", fileId)
+	env.Logger.Debugf("(f_id: %s) wrote %d bytes to combined file", fileId, buf.Len())
+	env.Logger.Infof("(f_id: %s) successfully downloaded file", fileId)
 	return nil
 }
 
-func MoveCombinedFile(fileId uuid.UUID, totalSize int64, policy data.FilePolicy) error {
-	srcFile := filepath.Join(conf.TempDownloadPath, fmt.Sprintf("%s.combined", fileId))
+func MoveCombinedFile(env *config.Environment, fileId uuid.UUID, totalSize int64, policy data.FilePolicy) error {
+	srcFile := filepath.Join(env.TempDownloadPath, fmt.Sprintf("%s.combined", fileId))
 
 	sourceFileStat, err := os.Stat(srcFile)
 	if err != nil {
@@ -178,13 +174,13 @@ func MoveCombinedFile(fileId uuid.UUID, totalSize int64, policy data.FilePolicy)
 	if err != nil {
 		return fmt.Errorf("could not chmod file: %w", err)
 	}
-	logger.Debugf("(f_id: %s) successfully chmod file at %s with permissions %o", fileId, policy.Destination, policy.Permissions)
+	env.Logger.Debugf("(f_id: %s) successfully chmod file at %s with permissions %o", fileId, policy.Destination, policy.Permissions)
 
 	return nil
 }
 
-func RequestFileChunks(fileId uuid.UUID, numChunks int) error {
-	logger.Infof("(f_id: %s) starting download of file with %d chunks", fileId, numChunks)
+func RequestFileChunks(env *config.Environment, fileId uuid.UUID, numChunks int) error {
+	env.Logger.Infof("(f_id: %s) starting download of file with %d chunks", fileId, numChunks)
 	jobs := make(chan int, numChunks)
 	outputErrors := make(map[int]error)
 
@@ -202,7 +198,7 @@ func RequestFileChunks(fileId uuid.UUID, numChunks int) error {
 	}
 
 	for workerNum := 0; workerNum < numberWorkers; workerNum++ {
-		go FileRequestWorker(&wg, workerNum, jobs, &outputErrors, fileId)
+		go FileRequestWorker(env, &wg, workerNum, jobs, &outputErrors, fileId)
 	}
 
 	wg.Wait()
@@ -219,7 +215,7 @@ func RequestFileChunks(fileId uuid.UUID, numChunks int) error {
 	return nil
 }
 
-func SendFileChunkReq(req packets.FileChunkReq) TcpAction {
+func SendFileChunkReq(env *config.Environment, req packets.FileChunkReq) TcpAction {
 	reqData := struct {
 		OpCode      int       `json:"op_code"`
 		FileId      uuid.UUID `json:"file_id"`
@@ -230,10 +226,10 @@ func SendFileChunkReq(req packets.FileChunkReq) TcpAction {
 		ChunkNumber: req.ChunkNumber,
 	}
 
-	return GetSendDataFunction(reqData)
+	return GetSendDataFunction(env, reqData)
 }
 
-func SendFileInfoReq(req packets.FileInfoReq) TcpAction {
+func SendFileInfoReq(env *config.Environment, req packets.FileInfoReq) TcpAction {
 	reqData := struct {
 		OpCode int       `json:"op_code"`
 		FileId uuid.UUID `json:"file_id"`
@@ -242,5 +238,5 @@ func SendFileInfoReq(req packets.FileInfoReq) TcpAction {
 		FileId: req.FileId,
 	}
 
-	return GetSendDataFunction(reqData)
+	return GetSendDataFunction(env, reqData)
 }

@@ -5,10 +5,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/withmandala/go-log"
 	"os"
-	"sync"
 )
 
 type Config struct {
+	filePath         string
 	ServerPublicKey  HexEncodedByteArray `json:"server_public_key"`
 	ClientPrivateKey HexEncodedByteArray `json:"client_private_key"`
 	ClientId         uuid.NullUUID       `json:"client_id"`
@@ -19,31 +19,22 @@ type Config struct {
 	TempDownloadPath string              `json:"temp_download_path"`
 }
 
-var instanceLock = &sync.Mutex{}
-var instance *Config
-
 var configLogger = log.New(os.Stdout).WithColor()
 
-func GetConfigInstance() *Config {
-	instanceLock.Lock()
-	defer instanceLock.Unlock()
-
-	if instance == nil {
-		newConfig := Config{
-			ServerHost:       "localhost",
-			ServerPort:       9000,
-			DebugLogging:     false,
-			TempDownloadPath: "temp/",
-		}
-		loadConfigFile(&newConfig)
-
-		instance = &newConfig
+func CreateConfig(path string) Config {
+	newConfig := Config{
+		filePath:         path,
+		ServerHost:       "localhost",
+		ServerPort:       9000,
+		DebugLogging:     false,
+		TempDownloadPath: "temp/",
 	}
-	return instance
+	loadConfigFile(path, &newConfig)
+	return newConfig
 }
 
-func loadConfigFile(config *Config) {
-	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_RDONLY, 660)
+func loadConfigFile(path string, config *Config) {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDONLY, 660)
 	if err != nil {
 		configLogger.Fatal("Could not open settings file to load!", err)
 	}
@@ -67,7 +58,7 @@ func loadConfigFile(config *Config) {
 }
 
 func (c Config) SaveConfig() {
-	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_WRONLY, 660)
+	file, err := os.OpenFile(c.filePath, os.O_CREATE|os.O_WRONLY, 660)
 	if err != nil {
 		configLogger.Error("Could not open settings file to save!", err)
 	}

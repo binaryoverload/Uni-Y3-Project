@@ -11,11 +11,10 @@ import (
 	"time"
 )
 
-type TcpAction func(conn *net.Conn, prevData interface{}) (interface{}, error)
+type TcpAction func(conn *net.Conn, env *config.Environment, prevData interface{}) (interface{}, error)
 
-func RunTcpActions(actions []TcpAction) (interface{}, error) {
-	conf := config.GetConfigInstance()
-	c, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort), 10*time.Second)
+func RunTcpActions(env *config.Environment, actions []TcpAction) (interface{}, error) {
+	c, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", env.ServerHost, env.ServerPort), 10*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("connecting: %w", err)
 	}
@@ -25,7 +24,7 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 		if err != nil {
 			return nil, fmt.Errorf("setting tcp ttl: %w", err)
 		}
-		currentData, err = actions[i](&c, currentData)
+		currentData, err = actions[i](&c, env, currentData)
 		if err != nil {
 			return nil, err
 		}
@@ -37,14 +36,14 @@ func RunTcpActions(actions []TcpAction) (interface{}, error) {
 	return currentData, nil
 }
 
-func GetSendDataFunction(data interface{}) TcpAction {
+func GetSendDataFunction(env *config.Environment, data interface{}) TcpAction {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil
 	}
 
-	return func(conn *net.Conn, _ interface{}) (interface{}, error) {
-		data, err := encryption.EncryptAes(jsonData)
+	return func(conn *net.Conn, env *config.Environment, _ interface{}) (interface{}, error) {
+		data, err := encryption.EncryptAes(env, jsonData)
 		if err != nil {
 			return nil, err
 		}

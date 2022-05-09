@@ -1,14 +1,11 @@
 package data
 
 import (
-	"client/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
 )
-
-var logger = utils.GetLogger()
 
 type FilePolicy struct {
 	FileId      uuid.UUID `json:"file_id"`

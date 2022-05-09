@@ -1,11 +1,14 @@
 package utils
 
-import "os/user"
+import (
+	"github.com/withmandala/go-log"
+	"os/user"
+)
 
-func IsRoot() bool {
+func IsRoot(logger *log.Logger) bool {
 	currentUser, err := user.Current()
 	if err != nil {
-		GetLogger().Fatalf("[isRoot] Unable to get current user: %s", err)
+		logger.Fatalf("[isRoot] Unable to get current user: %s", err)
 	}
 	return currentUser.Username == "root"
 }
