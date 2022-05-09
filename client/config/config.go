@@ -29,20 +29,20 @@ func GetConfigInstance() *Config {
 	defer instanceLock.Unlock()
 
 	if instance == nil {
-		loadedConfig := loadConfig()
-		instance = &loadedConfig
+		newConfig := Config{
+			ServerHost:       "localhost",
+			ServerPort:       9000,
+			DebugLogging:     false,
+			TempDownloadPath: "temp/",
+		}
+		loadConfigFile(&newConfig)
+
+		instance = &newConfig
 	}
 	return instance
 }
 
-func loadConfig() Config {
-	config := Config{
-		ServerHost:       "localhost",
-		ServerPort:       9000,
-		DebugLogging:     false,
-		TempDownloadPath: "temp/",
-	}
-
+func loadConfigFile(config *Config) {
 	file, err := os.OpenFile("client_settings.json", os.O_CREATE|os.O_RDONLY, 660)
 	if err != nil {
 		configLogger.Fatal("Could not open settings file to load!", err)
@@ -54,16 +54,16 @@ func loadConfig() Config {
 	}
 
 	if fileInfo.Size() == 0 {
-		return config
+		return
 	}
 
 	jsonDecoder := json.NewDecoder(file)
-	err = jsonDecoder.Decode(&config)
+	err = jsonDecoder.Decode(config)
 	if err != nil {
 		configLogger.Fatal("Could not decode JSON!", err)
 	}
 
-	return config
+	return
 }
 
 func (c Config) SaveConfig() {
