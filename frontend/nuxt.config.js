@@ -143,6 +143,7 @@ export default {
         "faTimesCircle",
         "faTrash",
         "faUser",
+        "faStar"
       ],
     },
   },
