@@ -11,8 +11,8 @@
             <span>Delete Token</span>
           </t-button>
           <t-button
-            :to="`/users/edit/${$route.params.id}`"
-            :href="`/users/edit/${$route.params.id}`"
+            :to="`/enrolment-tokens/edit/${$route.params.id}`"
+            :href="`/enrolment-tokens/edit/${$route.params.id}`"
             tagName="a"
             >Edit Token</t-button
           >
