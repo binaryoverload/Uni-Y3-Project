@@ -45,6 +45,7 @@ async function updateEnrolmentToken(id, data) {
     return await knex(ENROLMENT_TOKENS_TABLE_NAME)
         .update({ name, expires_at, usage_current, usage_limit })
         .where("id", id)
+        .returning(["id", "name", "token", "created_at", "usage_current", "expires_at"])
         .catch(handlePostgresError)
 }
 
