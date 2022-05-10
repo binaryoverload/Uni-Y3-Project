@@ -8,7 +8,7 @@
             Clients are added through enrolment tokens.
           </p>
           <nuxt-link
-            to="/enrolment-tokens"
+            to="/enrolment-tokens/create"
             class="flex items-center text-indigo-600 hover:text-indigo-700 hover:underline"
             ><font-awesome-icon icon="arrow-right" class="mr-2" />Create new
             enrolment token</nuxt-link
