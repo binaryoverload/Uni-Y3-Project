@@ -50,11 +50,16 @@
 </template>
 
 <script>
+import { formMixin } from "~/mixins/formUtils"
+
 export default {
   layout: "dashboard",
   middleware: "authed",
+  mixins: [formMixin()],
   methods: {
     async submit() {
+      if (this.isFormLoading()) return
+      this.setFormLoading(true)
       try {
         const response = await this.$axios.$patch(
           `/users/${this.$route.params.id}`,
@@ -69,7 +74,9 @@ export default {
           this.$router.push(`/users/${response.data.id}`)
           return
         }
+        this.setFormLoading(false)
       } catch (error) {
+        this.setFormLoading(false)
         if (error.response) {
           this.errors = error.response.data
         } else if (error.request) {

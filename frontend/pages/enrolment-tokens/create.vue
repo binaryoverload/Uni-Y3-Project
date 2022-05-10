@@ -46,11 +46,16 @@
 </template>
 
 <script>
+import { formMixin } from "~/mixins/formUtils"
+
 export default {
   layout: "dashboard",
   middleware: "authed",
+  mixins: [formMixin()],
   methods: {
     async submit() {
+      if (this.isFormLoading()) return
+      this.setFormLoading(true)
       try {
         const response = await this.$axios.$post("/enrolment-tokens", {
           name: this.name,
@@ -61,7 +66,9 @@ export default {
           this.$router.push(`/enrolment-tokens/${response.data.id}`)
           return
         }
+        this.setFormLoading(false)
       } catch (error) {
+        this.setFormLoading(false)
         if (error.response) {
           this.errors = error.response.data.data
         } else if (error.request) {

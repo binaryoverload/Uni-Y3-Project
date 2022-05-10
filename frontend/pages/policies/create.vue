@@ -34,11 +34,16 @@
 </template>
 
 <script>
+import { formMixin } from "~/mixins/formUtils"
+
 export default {
   layout: "dashboard",
   middleware: "authed",
+  mixins: [formMixin()],
   methods: {
     async submit() {
+      if (this.isFormLoading()) return
+      this.setFormLoading(true)
       try {
         const response = await this.$axios.$post("/policies", {
           name: this.name,
@@ -49,7 +54,9 @@ export default {
           this.$router.push(`/policies/${response.data.id}`)
           return
         }
+        this.setFormLoading(false)
       } catch (error) {
+        this.setFormLoading(false)
         if (error.response) {
           this.errors = error.response.data.data
         } else if (error.request) {

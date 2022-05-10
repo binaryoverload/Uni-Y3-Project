@@ -135,7 +135,7 @@ export default {
   async fetch() {
     const id = this.$route.params.id
     try {
-    this.policiesData = (await this.$axios.$get("/policies/" + id)).data
+      this.policiesData = (await this.$axios.$get("/policies/" + id)).data
     } catch (e) {
       this.$nuxt.context.error({
         status: e.response.status,

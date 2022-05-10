@@ -35,11 +35,12 @@
 </template>
 
 <script>
-// Keep a cache of form data so switching types doesn't lose data
+import { formMixin } from "~/mixins/formUtils"
 
 export default {
   layout: "dashboard",
   middleware: "authed",
+  mixins: [formMixin()],
   data() {
     return {
       type: "command",
@@ -76,6 +77,8 @@ export default {
   },
   methods: {
     async submit() {
+      if (this.isFormLoading()) return
+      this.setFormLoading(true)
       try {
         const modifiedData =
           this.data.args != null
@@ -95,7 +98,9 @@ export default {
           this.$router.push(`/policies/${policyId}`)
           return
         }
+        this.setFormLoading(false)
       } catch (error) {
+        this.setFormLoading(false)
         if (error.response) {
           this.errors = error.response.data.data
         } else if (error.request) {
