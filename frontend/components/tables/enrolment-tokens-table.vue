@@ -41,7 +41,6 @@ const schema = [
       }
 
       if (row.expires_at) {
-        console.log(row)
         const timeUntilExpiry = Date.now() - Date.parse(row.expires_at)
         if (isNaN(timeUntilExpiry)) {
           expiresAtScore = Status.unknown

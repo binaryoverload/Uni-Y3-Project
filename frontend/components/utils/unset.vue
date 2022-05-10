@@ -1,8 +1,6 @@
 <template>
-  <fragment>
-    <span v-if="condition">{{ data }}</span>
-    <span v-else class="text-slate-400">&lt;unset&gt;</span>
-  </fragment>
+  <span v-if="condition">{{ data }}</span>
+  <span v-else class="text-slate-400">&lt;unset&gt;</span>
 </template>
 
 <script>
