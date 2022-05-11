@@ -1,20 +1,25 @@
 function permsNumToLetter(permissions) {
-  if (typeof permissions !== "number") {
+  let perms = permissions
+  if (typeof perms === "undefined") {
+    return "---------"
+  }
+
+  if (typeof perms === "string") {
+    perms = parseInt(permissions)
+  }
+
+  if (typeof perms !== "number") {
     throw new Error("Not a number")
   }
 
-  console.log(permissions)
-  console.log(permissions.toString(8))
-
-  let perms = "rwxrwxrwx"
-  for (let i = 0; i < perms.length; i++) {
-    let bit = (perms.length - 1) - i
+  let permString = "rwxrwxrwx"
+  for (let i = 0; i < permString.length; i++) {
+    let bit = (permString.length - 1) - i
     if ((permissions & (1 << bit)) === 0) {
-      console.log("blanked", i)
-      perms = perms.substring(0, i) + "-" + perms.substring(i + 1)
+      permString = permString.substring(0, i) + "-" + permString.substring(i + 1)
     }
   }
-  return perms;
+  return permString;
 }
 
 module.exports = {

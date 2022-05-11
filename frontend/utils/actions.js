@@ -20,7 +20,7 @@ async function deleteEntity(url, callback) {
   }
 }
 
-async function deletePolicyItem() {
+async function deletePolicyItem(cb) {
   const result = await this.$swal({
     icon: "warning",
     title: "Are you sure?",
@@ -40,10 +40,11 @@ async function deletePolicyItem() {
     function () {
       this.$swal({
         icon: "success",
-        title: "Deleted token!",
+        title: "Deleted item!",
         html: `Successfully delete the policy item <span class="text-indigo-700">#${this.item.policy_order}</span>.`,
       })
-      this.$nuxt.refresh()
+      // fight jank with jank
+      cb ? cb() : this.$nuxt.refresh();
     }.bind(this)
   )
 }

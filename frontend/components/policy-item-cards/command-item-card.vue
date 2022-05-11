@@ -18,6 +18,13 @@
       </p>
     </div>
     <div>
+      <nuxt-link
+        class="px-2 py-1.5 block text-gray-500 bg-gray-200 rounded cursor-pointer hover:bg-gray-300 hover:text-gray-600 focus:ring-gray-500 focus:border-gray-500 focus:ring-2 focus:outline-none focus:ring-opacity-50"
+        :to="`/policy-items/${item.id}`">
+        <font-awesome-icon icon="eye" class="block" />
+      </nuxt-link>
+    </div>
+    <div>
       <div
         class="px-2 py-1.5 text-red-500 bg-red-200 rounded cursor-pointer hover:bg-red-300 hover:text-red-600 focus:ring-red-500 focus:border-red-500 focus:ring-2 focus:outline-none focus:ring-opacity-50"
         tabindex="0"
