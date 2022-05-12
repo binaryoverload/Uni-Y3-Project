@@ -25,7 +25,7 @@
           <table>
             <tbody>
               <tr>
-                <td class="pb-2 pr-20 font-bold">Type</td>
+                <td class="pb-2 pr-40 font-bold">Type</td>
                 <td class="pb-2 text-slate-600">{{ item.type }}</td>
               </tr>
 
