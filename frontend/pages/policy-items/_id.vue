@@ -81,6 +81,12 @@
 
               <!-- file type -->
               <tr v-if="isFile">
+                <td class="pb-2 font-bold">File ID</td>
+                <td class="pb-2 text-slate-600">
+                  {{ item.data.file_id }}
+                </td>
+              </tr>
+              <tr v-if="isFile">
                 <td class="pb-2 font-bold">Destination</td>
                 <td class="pb-2 text-slate-600">
                   {{ item.data.destination }}
@@ -95,9 +101,21 @@
                 </td>
               </tr>
               <tr v-if="isFile">
-                <td class="pb-2 font-bold">File ID</td>
+                <td class="pb-2 font-bold">Filename</td>
                 <td class="pb-2 text-slate-600">
-                  {{ item.data.file_id }}
+                  {{ item.data.name }}
+                </td>
+              </tr>
+              <tr v-if="isFile">
+                <td class="pb-2 font-bold">Size</td>
+                <td class="pb-2 text-slate-600">
+                  {{ size(item.data.size) }}
+                </td>
+              </tr>
+              <tr v-if="isFile">
+                <td class="pb-2 font-bold">Hash (MD5)</td>
+                <td class="pb-2 text-slate-600">
+                  {{ item.data.hash }}
                 </td>
               </tr>
             </tbody>
@@ -111,6 +129,7 @@
 <script>
 import { deletePolicyItem } from "~/utils/actions"
 import { permsNumToLetter } from "~/utils/strings"
+import prettyBytes from "pretty-bytes"
 
 export default {
   middleware: "authed",
@@ -140,6 +159,10 @@ export default {
     perms(num) {
       return permsNumToLetter(num)
     },
+    size(bytes) {
+      if (!bytes) return ""
+      return prettyBytes(bytes)
+    },
   },
   async fetch() {
     const id = this.$route.params.id
@@ -151,6 +174,29 @@ export default {
         message:
           e.response.status === 404
             ? "Policy item could not be found"
+            : e.response.statusText,
+      })
+      return
+    }
+
+    try {
+      if (this.item.type === "file") {
+        const newData = {
+          ...this.item.data,
+          ...(await this.$axios.$get("/files/" + this.item.data.file_id)).data,
+        }
+
+        this.item = {
+          ...this.item,
+          data: newData,
+        }
+      }
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "File could not be found"
             : e.response.statusText,
       })
     }
