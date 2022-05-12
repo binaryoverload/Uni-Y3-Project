@@ -14,7 +14,13 @@ const fileType = [
         .exists()
         .trim()
         .isLength({ min: 1 }),
-    body("data.permissions", "File permissions is required").if(fileTypeValidator).bail().exists().trim().isOctal(),
+    body("data.permissions", "File permissions is required")
+        .if(fileTypeValidator)
+        .bail()
+        .exists()
+        .trim()
+        .isNumeric({ min: 0, max: 511 })
+        .toInt(),
 ]
 
 const packageTypeValidator = body("type", "The policy type is required")

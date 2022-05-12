@@ -52,7 +52,9 @@ export default {
           action: "install",
           packages: [],
         },
-        file: {},
+        file: {
+          permissions: 0,
+        },
       },
       errorCache: {},
       data: {},
