@@ -79,7 +79,7 @@ const schema = [
     key: "expires_at",
     format: "datetime",
     default: "No expiry",
-    heading: "Last seen",
+    heading: "Expiry Date",
   },
   {
     display: "actions",
