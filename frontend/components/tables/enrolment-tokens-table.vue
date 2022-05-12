@@ -99,7 +99,9 @@ const schema = [
             authToken = authToken.substring("Bearer ".length)
           }
 
-          let name = `installer-${row.name.replace(" ", "").toLowerCase()}.zip`
+          let name = `installer-${row.name
+            .replaceAll(" ", "-")
+            .toLowerCase()}.zip`
 
           window.location = `${this.$axios.defaults.baseURL}/install-bundle?auth_token=${authToken}&token=${row.token}&name=${name}`
           await this.$swal({
