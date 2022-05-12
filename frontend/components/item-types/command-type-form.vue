@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-4">
     <form-input
       label="Command"
       :value="value.command"

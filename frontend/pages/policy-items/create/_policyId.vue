@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="mb-10 text-5xl font-bold leading-[3rem]">Create Policy Item</p>
-    <form @submit.prevent="submit" class="space-y-4">
+    <form @submit.prevent="submit" class="space-y-8">
       <form-input
         label="Item Type"
         :options="[

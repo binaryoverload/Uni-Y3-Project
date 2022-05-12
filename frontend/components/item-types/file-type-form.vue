@@ -1,12 +1,17 @@
 <template>
-  <div>
+  <div class="space-y-4">
     <form-input
       component="select"
-      :options="[{ id: 'test', name: 'hi' }]"
+      :options="options"
       label="File"
+      required
       :value="value.file_id"
       @input="$emit('input', { ...value, file_id: $event })" />
-    {{ val }}
+    <form-input
+      label="Destination"
+      required
+      :value="value.destination"
+      @input="$emit('input', { ...value, destination: $event })" />
   </div>
 </template>
 
@@ -23,8 +28,17 @@ export default {
   },
   data() {
     return {
+      options: [],
       val: null,
     }
+  },
+  async fetch() {
+    this.options = (await this.$axios.$get("/files")).data.map(opt => {
+      return {
+        id: opt.id,
+        name: opt.name + " (" + new Date(opt.created_at).toLocaleString() + ")",
+      }
+    })
   },
 }
 </script>

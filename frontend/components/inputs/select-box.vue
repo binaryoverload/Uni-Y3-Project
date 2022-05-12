@@ -1,5 +1,9 @@
 <template>
-  <select :id="id" @change="$emit('input', $event.target.value)">
+  <select
+    :id="id"
+    @change="$emit('input', $event.target.value)"
+    :required="required"
+    class="items-center max-w-sm border rounded bg-slate-100 border-slate-300 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-opacity-50 focus-within:ring-slate-400">
     <option value="" :selected="!value">
       {{ placeholder || "Select an option..." }}
     </option>
@@ -20,6 +24,7 @@ export default {
     value: String,
     options: Array,
     placeholder: String,
+    required: Boolean,
   },
 }
 </script>
