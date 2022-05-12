@@ -5,10 +5,13 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon index.js"
+        "dev": "nodemon index.js",
+        "lint": "eslint . --ext .js",
+        "lint:fix": "npm run lint -- --fix"
     },
     "author": "William Oldham",
     "dependencies": {
+        "archiver": "^5.3.1",
         "argon2": "^0.28.3",
         "chalk": "^4.1.2",
         "cors": "^2.8.5",
@@ -38,6 +41,7 @@
     },
     "devDependencies": {
         "eslint": "^8.2.0",
+        "eslint-config-prettier": "^8.5.0",
         "prettier": "2.5.1"
     }
 }
