@@ -93,7 +93,7 @@ if (
     !validator.isIP(mergedConfig.externalHostname) &&
     !validator.isFQDN(mergedConfig.externalHostname, { require_tld: false })
 ) {
-    console.error("External URL must be provided")
+    console.error("External hostname must be provided")
     process.exit(exitCodes.configInvalidExternalHostname)
 }
 

@@ -9,13 +9,14 @@ const policyItems = require("./policyItems")
 const config = require("../utils/config")
 const encryption = require("../utils/encryption")
 
-const { validateJwt } = require("../middlewares/validateJwt")
+const { validateJwtQuery } = require("../middlewares/validateJwt")
 const { executeQuery } = require("../utils/http")
 const archiver = require("archiver")
 const fs = require("fs")
 const fsPromises = require("fs").promises
 const path = require("path")
 const { asyncFilter } = require("../utils/misc")
+const { NotFoundError } = require("../utils/httpExceptions")
 
 module.exports = {
     setupRoutes(app) {
@@ -29,12 +30,23 @@ module.exports = {
         app.use("/clients", clients)
 
         app.get(
-            "/install-bundle/:token",
-            validateJwt,
-            executeQuery(async ({ res, params }) => {
-                const zip = archiver("zip", {})
+            "/install-bundle",
+            validateJwtQuery,
+            executeQuery(async ({ res, query }) => {
+                const { token, name } = query
 
+                if (!token) {
+                    return new NotFoundError()
+                }
+
+                const zip = archiver("zip", {})
                 zip.pipe(res)
+
+                if (name) {
+                    res.append("Content-Disposition", `attachment; filename="${name}"`)
+                } else {
+                    res.append("Content-Disposition", 'attachment; filename="themis-installer.zip"')
+                }
 
                 const baseDir = "./install-bundle"
 
@@ -48,7 +60,7 @@ module.exports = {
                     server_public_key: encryption.ecPublicKeyHex,
                     server_host: config.externalHostname,
                     server_port: config.ports.tcp,
-                    enrolment_token: params.token,
+                    enrolment_token: token,
                 }
 
                 zip.append(JSON.stringify(clientSettings, null, 2), {

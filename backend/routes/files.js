@@ -3,9 +3,10 @@ const uuid = require("uuid")
 const path = require("path")
 
 const { validateJwt } = require("../middlewares/validateJwt")
-const { executeQuery } = require("../utils/http")
+const { executeQuery, checkValidationErrors } = require("../utils/http")
 const config = require("../utils/config")
-const { createFile } = require("../models/files")
+const { createFile, getFileById } = require("../models/files")
+const { idParamValidator } = require("../validation/common")
 
 const router = Router()
 
@@ -33,6 +34,15 @@ router.post(
                 return createdFile
             }
         }
+    })
+)
+
+router.get(
+    "/:id",
+    validateJwt,
+    checkValidationErrors(idParamValidator),
+    executeQuery(async ({ params }) => {
+        return getFileById(params.id)
     })
 )
 

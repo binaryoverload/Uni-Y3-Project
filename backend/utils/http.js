@@ -92,6 +92,7 @@ function executeQuery(callback) {
         try {
             returnValue = callback({
                 body: req.body,
+                query: req.query,
                 params: req.params,
                 user: req.user,
                 req: req,

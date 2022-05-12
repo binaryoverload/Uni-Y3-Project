@@ -33,4 +33,31 @@ const validateJwt = async (req, res, next) => {
     next()
 }
 
-module.exports = { validateJwt }
+const validateJwtQuery = async (req, res, next) => {
+    const { auth_token: accessToken } = req.query
+
+    if (!accessToken) {
+        throw new UnauthorizedError("Authorization header malformed")
+    }
+
+    if (!validator.isJWT(accessToken)) {
+        throw new UnauthorizedError("Authorization header malformed")
+    }
+
+    const decoded = jwt.verify(accessToken, config.jwt.secret)
+
+    if (decoded?.token_type !== "access") {
+        throw new UnauthorizedError(
+            `Token type is invalid. Expected 'refresh' got '${decoded.token_type}'`,
+            exceptionCodes.invalidTokenType
+        )
+    }
+
+    const { username, checksum } = decoded
+
+    req.user = getSafeUser(await authorizeUser(username, checksum))
+
+    next()
+}
+
+module.exports = { validateJwt, validateJwtQuery }
