@@ -6,6 +6,7 @@ const exitCodes = {
     configPasswordHashing: 23,
     configEncryptionPrivateKey: 24,
     configEncryptionCurve: 25,
+    configInvalidExternalHostname: 26
 }
 
 module.exports = exitCodes

@@ -1,6 +1,8 @@
 const net = require("net")
 
 const { logger } = require("../utils/logger")
+const config = require("../utils/config")
+
 const { opCodeMapping, OuterMessage, HelloNAck, ErrorPacket } = require("./outerMessages")
 const SessionHandler = require("./sessionHandler")
 const { TcpError } = require("../utils/tcpExceptions")
@@ -142,7 +144,7 @@ function handleConnection(conn) {
 }
 
 function startTCPServer() {
-    server.listen(9000, function () {
+    server.listen(config.ports.tcp, function () {
         const { address, port } = server.address()
         logger.info(`Server listening on ${address}${port}`, tcpLabel)
     })

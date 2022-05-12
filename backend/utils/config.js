@@ -20,7 +20,11 @@ if (missingEnv.length > 0) {
 
 const defaultConfig = {
     environment: "production",
-    port: 8080,
+    ports: {
+        http: 8080,
+        tcp: 9000
+    },
+    externalHostname: "",
     jwt: {
         accessValidDuration: "30m",
         refreshValidDuration: "30d",
@@ -49,7 +53,11 @@ const defaultConfig = {
 
 const envConfig = {
     environment: process.env.NODE_ENV?.toLowerCase(),
-    port: process.env.PORT,
+    ports: {
+        http: process.env.PORT,
+        tcp: process.env.TCP_PORT
+    },
+    externalHostname: process.env.EXTERNAL_HOSTNAME,
     jwt: {
         secret: process.env.JWT_SECRET,
         accessValidDuration: process.env.JWT_ACCESS_VALID_DURATION,
@@ -80,6 +88,11 @@ const envConfig = {
 }
 
 const mergedConfig = merge(defaultConfig, envConfig)
+
+if (!validator.isIP(mergedConfig.externalHostname) && !validator.isFQDN(mergedConfig.externalHostname, {require_tld: false})) {
+    console.error("External URL must be provided")
+    process.exit(exitCodes.configInvalidExternalHostname)
+}
 
 if (!validator.isLength(mergedConfig.jwt.secret, { min: 32, max: 64 })) {
     console.error("JWT Secret must be between 32 and 64 characters long!")
