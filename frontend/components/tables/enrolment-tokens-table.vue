@@ -93,8 +93,25 @@ const schema = [
       },
       {
         icon: "download",
-        onClick: () => {
-          alert("downloaded!!")
+        async onClick(row) {
+          let authToken = this.$auth.strategy.token.get()
+          if (authToken.startsWith("Bearer ")) {
+            authToken = authToken.substring("Bearer ".length)
+          }
+
+          let name = `installer-${row.name.replace(" ", "").toLowerCase()}.zip`
+
+          window.location = `${this.$axios.defaults.baseURL}/install-bundle?auth_token=${authToken}&token=${row.token}&name=${name}`
+          await this.$swal({
+            icon: "success",
+            timerProgressBar: true,
+            showConfirmButton: false,
+            title: "Downloaded installer!",
+            text: `Check your downloads folder for the installer. The filename is "${name}"`,
+            timer: 5000,
+            toast: true,
+            position: "top-end",
+          })
         },
       },
       {
