@@ -1,19 +1,13 @@
 const { getEnrolmentTokenByToken, updateEnrolmentToken } = require("../models/enrolmentTokens")
-const { cli } = require("triple-beam/config")
 const Cache = require("node-cache")
 
-const fs = require("fs")
 const fsPromise = require("fs/promises")
 
-const crc32 = require("crc-32")
-
 const { createClient, getClientByPublicKey, getClientById, updateClient } = require("../models/clients")
-const { getAllPolicyItems } = require("../models/policyItems")
 const { getAllPolicies } = require("../models/policies")
 const { getFileById } = require("../models/files")
 const path = require("path")
 const config = require("../utils/config")
-const FS = require("fs")
 const opCodes = {
     heartbeat: 1,
     heartbeatAck: 2,

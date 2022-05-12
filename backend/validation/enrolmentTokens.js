@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator")
+const { body } = require("express-validator")
 const { idParamValidator } = require("./common")
 
 const expiresAtValidator = body("expires_at", "Expires at must be null or a epoch value")

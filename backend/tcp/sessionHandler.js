@@ -1,12 +1,10 @@
 const { logger } = require("../utils/logger")
-const config = require("../utils/config")
+
 const { Hello, Data, HelloNAck, HelloAck, ErrorPacket } = require("./outerMessages")
 const { computeSharedECHDSecret, decryptAes, ecPublicKey, encryptAes } = require("../utils/encryption")
-const { opCodeDecodeFunctions, encodeError, encodeTCPError, opCodes: innerOpCodes } = require("./innerMessages")
+const { opCodeDecodeFunctions, encodeTCPError, opCodes: innerOpCodes } = require("./innerMessages")
 const { CloseConnectionError } = require("../utils/tcpExceptions")
 const { getClientByPublicKey } = require("../models/clients")
-const { cli } = require("triple-beam/config")
-const ipaddr = require("ipaddr.js")
 
 class SessionHandler {
     #receivedHello = false
@@ -19,7 +17,7 @@ class SessionHandler {
     constructor(hostAddress) {
         this.#hostAddress = hostAddress
 
-        logger.debug(`Started TCP session`, { label: "sess", host: hostAddress.full })
+        logger.debug("Started TCP session", { label: "sess", host: hostAddress.full })
     }
 
     async processOuterPacket(packet) {
@@ -91,7 +89,7 @@ class SessionHandler {
                 )
             }
 
-            let result = null
+            let result
             try {
                 result = await decodeFunction(
                     {

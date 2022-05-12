@@ -22,7 +22,7 @@ const defaultConfig = {
     environment: "production",
     ports: {
         http: 8080,
-        tcp: 9000
+        tcp: 9000,
     },
     externalHostname: "",
     jwt: {
@@ -55,7 +55,7 @@ const envConfig = {
     environment: process.env.NODE_ENV?.toLowerCase(),
     ports: {
         http: process.env.PORT,
-        tcp: process.env.TCP_PORT
+        tcp: process.env.TCP_PORT,
     },
     externalHostname: process.env.EXTERNAL_HOSTNAME,
     jwt: {
@@ -89,7 +89,10 @@ const envConfig = {
 
 const mergedConfig = merge(defaultConfig, envConfig)
 
-if (!validator.isIP(mergedConfig.externalHostname) && !validator.isFQDN(mergedConfig.externalHostname, {require_tld: false})) {
+if (
+    !validator.isIP(mergedConfig.externalHostname) &&
+    !validator.isFQDN(mergedConfig.externalHostname, { require_tld: false })
+) {
     console.error("External URL must be provided")
     process.exit(exitCodes.configInvalidExternalHostname)
 }

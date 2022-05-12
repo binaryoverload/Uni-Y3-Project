@@ -1,10 +1,8 @@
-const { Pool } = require("pg")
 const PostgresError = require("pg-error-enum").PostgresError
 
 const config = require("../utils/config")
 const { logger } = require("../utils/logger")
 const exitCodes = require("../utils/exitCodes")
-const { handlePostgresError } = require("../utils/errorHandling")
 
 require("knex-with-relations")
 

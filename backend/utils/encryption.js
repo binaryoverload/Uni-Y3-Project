@@ -47,4 +47,5 @@ module.exports = {
     encryptAes,
     decryptAes,
     ecPublicKey: ecdh.getPublicKey(null, "compressed"),
+    ecPublicKeyHex: ecdh.getPublicKey("hex", "compressed"),
 }

@@ -6,7 +6,6 @@ const { validateJwt } = require("../middlewares/validateJwt")
 const { executeQuery } = require("../utils/http")
 const config = require("../utils/config")
 const { createFile } = require("../models/files")
-const { BadRequest } = require("../utils/httpExceptions")
 
 const router = Router()
 

@@ -33,7 +33,7 @@ async function getFileById(id) {
         .catch(handlePostgresError)
 }
 
-async function getAllFiles(id) {
+async function getAllFiles() {
     return await knex(FILES_TABLE_NAME)
         .select(["id", "name", "original_filename", "hash", "size", "updated_at"])
         .first()

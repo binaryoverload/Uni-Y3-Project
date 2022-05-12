@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator")
-const { DuplicateEntityError, HttpError } = require("./httpExceptions")
+const { HttpError } = require("./httpExceptions")
 const { NotFoundError, exceptionCodes, DatabaseDataError } = require("./httpExceptions")
 const { JsonWebTokenError, TokenExpiredError } = require("jsonwebtoken")
 

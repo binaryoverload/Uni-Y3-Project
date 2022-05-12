@@ -33,7 +33,7 @@ function processFinalData(finalData, address) {
     })
 
     if (!dataModel) {
-        logger.debug(`Unknown op-code, dropping packet`, { label: "tcp,err", host: address })
+        logger.debug("Unknown op-code, dropping packet", { label: "tcp,err", host: address })
         return
     }
 
@@ -52,7 +52,7 @@ function handleConnection(conn) {
         full: ip + ":" + conn.remotePort,
     }
 
-    logger.info(`new client connection`, { ...tcpLabel, host: remoteAddress.full.full })
+    logger.info("new client connection", { ...tcpLabel, host: remoteAddress.full.full })
 
     const sessionHandler = new SessionHandler(remoteAddress)
 
@@ -68,7 +68,7 @@ function handleConnection(conn) {
             const buffer = d.slice(0, 4)
             remainingLength = buffer.readUInt32BE()
             if (remainingLength === 0) {
-                logger.debug(`Received a 0-length packet`, { label: "tcp,err", host: remoteAddress.full })
+                logger.debug("Received a 0-length packet", { label: "tcp,err", host: remoteAddress.full })
                 return
             }
             d = d.slice(4)
@@ -135,7 +135,7 @@ function handleConnection(conn) {
     }
 
     function onConnClose() {
-        logger.info(`Connection closed`, { ...tcpLabel, host: remoteAddress.full })
+        logger.info("Connection closed", { ...tcpLabel, host: remoteAddress.full })
     }
 
     function onConnError(err) {

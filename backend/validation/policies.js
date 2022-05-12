@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator")
+const { body } = require("express-validator")
 
 module.exports = {
     policyCreate: [
@@ -14,7 +14,6 @@ module.exports = {
             .trim()
             .isLength({ min: 1 })
             .withMessage("The description must be at least 1 character long"),
-        body("created_by", "created by Id must exist!")
-            .exists().isUUID(4).withMessage("ID must be a UUID v4"),
+        body("created_by", "created by Id must exist!").exists().isUUID(4).withMessage("ID must be a UUID v4"),
     ],
 }

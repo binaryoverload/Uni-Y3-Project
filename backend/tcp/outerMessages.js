@@ -34,7 +34,7 @@ class OuterMessage {
         this.opCode = opCode
     }
 
-    static decode(buffer) {
+    static decode() {
         throw new Error(`Decode is not defined for ${this.name}`)
     }
 

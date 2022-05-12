@@ -2,7 +2,6 @@ const { respondFail, respondError, handleRequestError } = require("../utils/http
 const config = require("../utils/config")
 const { logger } = require("../utils/logger")
 const { DatabaseError } = require("../utils/httpExceptions")
-const { handleError } = require("pg/lib/native/query")
 
 const notFound = (req, res, next) => {
     return respondFail(res, 404, { message: "Not found!" })

@@ -1,5 +1,4 @@
 const { getUserByUsername } = require("../models/user")
-const { respondFail } = require("../utils/http")
 const { UnauthorizedError } = require("../utils/httpExceptions")
 
 async function authorizeUser(username, checksum) {
