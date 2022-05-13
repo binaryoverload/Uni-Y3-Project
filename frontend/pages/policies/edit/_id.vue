@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="mb-10 text-5xl font-bold leading-[3rem]">Create Policies</p>
+    <p class="mb-10 text-5xl font-bold leading-[3rem]">Edit Policy</p>
     <form @submit.prevent="submit">
       <div class="space-y-4">
         <section-header
@@ -28,7 +28,7 @@
         class="mt-8"
         >{{ errors.message }}</t-alert
       >
-      <t-button class="mt-4">Create</t-button>
+      <t-button class="mt-4">Edit</t-button>
     </form>
   </div>
 </template>
@@ -37,21 +37,23 @@
 import { formMixin } from "~/mixins/formUtils"
 
 export default {
-  layout: "dashboard",
   middleware: "authed",
+  layout: "dashboard",
   mixins: [formMixin()],
   methods: {
     async submit() {
       if (this.isFormLoading()) return
       this.setFormLoading(true)
       try {
-        const response = await this.$axios.$post("/policies", {
-          name: this.name,
-          description: this.description,
-          created_by: this.$auth.user.id,
-        })
+        const response = await this.$axios.$patch(
+          `/policies/${this.$route.params.id}`,
+          {
+            name: this.name,
+            description: this.description,
+          }
+        )
         if (response.status === "success") {
-          this.$router.push(`/policies/${response.data.id}`)
+          this.$router.push(`/policies/${this.$route.params.id}`)
           return
         }
         this.setFormLoading(false)
@@ -71,10 +73,26 @@ export default {
       }
     },
   },
+  async fetch() {
+    const id = this.$route.params.id
+    try {
+      const policyData = (await this.$axios.$get("/policies/" + id)).data
+      this.name = policyData.name
+      this.description = policyData.description
+    } catch (e) {
+      this.$nuxt.context.error({
+        status: e.response.status,
+        message:
+          e.response.status === 404
+            ? "Policy could not be found"
+            : e.response.statusText,
+      })
+    }
+  },
   data() {
     return {
       name: "",
-      description: null,
+      description: "",
       errors: {},
     }
   },

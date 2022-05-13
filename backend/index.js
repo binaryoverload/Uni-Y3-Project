@@ -40,6 +40,6 @@ app.listen(config.ports.http, () => {
 })
 ;["exit", "SIGINT", "SIGUSR1", "SIGUSR2", "SIGTERM"].forEach(eventType => {
     process.on(eventType, () => {
-        pool.end()
+        pool?.end()
     })
 })
