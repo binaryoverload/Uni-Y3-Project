@@ -9,12 +9,22 @@
         :value="value"
         :id="id"
         :required="required"
+        :type="showPassword ? 'text' : 'password'"
         @input="$emit('input', $event)"
         placeholder="Press 'Generate'"
         autocomplete="new-password"
         name="password"
         class="flex-1"
         input-classes="font-mono" />
+      <t-button
+        type="button"
+        variant="neutral"
+        @click="$emit('show-password', !showPassword)"
+        class="space-x-2">
+        <font-awesome-icon
+          :icon="showPassword ? 'eye-slash' : 'eye'"
+          class="text-base fa-fw" />
+      </t-button>
       <t-button
         type="button"
         variant="neutral"
@@ -48,9 +58,11 @@ export default {
       required: true,
     },
     required: Boolean,
+    showPassword: Boolean,
   },
   methods: {
     async generatePassword() {
+      this.$emit("show-password", true)
       const result = await fetch("https://www.dinopass.com/password/simple", {
         method: "get",
       })

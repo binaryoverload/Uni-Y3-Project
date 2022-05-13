@@ -119,6 +119,7 @@ export default {
     icons: {
       solid: [
         "faEye",
+        "faEyeSlash",
         "faArrowLeft",
         "faArrowRight",
         "faAsterisk",

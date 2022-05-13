@@ -14,6 +14,8 @@
           :error="errors.username" />
         <password-input
           label="Password"
+          :show-password="showPassword"
+          @show-password="showPassword = $event"
           v-model="password"
           class="mt-4"
           required />
@@ -94,6 +96,7 @@ export default {
       password: "",
       first_name: null,
       last_name: null,
+      showPassword: false,
       errors: {},
     }
   },
