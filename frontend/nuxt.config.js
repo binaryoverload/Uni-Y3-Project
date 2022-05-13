@@ -107,6 +107,9 @@ export default {
         autoprefixer: {},
       },
     },
+    transpile: [
+      'pretty-bytes'
+    ]
   },
 
   sweetalert: {

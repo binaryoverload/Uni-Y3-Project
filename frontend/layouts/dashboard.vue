@@ -9,6 +9,7 @@
       <sidebar-link to="/enrolment-tokens" icon="ticket-alt"
         >Enrolment Tokens</sidebar-link
       >
+      <sidebar-link to="/files" icon="file">Files</sidebar-link>
       <sidebar-link to="/users" icon="user">Users</sidebar-link>
       <sidebar-button
         @click="$auth.logout()"

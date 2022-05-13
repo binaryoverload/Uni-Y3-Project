@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import prettyBytes from "pretty-bytes"
+
 export default {
   props: {
     schema: {
@@ -42,6 +44,10 @@ export default {
           return new Date(value).toLocaleString("en-GB")
         } else if (this.schema.format === "date") {
           return new Date(value).toLocaleDateString("en-GB")
+        }
+
+        if (this.schema.format === "bytes") {
+          return prettyBytes(value)
         }
 
         return value
