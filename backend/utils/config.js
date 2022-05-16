@@ -26,7 +26,7 @@ const defaultConfig = {
     },
     externalHostname: "",
     jwt: {
-        accessValidDuration: "30m",
+        accessValidDuration: "30s",
         refreshValidDuration: "30d",
     },
     loggingLevel: "info",
