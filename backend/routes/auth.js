@@ -55,7 +55,10 @@ router.post(
 
         const user = await authorizeUser(username, checksum)
 
-        return { access_token: signAccessJwt(user.username, user.checksum) }
+        return {
+            access_token: signAccessJwt(user.username, user.checksum),
+            refresh_token: signRefreshJwt(username, user.checksum),
+        }
     })
 )
 
