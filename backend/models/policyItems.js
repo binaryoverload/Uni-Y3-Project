@@ -55,8 +55,6 @@ async function deletePolicyItem(id) {
     return deletedObject
 }
 
-async function updatePolicyItem(id, data) {}
-
 async function getPolicyItem(id) {
     return await knex(POLICY_ITEMS_TABLE_NAME)
         .select(["id", "policy_id", "policy_order", "type", "stop_on_error", "data"])
@@ -83,7 +81,6 @@ module.exports = {
     PolicyItemTypes,
     createPolicyItem,
     deletePolicyItem,
-    updatePolicyItem,
     getPolicyItem,
     getAllPolicyItems,
     getPolicyItemsForPolicy,

@@ -2,17 +2,14 @@ module.exports = {
     env: {
         commonjs: true,
         es2021: true,
-        node: true
+        node: true,
     },
-    extends: [
-        "eslint:recommended",
-        "prettier"
-    ],
+    extends: ["eslint:recommended", "prettier"],
     parserOptions: {
-        ecmaVersion: 13
+        ecmaVersion: 13,
     },
     rules: {
-        quotes: [2, "double"],
-        "no-unused-vars": 1
-    }
+        quotes: [2, "double", { avoidEscape: true }],
+        "no-unused-vars": 1,
+    },
 }

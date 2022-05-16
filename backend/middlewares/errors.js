@@ -3,10 +3,12 @@ const config = require("../utils/config")
 const { logger } = require("../utils/logger")
 const { DatabaseError } = require("../utils/httpExceptions")
 
+// eslint-disable-next-line no-unused-vars
 const notFound = (req, res, next) => {
     return respondFail(res, 404, { message: "Not found!" })
 }
 
+// eslint-disable-next-line no-unused-vars
 const internalError = (err, req, res, next) => {
     if (config.environment !== "development") {
         delete err.stack
