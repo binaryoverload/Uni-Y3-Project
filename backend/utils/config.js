@@ -24,7 +24,7 @@ const defaultConfig = {
         http: 8080,
         tcp: 9000,
     },
-    externalHostname: "",
+    externalHostname: "localhost",
     jwt: {
         accessValidDuration: "30s",
         refreshValidDuration: "30d",
@@ -37,7 +37,7 @@ const defaultConfig = {
     },
     files: {
         sizeLimit: 100 * 1024 * 1024, // 100MiB
-        chunkSize: 10 * 1024 * 1024,
+        chunkSize: 10 * 1024 * 1024, // 10MiB
         uploadDirectory: "./uploads/",
     },
     encryption: {

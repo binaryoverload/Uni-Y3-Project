@@ -32,8 +32,6 @@ setupRoutes(app)
 app.use(notFound)
 app.use(internalError)
 
-app.get("/", (req, res) => res.send("Hello world"))
-
 startTCPServer()
 app.listen(config.ports.http, () => {
     logger.info(`Server running on http://localhost:${config.ports.http}/ in ${config.environment} mode`)
