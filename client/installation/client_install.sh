@@ -32,6 +32,7 @@ chmod 755 "$config_dir"
 # Copy executable
 log_info "Copying client exe to local bin directory"
 cp "client" "/usr/local/bin/themis-client"
+chmod +x "/usr/local/bin/themis-client"
 
 # Create and copy config files
 log_info "Creating ${config_dir}/policy_storage.json"
@@ -47,6 +48,9 @@ chmod 644 "/etc/systemd/system/themis-client.service"
 
 log_info "Reloading systemd daemon"
 systemctl daemon-reload
+
+log_info "Starting service 'themis-client'"
+systemctl start "themis-client"
 
 log_info "Enabling service 'themis-client' to start at boot"
 systemctl enable "themis-client"

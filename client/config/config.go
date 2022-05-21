@@ -2,9 +2,10 @@ package config
 
 import (
 	"encoding/json"
+	"os"
+
 	"github.com/google/uuid"
 	"github.com/withmandala/go-log"
-	"os"
 )
 
 type Config struct {
@@ -27,7 +28,7 @@ func CreateConfig(path string) Config {
 		ServerHost:       "localhost",
 		ServerPort:       9000,
 		DebugLogging:     false,
-		TempDownloadPath: "temp/",
+		TempDownloadPath: "/tmp",
 	}
 	loadConfigFile(path, &newConfig)
 	return newConfig
